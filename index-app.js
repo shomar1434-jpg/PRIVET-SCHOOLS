@@ -318,6 +318,13 @@ const launchApp = (appId) => {
         window.location.href='private-system-admin-section-preview.html?section=owner&systemAdmin=1&returnHome='+encodeURIComponent('index.html?systemAdminReturn=1&edition=private');
         return;
     }
+        const liveSystemAdmin = !!(currentUser?.isRootAdmin || sessionStorage.getItem('system_admin_context') === '1' || sessionStorage.getItem('system_admin_verified') === 'true');
+        if(isPrivateEdition && liveSystemAdmin && ['leadership','agency','performance','health_advisor','kindergarten_teacher','student_advisor','activity_leader','administrative_employee'].includes(appId)){
+            const liveSectionMap={leadership:'manager',agency:'agent',performance:'teacher',health_advisor:'health_advisor',kindergarten_teacher:'kindergarten_teacher',student_advisor:'student_advisor',activity_leader:'activity_leader',administrative_employee:'administrative_employee'};
+            window.location.href='private-system-admin-section-preview.html?section='+encodeURIComponent(liveSectionMap[appId])+'&systemAdmin=1&returnHome='+encodeURIComponent('index.html?systemAdminReturn=1&edition=private');
+            return;
+        }
+
     if(isPrivateEdition && appId==='private_compliance'){
         window.location.href='private-system-admin-section-preview.html?section=compliance&systemAdmin=1&returnHome='+encodeURIComponent('index.html?systemAdminReturn=1&edition=private');
         return;

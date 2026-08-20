@@ -1,7 +1,1 @@
-تعديل هوية التقارير وإعدادات المستخدمين
-- school-base-settings-source.js: يميز بيانات المؤسسة عن بيانات المستخدم.
-- private-report-identity-source.js: إعدادات المستخدم = الاسم + التوقيع فقط.
-- Supabase migration: user_report_profiles.
-- private-user-report-profile: حفظ ملف المستخدم الشخصي.
-- private-school-template v2: يسمح لكل عضو نشط بقراءة القالب، ويحصر تعديله بالمالك/المدير.
-ارفع الملفات فوق المستودع بنفس المسارات.
+Replace index-app.js and private-system-admin-section-preview.html in repository root. Supabase system-admin is already deployed as version 3.

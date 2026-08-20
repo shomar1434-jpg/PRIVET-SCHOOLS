@@ -1,15 +1,65 @@
-<!doctype html><html lang="ar" dir="rtl"><head>
-
-<script src="private-storage-namespace.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>معاينة أقسام المدارس الخاصة</title><style>
-*{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial;background:#f4f8f7;color:#0f172a}.wrap{max-width:1180px;margin:auto;padding:24px}.top{background:linear-gradient(135deg,#0b4d3c,#0f766e);color:#fff;border-radius:24px;padding:22px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 18px 46px #0f172a18}.top h1{margin:0;font-size:26px}.top p{margin:7px 0 0;color:#d5f5ec}.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer}.back{background:#fff;color:#0b4d3c}.notice{margin:18px 0;background:#fff8df;border:1px solid #ead28b;border-radius:16px;padding:14px;color:#6b4f0b;font-size:13px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.card{background:#fff;border:1px solid #dfe9e6;border-radius:20px;padding:18px;box-shadow:0 10px 28px #0f172a0c}.card h2{margin:0 0 8px;font-size:18px;color:#0b4d3c}.card p{font-size:13px;color:#64748b;line-height:1.8}.pill{display:inline-block;background:#e7f6f2;color:#0f766e;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;margin:3px}.section-title{margin:24px 0 12px;font-size:20px}.req{display:flex;gap:8px;align-items:flex-start;padding:9px 0;border-bottom:1px solid #edf2f1;font-size:13px}.req:last-child{border-bottom:0}.icon{font-size:30px}.muted{color:#64748b;font-size:12px}@media(max-width:620px){.wrap{padding:12px}.top{align-items:flex-start;flex-direction:column}.top h1{font-size:21px}}
-</style><link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head><body><main class="wrap"><header class="top"><div><h1 id="title">معاينة القسم</h1><p>وضع مدير النظام — معاينة بنية القسم دون انتحال هوية مالك أو مستخدم مدرسة.</p></div><button class="btn back" onclick="goBack()">العودة إلى أقسام المدارس الخاصة</button></header><div class="notice">هذه المعاينة مخصصة لمدير النظام. البيانات التشغيلية الفعلية تظهر بعد إنشاء مدرسة خاصة ودخول المستخدم بصلاحياته الحقيقية.</div><section id="content"></section></main><script>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>أقسام المدارس الخاصة — مدير النظام</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script>
+<script src="standalone-private-config.js"></script><script src="private-school-config.js"></script><script src="private-school-bridge.js"></script>
+<style>
+:root{--green:#07a869;--blue:#3d7eb9;--turq:#0da9a6;--navy:#15445a;--gold:#c1b489;--gray:#c2c1c1;--ink:#17324a}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f4faf8,#eef6f9);font-family:Tajawal,"Segoe UI",Tahoma,Arial,sans-serif;color:var(--ink)}.wrap{width:min(1180px,calc(100% - 28px));margin:auto;padding:22px 0 38px}
+.top{background:linear-gradient(120deg,var(--navy),#0b7565);color:#fff;border-radius:24px;padding:20px 24px;display:flex;justify-content:space-between;gap:16px;align-items:center;box-shadow:0 16px 38px #15445a22}.top h1{margin:0;font-size:25px}.top p{margin:6px 0 0;color:#daf1ec}.btn{border:0;border-radius:12px;padding:10px 15px;font:inherit;font-weight:900;cursor:pointer}.back{background:#fff;color:var(--navy)}
+.summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}.metric{background:#fff;border:1px solid #dce7eb;border-radius:18px;padding:16px;box-shadow:0 9px 25px #15445a0b}.metric b{display:block;font-size:27px;color:var(--navy)}.metric span{font-size:12px;color:#687b87;font-weight:700}
+.panel{background:#fff;border:1px solid #dce7eb;border-radius:21px;padding:18px;box-shadow:0 10px 28px #15445a0d}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.panel h2{margin:0;color:var(--navy)}.muted{color:#6b7d88;font-size:13px;line-height:1.7}.directory{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:13px}.entry{border:1px solid #e0e8ec;border-radius:17px;padding:15px;background:#fbfdfd}.entry-top{display:flex;justify-content:space-between;gap:12px}.name{font-weight:900;font-size:16px}.email{font-size:12px;color:#6a7b87;direction:ltr;text-align:right;margin-top:4px}.school{margin-top:10px;padding-top:9px;border-top:1px solid #edf2f4;font-size:12px;color:#526b78}.badge{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900;height:max-content}.active{background:#e8f8ef;color:#087548}.pending{background:#fff7df;color:#8c6500}.disabled,.archived{background:#f0f2f4;color:#606970}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.primary{background:var(--green);color:#fff}.secondary{background:#eaf3f7;color:var(--navy)}.empty{padding:32px;text-align:center;color:#788893;background:#f8fbfb;border:1px dashed #cbdadd;border-radius:17px;margin-top:14px}.loading{padding:32px;text-align:center;color:#5d7480}.static-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:14px}.static-card{border:1px solid #e0e8ec;border-radius:17px;padding:15px;background:#fbfdfd}.static-card .icon{font-size:29px}.static-card h3{margin:8px 0 5px;color:var(--navy)}.notice{margin:14px 0;background:#eff8f6;border-right:4px solid var(--turq);border-radius:13px;padding:11px 13px;font-size:12px;color:#42635e}
+@media(max-width:700px){.top{flex-direction:column;align-items:flex-start}.summary{grid-template-columns:1fr}.directory{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div><h1 id="title">القسم</h1><p id="subtitle">عرض تشغيلي حي لمدير النظام مع عزل المدارس.</p></div><button class="btn back" onclick="goBack()">العودة إلى الأقسام</button></header>
+<div id="liveArea"><section class="summary"><div class="metric"><b id="entryCount">—</b><span>الحسابات في هذا القسم</span></div><div class="metric"><b id="schoolCount">—</b><span>إجمالي المدارس</span></div><div class="metric"><b id="activeSchools">—</b><span>المدارس النشطة</span></div></section>
+<section class="panel"><div class="panel-head"><div><h2 id="dirTitle">المستخدمون المرتبطون</h2><div class="muted">كل بطاقة مربوطة بمعرف المدرسة الخاص بها ولا يمكن دمج المستخدمين بين المدارس.</div></div><button class="btn secondary" onclick="loadDirectory()">تحديث</button></div><div id="directory" class="loading">جارٍ تحميل البيانات من Supabase…</div></section></div>
+<div id="staticArea" hidden></div>
+</main>
+<script>
 const q=new URLSearchParams(location.search),section=q.get('section')||'owner';
-const data={
- owner:{title:'قسم مالك المدرسة',intro:'أعلى مستوى إداري داخل المدرسة الخاصة، ويبدأ منه التسلسل التنظيمي بعد إنشاء المدرسة.',cards:[['👑','إدارة المالك','عرض بيانات الملكية وحالة المدرسة والهوية المؤسسية.'],['👤','دعوة مدير المدرسة','المالك ينشئ دعوة المدير، والمدير يقبلها بحسابه ثم يبدأ إدارة المستخدمين.'],['✅','فحص الالتزام (داخل المالك والمدير)','متابعة المتطلبات والشواهد وإقفال الملف بعد اكتماله.'],['🧾','اعتماد تقرير المدير','تقرير مدير المدرسة يرفع للمالك للاعتماد أو الإعادة أو الرفض.'],['🎨','هوية وقالب المدرسة (داخل المالك والمدير)','الشعار والختم والتوقيع والبيانات التي تنعكس على التقارير.'],['📚','المخرجات المؤسسية (داخل المالك والمدير)','معاينة وأرشفة واعتماد الملفات النهائية.']]},
- compliance:{title:'فحص الالتزام (داخل المالك والمدير)',intro:'ملف متطلبات المدارس الأهلية والخاصة قبل إصدار الملف النهائي.',cards:[['📄','التراخيص الأساسية','الترخيص التشغيلي، السلامة، بلدي، البناء، والسجل التجاري.'],['🏢','بيانات المستثمر','مطابقة بيانات المركز السعودي للأعمال مع السجل التجاري.'],['👔','متطلبات مدير المدرسة','التكليف الداخلي من المالك، عقد قوى، بيانات منصة مدارس، والمسح الأمني.'],['💰','الرسوم والإعلانات','شواهد إعلان الرسوم في الموقع/التواصل ومنصة مدارس.'],['🎓','الطلاب والمعلمون','التسجيل في منصة مدارس، الغياب، والطاقة الاستيعابية.'],['📚','المناهج والكتب','متطلبات شرطية تسمح بـ «لا ينطبق» عند تطبيق المنهج الحكومي.']]},
- template:{title:'هوية وقالب المدرسة (داخل المالك والمدير)',intro:'الإطار الموحد الذي يطبع عليه التقارير والسجلات والمخرجات.',cards:[['🏫','بيانات المدرسة','الاسم، إدارة التعليم، بيانات التواصل.'],['🖼️','الشعارات','شعار الوزارة وشعار المدرسة وفق مساحات ثابتة.'],['✍️','التوقيعات','توقيع المالك وتوقيع المدير.'],['🔏','الختم الرقمي','ختم موحد ينعكس على المخرجات المعتمدة.'],['📐','قواعد A4','هوامش واتجاه تلقائي ومنع قص الصفوف والصور.'],['🧩','تطبيق موحد','استخدام القالب في التقارير والسجلات والمخرجات المؤسسية (داخل المالك والمدير).']]},
- outputs:{title:'المخرجات المؤسسية (داخل المالك والمدير)',intro:'أرشيف المخرجات النهائية المجمدة والمعتمدة للمدرسة الخاصة.',cards:[['🗂️','أرشيف موحد','حفظ المخرجات حسب المصدر والعام الدراسي.'],['🔒','Snapshot ثابت','تجميد نسخة المحتوى قبل الاعتماد.'],['🧮','تحقق السلامة','بصمة للمحتوى لمنع تبدل التقرير بعد اعتماده.'],['🖨️','الطباعة','تتبع عدد مرات الطباعة وآخر من طبع.'],['📄','PDF نهائي','لا يعتمد المخرج النهائي إلا بعد رفع PDF صحيح عبر وحدة المخرجات.'],['📋','سجل أحداث','تسجيل الإنشاء والمعاينة والطباعة والاعتماد.']]}
+const roleMeta={
+ owner:['قسم مالك المدرسة','owner','الملاك'],
+ manager:['قسم مدير/ة المدرسة','manager','المديرون والمديرات'],
+ agent:['قسم الوكيل/ة','agent','الوكلاء والوكيلات'],
+ teacher:['قسم المعلم/المعلمة','teacher','المعلمون والمعلمات'],
+ student_advisor:['قسم الموجه/الموجهة الطلابية','student_advisor','الموجهون والموجهات الطلابية'],
+ health_advisor:['قسم الموجه الصحي','health_advisor','الموجهون الصحيون'],
+ activity_leader:['قسم رائد/ة النشاط','activity_leader','رواد ورائدات النشاط'],
+ kindergarten_teacher:['قسم معلمة رياض الأطفال','kindergarten_teacher','معلمات رياض الأطفال'],
+ administrative_employee:['قسم الموظف/ة الإداري/ة','administrative_employee','الموظفون والموظفات الإداريون']
 };
-const d=data[section]||data.owner;document.getElementById('title').textContent=d.title;document.getElementById('content').innerHTML=`<h2 class="section-title">${d.title}</h2><p class="muted" style="font-size:14px;line-height:1.9">${d.intro}</p><div class="grid">${d.cards.map(c=>`<article class="card"><div class="icon">${c[0]}</div><h2>${c[1]}</h2><p>${c[2]}</p></article>`).join('')}</div>`;
-function goBack(){const r=q.get('returnHome');location.href=r||'index.html?systemAdminReturn=1&edition=private'}
+const staticData={
+ compliance:{title:'فحص الالتزام',cards:[['📄','التراخيص الأساسية','الترخيص التشغيلي والسلامة والسجل التجاري والمتطلبات النظامية.'],['🏢','بيانات المستثمر','مطابقة بيانات المنشأة والاستثمار.'],['👔','متطلبات مدير المدرسة','التكليف والعقد والبيانات النظامية.'],['🎓','الطلاب والمعلمون','التسجيل والغياب والطاقة الاستيعابية.']]},
+ template:{title:'هوية وقالب المدرسة',cards:[['🏫','بيانات المدرسة','الاسم والإدارة التعليمية وبيانات التواصل.'],['✍️','التوقيعات','توقيع المالك والمدير.'],['🔏','الختم الرقمي','الختم الموحد للمخرجات الرسمية.'],['📐','قواعد التقارير','قالب موحد للطباعة والمخرجات.']]},
+ outputs:{title:'المخرجات المؤسسية',cards:[['🗂️','الأرشيف الموحد','حفظ المخرجات حسب المدرسة والعام.'],['🔒','النسخة المعتمدة','تجميد المخرج بعد الاعتماد.'],['📄','PDF نهائي','المخرج النهائي الرسمي.'],['📋','سجل الأحداث','تتبع الإنشاء والاعتماد والطباعة.']]}
+};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function statusLabel(s){return s==='active'?'نشط':s==='pending'?'بانتظار التفعيل':s==='disabled'?'معطل':s==='archived'?'مؤرشف':s||'—'}
+function goBack(){location.href=q.get('returnHome')||'index.html?systemAdminReturn=1&edition=private'}
+function client(){if(!window.PrivateSchoolBridge?.getClient)throw new Error('تعذر تهيئة اتصال Supabase');return PrivateSchoolBridge.getClient()}
+async function sys(body){const r=await client().functions.invoke('system-admin',{body});if(r.error)throw new Error(r.data?.error||r.error.message||'تعذر تحميل بيانات القسم');if(r.data?.error)throw new Error(r.data.error);return r.data}
+function openOwner(path){location.href=new URL(path,location.href).href}
+function openSchool(id){location.href='private-system-admin.html?systemAdmin=1&schoolId='+encodeURIComponent(id)}
+async function loadDirectory(){
+ const meta=roleMeta[section];if(!meta)return;
+ document.getElementById('directory').className='loading';document.getElementById('directory').textContent='جارٍ تحميل البيانات من Supabase…';
+ try{
+   const v=await sys({action:'verify'});if(!v?.ok)throw new Error('جلسة مدير النظام غير صالحة');
+   const d=await sys({action:'role_directory',role:meta[1]});const rows=d.entries||[];
+   document.getElementById('entryCount').textContent=rows.length;document.getElementById('schoolCount').textContent=d.schoolCount||0;document.getElementById('activeSchools').textContent=d.activeSchoolCount||0;
+   const box=document.getElementById('directory');box.className='directory';
+   box.innerHTML=rows.length?rows.map(x=>`<article class="entry"><div class="entry-top"><div><div class="name">${esc(x.name||x.displayName||x.email||'بدون اسم')}</div><div class="email">${esc(x.email||'')}</div></div><span class="badge ${esc(x.status||'disabled')}">${esc(statusLabel(x.status))}</span></div><div class="school"><b>${esc(x.school?.school_name||'')}</b><br><span dir="ltr">${esc(x.school?.school_code||'')}</span> • ${esc(statusLabel(x.school?.status))}</div><div class="actions">${section==='owner'&&x.loginPath&&x.school?.status==='active'?`<button class="btn primary" onclick="openOwner('${esc(x.loginPath)}')">بوابة دخول المالك</button>`:''}<button class="btn secondary" onclick="openSchool('${esc(x.school?.id||'')}')">تفاصيل المدرسة</button></div></article>`).join(''):`<div class="empty" style="grid-column:1/-1">لا توجد حسابات مرتبطة بهذا القسم حتى الآن.</div>`;
+ }catch(e){document.getElementById('directory').className='empty';document.getElementById('directory').textContent=e.message||'تعذر تحميل البيانات'}
+}
+(function init(){
+ if(roleMeta[section]){
+   const m=roleMeta[section];document.getElementById('title').textContent=m[0];document.getElementById('dirTitle').textContent=m[2];loadDirectory();return;
+ }
+ const d=staticData[section]||staticData.compliance;document.getElementById('liveArea').hidden=true;const s=document.getElementById('staticArea');s.hidden=false;document.getElementById('title').textContent=d.title;s.innerHTML=`<section class="panel"><h2>${d.title}</h2><div class="notice">هذه الأدوات التشغيلية مشتركة بين المالك ومدير المدرسة، وتُحفظ بيانات كل مدرسة تحت school_id مستقل.</div><div class="static-grid">${d.cards.map(c=>`<article class="static-card"><div class="icon">${c[0]}</div><h3>${c[1]}</h3><div class="muted">${c[2]}</div></article>`).join('')}</div></section>`;
+})();
 </script></body></html>
