@@ -27,11 +27,18 @@
     const scoped=parse(localStorage.getItem(scopedKey()))||{};
     return {
       school:String(scoped.school||localStorage.getItem('setting_school')||'').trim(),
-      manager:String(scoped.manager||localStorage.getItem('def_m')||'').trim(),
+      manager:String(scoped.manager||localStorage.getItem('def_m')||localStorage.getItem('persist_name_p')||'').trim(),
+      owner:String(scoped.owner||localStorage.getItem('setting_owner')||'').trim(),
+      userName:String(scoped.userName||localStorage.getItem('persist_name_m')||'').trim(),
       education:String(scoped.education||scoped.region||localStorage.getItem('setting_region')||'').trim(),
       year:String(scoped.year||localStorage.getItem('setting_academic_year')||START_YEAR).replace(/\s*هـ?\s*$/,'').trim(),
       signature:scoped.signature||localStorage.getItem('setting_sig')||'',
-      stamp:scoped.stamp||localStorage.getItem('setting_stamp')||''
+      managerSignature:scoped.managerSignature||localStorage.getItem('setting_sig')||'',
+      ownerSignature:scoped.ownerSignature||localStorage.getItem('setting_owner_sig')||'',
+      userSignature:scoped.userSignature||localStorage.getItem('persist_sig_data')||'',
+      stamp:scoped.stamp||localStorage.getItem('setting_stamp')||'',
+      schoolLogo:scoped.schoolLogo||localStorage.getItem('setting_school_logo')||'',
+      ministryLogo:scoped.ministryLogo||localStorage.getItem('setting_ministry_logo')||''
     };
   }
   function write(data){
@@ -103,7 +110,9 @@
   function semanticKind(el){
     const t=textAround(el);
     if(/اسم\s*المدرسة|school.?name/i.test(t))return 'school';
+    if(/اسم\s*المالك|مالك\/?ة?\s*المدرسة|school.?owner|owner.?name/i.test(t))return 'owner';
     if(/مدير\/?ة?\s*المدرسة|اسم\s*المدير|مدير\s*المدرسة|المدير\s*\/\s*المقي|المدير\s*المعتمد|principal|manager.?name/i.test(t))return 'manager';
+    if(/معد\s*التقرير|مُعد\s*التقرير|اسم\s*(الوكيل|المعلم|الموجه|الموظف|رائد|الرائدة|المعلمة)|رائد\/?ة?\s*النشاط|معلمة\s*رياض\s*الأطفال|الموظف\/?ة?\s*الإداري|report.?author|prepared.?by|user.?name/i.test(t))return 'userName';
     if(/الإدارة\s*التعليمية|إدارة\s*التعليم|المنطقة\s*التعليمية|education.?office|education.?department|region/i.test(t))return 'education';
     if(/العام\s*الدراسي|academic.?year|school.?year/i.test(t))return 'year';
     return '';
@@ -116,9 +125,21 @@
     if(!el.value||el.dataset.sspBaseAutofill==='1'){el.value=v;el.dataset.sspBaseAutofill='1';}
   }
   function fillImages(root){const s=read();
-    root.querySelectorAll('img').forEach(img=>{const t=((img.id||'')+' '+(img.className||'')+' '+(img.alt||'')).toLowerCase();if(s.signature&&/(sig|signature|manager-sig|توقيع)/i.test(t)){img.src=s.signature;img.style.display='';img.classList.remove('hidden')}if(s.stamp&&/(stamp|seal|school-stamp|ختم)/i.test(t)){img.src=s.stamp;img.style.display='';img.classList.remove('hidden')}});
-    root.querySelectorAll('[data-signature-source],#sig-display,.manager-signature,.signature-display').forEach(el=>{if(s.signature&&el.tagName!=='INPUT'&&el.tagName!=='BUTTON'){if(el.tagName==='IMG')el.src=s.signature;else el.innerHTML='<img src="'+s.signature+'" alt="توقيع مدير المدرسة" style="max-width:100%;max-height:100%;object-fit:contain">'}});
-    root.querySelectorAll('[data-stamp-source],#stamp-display,.school-stamp,.stamp-display').forEach(el=>{if(s.stamp&&el.tagName!=='INPUT'&&el.tagName!=='BUTTON'){if(el.tagName==='IMG')el.src=s.stamp;else el.innerHTML='<img src="'+s.stamp+'" alt="ختم المدرسة" style="max-width:100%;max-height:100%;object-fit:contain">'}});
+    function setImg(el,src,alt){if(!src||!el||['INPUT','BUTTON'].includes(el.tagName))return;if(el.tagName==='IMG'){el.src=src;el.style.display='';el.classList.remove('hidden')}else el.innerHTML='<img src="'+src+'" alt="'+alt+'" style="max-width:100%;max-height:100%;object-fit:contain">'}
+    root.querySelectorAll('img').forEach(img=>{
+      const t=((img.id||'')+' '+(img.className||'')+' '+(img.alt||'')).toLowerCase();
+      if(s.stamp&&/(stamp|seal|school-stamp|ختم)/i.test(t))return setImg(img,s.stamp,'ختم المدرسة');
+      if(s.ownerSignature&&/(owner.*sig|sig.*owner|مالك.*توقيع|توقيع.*مالك)/i.test(t))return setImg(img,s.ownerSignature,'توقيع مالك المدرسة');
+      if(s.managerSignature&&/(manager.*sig|sig.*manager|principal.*sig|مدير.*توقيع|توقيع.*مدير)/i.test(t))return setImg(img,s.managerSignature,'توقيع مدير المدرسة');
+      if(s.schoolLogo&&/(school.*logo|logo.*school|شعار.*المدرسة)/i.test(t))return setImg(img,s.schoolLogo,'شعار المدرسة');
+      if(s.ministryLogo&&/(ministry.*logo|logo.*ministry|شعار.*الوزارة)/i.test(t))return setImg(img,s.ministryLogo,'شعار الوزارة');
+      if((s.userSignature||s.managerSignature)&&/(sig|signature|توقيع)/i.test(t))return setImg(img,s.userSignature||s.managerSignature,'التوقيع الرقمي');
+    });
+    root.querySelectorAll('[data-user-signature],.user-signature,.report-author-signature').forEach(el=>setImg(el,s.userSignature,'توقيع المستخدم'));
+    root.querySelectorAll('[data-manager-signature],#sig-display,.manager-signature').forEach(el=>setImg(el,s.managerSignature,'توقيع مدير المدرسة'));
+    root.querySelectorAll('[data-owner-signature],.owner-signature').forEach(el=>setImg(el,s.ownerSignature,'توقيع مالك المدرسة'));
+    root.querySelectorAll('[data-signature-source],.signature-display').forEach(el=>setImg(el,s.userSignature||s.managerSignature,'التوقيع الرقمي'));
+    root.querySelectorAll('[data-stamp-source],#stamp-display,.school-stamp,.stamp-display').forEach(el=>setImg(el,s.stamp,'ختم المدرسة'));
   }
   function scan(root){root=root&&root.querySelectorAll?root:document;
     root.querySelectorAll('input,select,textarea').forEach(el=>{if(isStage(el))configureStage(el);if(isAcademicYear(el))configureYear(el);if(isJobTitle(el))configureJobTitle(el);fillBase(el)});fillImages(root);
@@ -127,4 +148,24 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{init();setTimeout(()=>scan(document),250);setTimeout(()=>scan(document),1000)});else{init();setTimeout(()=>scan(document),250);setTimeout(()=>scan(document),1000);}
   window.addEventListener('platformSettingsUpdated',()=>scan(document));
   window.addEventListener('schoolBaseSettingsUpdated',()=>scan(document));
+})();
+
+
+/* PRIVATE_REPORT_IDENTITY_BOOTSTRAP */
+(function(){
+  'use strict';
+  if(window.__PRIVATE_REPORT_IDENTITY_BOOTSTRAP__)return;
+  window.__PRIVATE_REPORT_IDENTITY_BOOTSTRAP__=true;
+  function hasSrc(name){return Array.from(document.scripts||[]).some(s=>(s.getAttribute('src')||'').split('?')[0].endsWith(name))}
+  function load(src){return new Promise((resolve,reject)=>{if(hasSrc(src)){resolve();return}const s=document.createElement('script');s.src=src;s.onload=resolve;s.onerror=reject;document.head.appendChild(s)})}
+  async function boot(){
+    try{
+      if(!window.supabase)await load('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0');
+      if(!window.StandalonePrivateConfig)await load('standalone-private-config.js');
+      if(!window.PrivateSchoolConfig)await load('private-school-config.js');
+      if(!window.PrivateSchoolBridge)await load('private-school-bridge.js');
+      if(!window.PrivateReportIdentity)await load('private-report-identity-source.js');
+    }catch(e){console.warn('Report identity bootstrap:',e?.message||e)}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

@@ -1,5 +1,7 @@
-PRIVET-SCHOOLS — Supabase link patch
-Project Ref: okjwdzvnqsdetxdsvdgr
-Project URL: https://okjwdzvnqsdetxdsvdgr.supabase.co
-ضع محتويات هذه الحزمة فوق جذر المستودع مع الحفاظ على نفس المسارات.
-لا تحذف الملفات الأخرى من المستودع.
+تعديل هوية التقارير وإعدادات المستخدمين
+- school-base-settings-source.js: يميز بيانات المؤسسة عن بيانات المستخدم.
+- private-report-identity-source.js: إعدادات المستخدم = الاسم + التوقيع فقط.
+- Supabase migration: user_report_profiles.
+- private-user-report-profile: حفظ ملف المستخدم الشخصي.
+- private-school-template v2: يسمح لكل عضو نشط بقراءة القالب، ويحصر تعديله بالمالك/المدير.
+ارفع الملفات فوق المستودع بنفس المسارات.
