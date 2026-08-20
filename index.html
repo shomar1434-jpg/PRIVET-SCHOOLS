@@ -970,14 +970,31 @@ body{
             <h2 class="text-3xl font-extrabold mb-2 text-white">بوابة إدارة المدارس الأهلية والخاصة</h2>
             <p class="text-slate-400 text-xs mb-8">دخول مدير النظام إلى مشروع المدارس الأهلية والخاصة المستقل</p>
             
-            <form id="system-admin-login-form" class="mb-3 space-y-3 max-w-sm mx-auto" onsubmit="event.preventDefault(); handlePrivateSystemAdminEntry();">
-                <input type="email" id="system-admin-email" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="البريد الإلكتروني لمدير النظام" required
-                       class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white text-center outline-none focus:border-teal-400" dir="ltr" data-email-field="true">
-                <input type="password" id="system-admin-password" autocomplete="current-password" placeholder="كلمة مرور مدير النظام" required
-                       class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white text-center outline-none focus:border-teal-400">
+            <form id="system-admin-login-form" class="mb-3 space-y-3 max-w-sm mx-auto" onsubmit="event.preventDefault(); handlePrivateSystemAdminEntry();" autocomplete="off">
+                <input type="email" id="system-admin-email" name="private_system_admin_email" autocomplete="off" autocapitalize="off" spellcheck="false" value="" placeholder="البريد الإلكتروني لمدير النظام" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white text-center outline-none focus:border-teal-400" dir="ltr" data-email-field="true" data-lpignore="true" data-1p-ignore="true">
+                <input type="password" id="system-admin-password" name="private_system_admin_password" autocomplete="new-password" value="" placeholder="كلمة مرور مدير النظام" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white text-center outline-none focus:border-teal-400" data-lpignore="true" data-1p-ignore="true">
             </form>
 
-            <p class="admin-edition-hint">أدخل بيانات مدير النظام ثم ادخل إلى نظام المدارس الأهلية والخاصة</p>
+            
+<script id="system-admin-empty-login-fields">
+(function(){
+  'use strict';
+  function clearAdminLoginFields(){
+    const email=document.getElementById('system-admin-email');
+    const password=document.getElementById('system-admin-password');
+    if(email) email.value='';
+    if(password) password.value='';
+  }
+  document.addEventListener('DOMContentLoaded',()=>{
+    clearAdminLoginFields();
+    requestAnimationFrame(clearAdminLoginFields);
+    setTimeout(clearAdminLoginFields,80);
+    setTimeout(clearAdminLoginFields,350);
+  });
+  window.addEventListener('pageshow',clearAdminLoginFields);
+})();
+</script>
+<p class="admin-edition-hint">أدخل بيانات مدير النظام ثم ادخل إلى نظام المدارس الأهلية والخاصة</p>
             <div class="admin-edition-actions standalone-private-entry" aria-label="دخول نظام المدارس الأهلية والخاصة">
                 <button type="button" class="admin-edition-card admin-edition-private standalone-private-login" onclick="handlePrivateSystemAdminEntry()">
                     <span class="admin-edition-icon" aria-hidden="true">🏢</span>
