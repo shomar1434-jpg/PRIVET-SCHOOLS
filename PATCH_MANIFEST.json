@@ -1,0 +1,16 @@
+{
+  "frontend": [
+    "private-owner-portal.html",
+    "private-manager-register.html",
+    "private-manager-login.html"
+  ],
+  "supabase": [
+    "supabase/functions/private-school-owner/index.ts",
+    "supabase/functions/private-school-invite/index.ts"
+  ],
+  "deployed_versions": {
+    "private-school-owner": 3,
+    "private-school-invite": 3
+  },
+  "project_ref": "okjwdzvnqsdetxdsvdgr"
+}

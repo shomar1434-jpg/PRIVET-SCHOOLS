@@ -1,10 +1,124 @@
-<!doctype html><html lang="ar" dir="rtl"><head>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>بوابة مالك المدرسة</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script>
+<script src="standalone-private-config.js"></script>
+<script src="private-school-config.js"></script>
+<script src="private-school-bridge.js"></script>
+<style>
+:root{--green:#07a869;--blue:#3d7eb9;--turq:#0da9a6;--navy:#15445a;--gold:#c1b489;--gray:#c2c1c1;--ink:#163247;--muted:#667985}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f5faf8,#edf7f8);font-family:Tajawal,"Segoe UI",Arial,sans-serif;color:var(--ink)}
+.wrap{width:min(1180px,calc(100% - 28px));margin:auto;padding:22px 0 36px}.top{display:flex;justify-content:space-between;align-items:center;gap:18px;background:linear-gradient(120deg,var(--navy),#0b6a5c);color:#fff;border-radius:24px;padding:20px 24px;box-shadow:0 14px 34px #15445a24}.top h1{margin:0;font-size:25px}.top p{margin:6px 0 0;color:#d9eeee}.btn{border:0;border-radius:12px;padding:11px 16px;font:inherit;font-weight:900;cursor:pointer}.logout{background:#fff;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:18px}.card{background:#fff;border:1px solid #dbe7eb;border-radius:20px;padding:18px;box-shadow:0 10px 28px #15445a0c}.card h2{margin:0 0 10px;font-size:18px}.metric{font-size:28px;font-weight:900;color:var(--navy)}.muted{font-size:13px;color:var(--muted);line-height:1.7}.field{margin:10px 0}.field label{display:block;font-size:12px;font-weight:900;margin-bottom:5px}.field input{width:100%;padding:11px 12px;border:1px solid #cbdbe1;border-radius:11px;font:inherit}.primary{background:var(--green);color:#fff}.secondary{background:#e9f4f2;color:#145447}.danger{background:#fff0f0;color:#b42318}.blue{background:#eaf3fb;color:#245f90}.gold{background:#f8f4e8;color:#665b34}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.list{margin-top:10px}.manager-row,.invite-row{border:1px solid #e0e9ed;border-radius:15px;padding:13px;margin-top:10px;background:#fbfdfd}.row-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.name{font-weight:900}.email{font-size:12px;color:var(--muted);margin-top:4px}.badge{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900}.b-active{background:#e7f8ef;color:#087548}.b-pending{background:#fff7df;color:#8a6500}.b-disabled{background:#f1f3f5;color:#59636b}.msg{min-height:20px;margin-top:8px;font-size:13px}.ok{color:#087548}.err{color:#b42318}.linkbox{margin-top:10px;padding:10px;border-radius:12px;background:#f1f8f7;font-size:12px;word-break:break-all;direction:ltr;text-align:left}
+.gov{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.gov a{text-decoration:none;color:var(--navy);background:#f4f9f8;border:1px solid #dce8e5;padding:14px;border-radius:15px;text-align:center;font-weight:900}
+@media(max-width:900px){.grid{grid-template-columns:1fr}.gov{grid-template-columns:1fr 1fr}}@media(max-width:520px){.top{align-items:flex-start;flex-direction:column}.gov{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div><h1 id="title">بوابة مالك المدرسة</h1><p id="identity">جارٍ تحميل بيانات المدرسة...</p></div><button class="btn logout" id="logout">تسجيل الخروج</button></header>
 
-<script src="private-storage-namespace.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>بوابة مالك المدرسة الخاصة</title><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script><script src="standalone-private-config.js"></script>
-<script src="private-school-config.js"></script><script src="private-school-bridge.js"></script><style>body{margin:0;background:#f8fafc;font-family:Tahoma,Arial;color:#0f172a}.wrap{max-width:1120px;margin:auto;padding:24px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;background:#0f172a;color:#fff;border-radius:22px;padding:20px}.top h1{margin:0;font-size:22px}.top p{margin:6px 0 0;color:#cbd5e1}.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:800;cursor:pointer}.out{background:#fff;color:#0f172a}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:18px}.card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:18px;box-shadow:0 8px 24px #0f172a0a}.card h2{font-size:16px;margin:0 0 10px}.metric{font-size:30px;font-weight:900}.muted{color:#64748b;font-size:13px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.primary{background:#0f766e;color:#fff}.secondary{background:#e2e8f0;color:#0f172a}.field{margin:9px 0}.field input,.field select{width:100%;box-sizing:border-box;padding:11px;border:1px solid #cbd5e1;border-radius:11px}.list{margin-top:10px;border-top:1px solid #e2e8f0}.row{padding:10px 0;border-bottom:1px solid #f1f5f9;font-size:13px;display:flex;justify-content:space-between;gap:8px}.msg{min-height:20px;color:#b91c1c;font-size:13px;margin-top:8px}.shared-governance-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:10px}.governance-card{border:1px solid #dce8ef;background:linear-gradient(145deg,#fff,#f4fbf8);border-radius:18px;padding:16px 12px;font-family:inherit;color:#17324a;cursor:pointer;text-align:center;min-height:138px;display:flex;flex-direction:column;justify-content:center;gap:7px;box-shadow:0 8px 22px #0b3d2f10}.governance-card span{font-size:28px}.governance-card b{font-size:15px}.governance-card small{font-size:11px;color:#64748b;line-height:1.5}@media(max-width:760px){.shared-governance-grid{grid-template-columns:1fr}}
-</style><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="private-school-theme.css"><link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head><body><div class="wrap"><header class="top"><div><h1 id="title">بوابة المالك</h1><p id="identity"></p></div><button class="btn out" id="logout">تسجيل الخروج</button></header><section class="grid"><article class="card"><h2>الملاك النشطون</h2><div id="ownerCount" class="metric">—</div><div class="muted">الحسابات المرتبطة بالمدرسة بصلاحية مالك</div></article><article class="card"><h2>مدير المدرسة</h2><div id="managerState" class="metric" style="font-size:20px">—</div><div class="muted" id="managerMail"></div></article><article class="card"><h2>الدعوات المعلقة</h2><div id="inviteCount" class="metric">—</div><div class="muted">دعوات المالك والمدير غير المكتملة</div></article></section><section class="grid"><article class="card"><h2>دعوة مستخدم قيادي</h2><div class="field"><select id="inviteRole"><option value="manager">مدير المدرسة</option><option value="owner">مالك إضافي</option></select></div><div class="field"><input id="inviteName" placeholder="الاسم الكامل"></div><div class="field"><input id="inviteEmail" type="email" placeholder="البريد الإلكتروني"></div><button class="btn primary" id="inviteBtn">إنشاء الدعوة</button><div id="inviteMsg" class="msg"></div></article><article class="card"><h2>مركز الحوكمة المشتركة</h2><div class="shared-governance-grid">
-<button class="governance-card" onclick="location.href='private-compliance.html?privateEdition=1'"><span>✅</span><b>فحص الالتزام</b><small>مساحة مشتركة بين المالك ومدير المدرسة</small></button>
-<button class="governance-card" onclick="location.href='private-template-settings.html?privateEdition=1'"><span>🎨</span><b>هوية وقالب المدرسة</b><small>قالب موحد يعمل عليه المالك والمدير</small></button>
-<button class="governance-card" onclick="location.href='private-outputs.html?privateEdition=1'"><span>📚</span><b>المخرجات المؤسسية</b><small>أرشيف مشترك للمخرجات والاعتمادات</small></button>
+<section class="grid">
+<article class="card"><h2>مدير المدرسة النشط</h2><div id="activeManager" class="metric">—</div><div id="activeManagerEmail" class="muted"></div><div id="activeLoginBox"></div></article>
+<article class="card"><h2>مديرون بانتظار التفعيل</h2><div id="pendingCount" class="metric">0</div><div class="muted">يظهر المدير هنا بعد التسجيل من الرابط الفريد، ولا يستطيع الدخول قبل تفعيله من المالك.</div></article>
+<article class="card"><h2>دعوات المدير المعلقة</h2><div id="inviteCount" class="metric">0</div><div class="muted">كل رابط تسجيل مدير صالح لمدة 7 أيام، وإنشاء رابط جديد يلغي الدعوة المعلقة السابقة.</div></article>
+</section>
+
+<section class="grid">
+<article class="card">
+<h2>إنشاء رابط تسجيل مدير/مديرة</h2>
+<div class="field"><label>اسم المدير/المديرة</label><input id="managerName" placeholder="الاسم الكامل"></div>
+<div class="field"><label>البريد الإلكتروني</label><input id="managerEmail" type="email" placeholder="name@example.com"></div>
+<button class="btn primary" id="createInvite">توليد رابط التسجيل</button>
+<div id="inviteMsg" class="msg"></div><div id="inviteLink"></div>
+</article>
+
+<article class="card" style="grid-column:span 2">
+<h2>إدارة حساب مدير المدرسة</h2>
+<div id="managers" class="list"><div class="muted">جارٍ التحميل...</div></div>
+</article>
+</section>
+
+<section class="card" style="margin-top:18px">
+<h2>الدعوات السابقة لمدير المدرسة</h2>
+<div id="invites" class="list"></div>
+</section>
+
+<section class="card" style="margin-top:18px">
+<h2>مركز الحوكمة المشتركة</h2>
+<div class="gov">
+<a href="private-compliance.html?privateEdition=1">✅ فحص الالتزام</a>
+<a href="private-template-settings.html?privateEdition=1">🎨 هوية وقالب المدرسة</a>
+<a href="private-outputs.html?privateEdition=1">📚 المخرجات المؤسسية</a>
+<a href="private-messages.html?privateEdition=1">✉️ مراسلة مدير/مديرة المدرسة</a>
 </div>
-<div class="actions" style="margin-top:12px"><button class="btn secondary" onclick="location.href='private-workflows.html?privateEdition=1'">الموافقات وسير العمل</button><button class="btn secondary" onclick="location.href='private-messages.html?privateEdition=1'">مراسلة مدير/مديرة المدرسة</button></div><p class="muted">فحص الالتزام والهوية والقالب والمخرجات المؤسسية مساحات مشتركة بين المالك ومدير المدرسة وتعمل على بيانات المدرسة نفسها.</p></article><article class="card"><h2>آخر الدعوات</h2><div id="invites" class="list"></div></article></section></div><script>let portal=null;async function load(){try{const ctx=await PrivateSchoolBridge.requireContext(['owner']);document.getElementById('title').textContent='بوابة مالك — '+ctx.schoolName;document.getElementById('identity').textContent=(ctx.userName||ctx.userEmail)+' • '+(ctx.schoolCode||'');portal=await PrivateSchoolBridge.owner('get_portal');document.getElementById('ownerCount').textContent=(portal.owners||[]).filter(x=>x.status==='active').length;const m=portal.manager;document.getElementById('managerState').textContent=m?.full_name||'لا يوجد مدير نشط';document.getElementById('managerMail').textContent=m?.email||'';const pending=(portal.invitations||[]).filter(x=>x.status==='pending');document.getElementById('inviteCount').textContent=pending.length;document.getElementById('invites').innerHTML=(portal.invitations||[]).slice(0,8).map(x=>`<div class="row"><span>${x.invitee_name||''}<br><span class="muted">${x.invitee_email||''}</span></span><b>${x.invite_role} — ${x.status}</b></div>`).join('')||'<div class="muted">لا توجد دعوات</div>'}catch(e){alert(e.message);location.replace('private-owner-login.html')}}document.getElementById('inviteBtn').onclick=async()=>{const m=document.getElementById('inviteMsg');m.textContent='';try{const role=document.getElementById('inviteRole').value;const r=await PrivateSchoolBridge.owner('create_invitation',{inviteRole:role,inviteeName:document.getElementById('inviteName').value,inviteeEmail:document.getElementById('inviteEmail').value});const url=new URL(r.invitePath,location.href).href;m.style.color='#047857';m.textContent='تم إنشاء الدعوة: '+url;await load()}catch(e){m.style.color='#b91c1c';m.textContent=e.message}};document.getElementById('logout').onclick=async()=>{await PrivateSchoolBridge.logout();location.replace('private-owner-login.html')};load();</script></body></html>
+</section>
+</div>
+
+<script>
+let ctx=null, portal=null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const abs=path=>new URL(path,location.href).href;
+async function copyText(text){try{await navigator.clipboard.writeText(text);return true}catch(_){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();return true}}
+function statusLabel(s){return s==='active'?'نشط':s==='pending'?'بانتظار التفعيل':s==='disabled'?'معطل':s}
+function statusClass(s){return s==='active'?'b-active':s==='pending'?'b-pending':'b-disabled'}
+function render(){
+ const managers=portal?.managers||[], active=managers.find(x=>x.status==='active')||null, pending=managers.filter(x=>x.status==='pending');
+ $('activeManager').textContent=active?.fullName||'لا يوجد مدير نشط';
+ $('activeManagerEmail').textContent=active?.email||'';
+ $('pendingCount').textContent=String(pending.length);
+ const invs=portal?.invitations||[];
+ $('inviteCount').textContent=String(invs.filter(x=>x.status==='pending').length);
+ if(active){
+   const login=abs(portal.managerLoginPath||active.loginPath||`private-manager-login.html?schoolId=${encodeURIComponent(ctx.schoolId)}`);
+   $('activeLoginBox').innerHTML=`<div class="linkbox">${esc(login)}</div><div class="actions"><button class="btn primary" data-copy-login="${esc(login)}">نسخ رابط دخول المدير</button><button class="btn blue" data-open-login="${esc(login)}">فتح رابط الدخول</button></div>`;
+ }else $('activeLoginBox').innerHTML='';
+ $('managers').innerHTML=managers.length?managers.map(m=>{
+   const login=m.status==='active'?abs(m.loginPath||`private-manager-login.html?schoolId=${encodeURIComponent(ctx.schoolId)}`):'';
+   return `<div class="manager-row"><div class="row-head"><div><div class="name">${esc(m.fullName||'مدير/مديرة المدرسة')}</div><div class="email">${esc(m.email||'')}</div></div><span class="badge ${statusClass(m.status)}">${esc(statusLabel(m.status))}</span></div>
+   <div class="actions">
+   ${m.status!=='active'?`<button class="btn primary" data-activate="${esc(m.membershipId)}">تفعيل مدير المدرسة</button>`:''}
+   ${m.status==='active'?`<button class="btn gold" data-disable="${esc(m.membershipId)}">تعطيل الحساب</button>`:''}
+   ${login?`<button class="btn blue" data-copy-login="${esc(login)}">نسخ رابط الدخول</button>`:''}
+   <button class="btn danger" data-delete="${esc(m.membershipId)}">حذف المدير</button>
+   </div></div>`;
+ }).join(''):'<div class="muted">لا توجد حسابات مدير مسجلة بعد.</div>';
+ $('invites').innerHTML=invs.length?invs.map(i=>`<div class="invite-row"><div class="row-head"><div><div class="name">${esc(i.invitee_name||'مدير/مديرة المدرسة')}</div><div class="email">${esc(i.email||i.invitee_email||'')}</div></div><span class="badge ${i.status==='pending'?'b-pending':'b-disabled'}">${esc(i.status)}</span></div>${i.status==='pending'?`<div class="actions"><button class="btn danger" data-cancel="${esc(i.id)}">إلغاء الدعوة</button></div>`:''}</div>`).join(''):'<div class="muted">لا توجد دعوات مدير حتى الآن.</div>';
+}
+async function load(){
+ try{
+   ctx=await PrivateSchoolBridge.requireContext(['owner']);
+   $('title').textContent='بوابة مالك — '+ctx.schoolName;
+   $('identity').textContent=(ctx.userName||ctx.userEmail)+' • '+(ctx.schoolCode||'');
+   portal=await PrivateSchoolBridge.owner('get_portal');
+   render();
+ }catch(e){alert(e.message||'تعذر فتح بوابة المالك');location.replace('private-owner-login.html')}
+}
+$('createInvite').onclick=async()=>{
+ const msg=$('inviteMsg');msg.className='msg';msg.textContent='جارٍ إنشاء الرابط...';
+ try{
+   const r=await PrivateSchoolBridge.owner('create_manager_invitation',{inviteeName:$('managerName').value.trim(),inviteeEmail:$('managerEmail').value.trim()});
+   const link=abs(r.invitePath);msg.className='msg ok';msg.textContent='تم إنشاء رابط تسجيل المدير.';
+   $('inviteLink').innerHTML=`<div class="linkbox">${esc(link)}</div><div class="actions"><button class="btn primary" id="copyInvite">نسخ الرابط</button><button class="btn blue" id="openInvite">فتح الرابط</button></div>`;
+   $('copyInvite').onclick=()=>copyText(link);$('openInvite').onclick=()=>window.open(link,'_blank','noopener');await load();
+ }catch(e){msg.className='msg err';msg.textContent=e.message||'تعذر إنشاء الدعوة'}
+};
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('button');if(!b)return;
+ try{
+  if(b.dataset.activate){const r=await PrivateSchoolBridge.owner('activate_manager',{memberId:b.dataset.activate});await load();if(r.managerLoginPath){const link=abs(r.managerLoginPath);await copyText(link);alert('تم تفعيل مدير المدرسة ونسخ رابط الدخول.');}}
+  if(b.dataset.disable){if(confirm('تعطيل حساب مدير المدرسة؟')){await PrivateSchoolBridge.owner('disable_manager',{memberId:b.dataset.disable});await load();}}
+  if(b.dataset.delete){if(confirm('سيتم حذف ارتباط هذا المدير بالمدرسة. هل أنت متأكد؟')){await PrivateSchoolBridge.owner('delete_manager',{memberId:b.dataset.delete});await load();}}
+  if(b.dataset.cancel){await PrivateSchoolBridge.owner('cancel_manager_invitation',{invitationId:b.dataset.cancel});await load();}
+  if(b.dataset.copyLogin)await copyText(b.dataset.copyLogin);
+  if(b.dataset.openLogin)window.open(b.dataset.openLogin,'_blank','noopener');
+ }catch(err){alert(err.message||'تعذر تنفيذ العملية')}
+});
+$('logout').onclick=async()=>{await PrivateSchoolBridge.logout();location.replace('private-owner-login.html')};
+load();
+</script>
+</body></html>
