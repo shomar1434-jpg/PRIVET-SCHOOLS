@@ -15,6 +15,11 @@
   if(['owner','manager'].includes(ctx.role))links.push(['المخرجات','private-outputs.html?privateEdition=1']);
   if(['owner','manager'].includes(ctx.role))links.push(['الهوية والقالب','private-template-settings.html?privateEdition=1']);
   if(ctx.role==='manager')links.push(['إدارة المستخدمين','private-manager-users.html?privateEdition=1']);
+  if(ctx.role==='manager'){
+    const openPrivateUsers=()=>location.href='private-manager-users.html?privateEdition=1';
+    try{g.showRegLink=openPrivateUsers;g.showActivation=openPrivateUsers;}catch(_){}
+    document.addEventListener('click',function(ev){const el=ev.target&&ev.target.closest&&ev.target.closest('#ssRegLink,#ssActivate,[onclick*=\"showRegLink\"],[onclick*=\"showActivation\"]');if(!el)return;ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();openPrivateUsers();},true);
+  }
   if(ctx.role==='owner')links[0]=['بوابة المالك','private-owner-portal.html?privateEdition=1'];
   const roleNames={owner:'المالك',manager:'مدير/ة المدرسة',agent:'الوكيل/الوكيلة',teacher:'المعلم/المعلمة',student_advisor:'الموجه/ة الطلابي/ة',activity_leader:'رائد/ة النشاط',kindergarten_teacher:'معلم/ة رياض الأطفال',health_advisor:'الموجه/ة الصحي/ة',administrative_employee:'الموظف/ة الإداري/ة'};
   const available=Array.isArray(ctx.availableRoles)&&ctx.availableRoles.length?ctx.availableRoles:[ctx.role];
@@ -23,7 +28,7 @@
   bar.innerHTML=`<strong style="margin-left:auto">${esc(ctx.schoolName||'المدرسة الخاصة')}</strong>${roleSelector}`+links.map(([t,u])=>`<a href="${esc(u)}" style="color:#fff;text-decoration:none;background:#ffffff18;border:1px solid #ffffff22;padding:7px 10px;border-radius:10px;font-size:13px">${esc(t)}</a>`).join('')+`<button id="private-nav-logout" style="border:0;border-radius:10px;padding:7px 10px;cursor:pointer">خروج</button>`;
   document.body.prepend(bar);
   const roleSel=document.getElementById('private-nav-role');if(roleSel)roleSel.onchange=async()=>{const chosen=roleSel.value;if(!chosen||chosen===ctx.role)return;roleSel.disabled=true;try{const data=await g.PrivateSchoolBridge.establishContext(ctx.schoolId,chosen);const next=data.context;location.replace(g.PrivateSchoolBridge.roleLanding(next)+(g.PrivateSchoolBridge.roleLanding(next).includes('?')?'&':'?')+'privateEdition=1')}catch(e){alert(e.message||'تعذر تبديل الدور');roleSel.disabled=false;roleSel.value=ctx.role}};
-  document.getElementById('private-nav-logout').onclick=async()=>{try{await g.PrivateSchoolBridge.logout()}catch(_){};try{g.PrivateSessionReset?.clearActiveSchoolContext?.({clearSystemAdmin:true})}catch(_){};location.replace(ctx.role==='owner'?'private-owner-login.html?fresh=1':'school-login.html?fresh=1')};
+  document.getElementById('private-nav-logout').onclick=async()=>{try{await g.PrivateSchoolBridge.logout()}catch(_){};try{g.PrivateSessionReset?.clearActiveSchoolContext?.({clearSystemAdmin:true})}catch(_){};location.replace(ctx.role==='owner'?('private-owner-login.html?fresh=1&schoolId='+encodeURIComponent(ctx.schoolId)):('school-login.html?fresh=1&edition=private&schoolId='+encodeURIComponent(ctx.schoolId)))};
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })(window);

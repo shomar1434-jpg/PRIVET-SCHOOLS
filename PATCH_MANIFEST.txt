@@ -1,1 +1,40 @@
-Replace index-app.js and private-system-admin-section-preview.html in repository root. Supabase system-admin is already deployed as version 3.
+تصحيح دورة إنشاء المدرسة والمالك والمدير — المدارس الأهلية والخاصة
+
+الملفات التي تُستبدل في جذر المستودع:
+- index-app.js
+- private-system-admin.html
+- private-system-admin-section-preview.html
+- private-school-bridge.js
+- supabase-bridge.js
+- private-owner-login.html
+- private-owner-portal.html
+- private-manager-register.html
+- private-manager-login.html
+- private-manager-users.html
+- school-login.html
+- private-school-nav.js
+- private-school-runtime.js
+
+تم تنفيذ ومراجعة:
+1) فصل جلسة مدير النظام عن جلسات مستخدمي المدارس.
+2) إصلاح ظهور قسم المالك الحي وعدم فقد جلسة مدير النظام.
+3) إصلاح فتح/نسخ رابط دخول المالك.
+4) صلاحيات إدارة المدرسة: تعديل الاسم، تعديل المالك والبريد، تغيير كلمة مرور المالك، تعطيل/تفعيل، حذف.
+5) بوابة المالك: إنشاء دعوة مدير فقط، ظهور المدير pending، التفعيل/التعطيل/الحذف، رابط دخول المدير.
+6) واجهة تسجيل المدير من الرابط الفريد.
+7) واجهة دخول المدير بعد التفعيل.
+8) إدارة مستخدمي المدرسة من المدير وربط الدعوات بـ Supabase.
+9) تشغيل رابط دخول المستخدمين الفعلي بدل الواجهة غير المنفذة.
+10) توافق مفاتيح جلسة المدرسة مع private-school-runtime.
+11) إبقاء جميع العلاقات مقيدة بـ school_id.
+12) فحص JavaScript لجميع الملفات والسكربتات الداخلية: بلا أخطاء.
+
+تم نشر Edge Functions في Supabase:
+- system-admin v4
+- private-school-session v2
+- private-school-provisioning v3
+- private-school-owner v4
+- private-school-invite v4
+
+مهم:
+لا ترفع نسخًا أقدم من Edge Functions فوق المشروع؛ النسخ المذكورة أعلاه منشورة بالفعل.

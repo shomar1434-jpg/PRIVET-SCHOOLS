@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
+<script src="private-storage-namespace.js"></script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>أقسام المدارس الخاصة — مدير النظام</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script>
@@ -41,8 +42,8 @@ const staticData={
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function statusLabel(s){return s==='active'?'نشط':s==='pending'?'بانتظار التفعيل':s==='disabled'?'معطل':s==='archived'?'مؤرشف':s||'—'}
 function goBack(){location.href=q.get('returnHome')||'index.html?systemAdminReturn=1&edition=private'}
-function client(){if(!window.PrivateSchoolBridge?.getClient)throw new Error('تعذر تهيئة اتصال Supabase');return PrivateSchoolBridge.getClient()}
-async function sys(body){const r=await client().functions.invoke('system-admin',{body});if(r.error)throw new Error(r.data?.error||r.error.message||'تعذر تحميل بيانات القسم');if(r.data?.error)throw new Error(r.data.error);return r.data}
+function client(){if(window.__privateSystemAdminClient)return window.__privateSystemAdminClient;if(!window.supabase?.createClient)throw new Error('تعذر تهيئة اتصال Supabase');const c=window.StandalonePrivateConfig||{};window.__privateSystemAdminClient=window.supabase.createClient(c.supabaseUrl,c.publishableKey,{auth:{storageKey:'PRIVATE_SCHOOLS_SYSTEM_ADMIN_AUTH_V1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});return window.__privateSystemAdminClient}
+async function sys(body){const c=client();const s=await c.auth.getSession();if(!s.data?.session)throw new Error('انتهت جلسة مدير النظام. ارجع إلى الأقسام وسجل الدخول من جديد.');const r=await c.functions.invoke('system-admin',{body});if(r.error){let msg=r.data?.error||r.error.message||'تعذر تحميل بيانات القسم';if(/non-2xx/i.test(msg))msg='رفض الخادم الطلب. تحقق من جلسة مدير النظام ثم أعد المحاولة.';throw new Error(msg)}if(r.data?.error)throw new Error(r.data.error);return r.data}
 function openOwner(path){location.href=new URL(path,location.href).href}
 function openSchool(id){location.href='private-system-admin.html?systemAdmin=1&schoolId='+encodeURIComponent(id)}
 async function loadDirectory(){

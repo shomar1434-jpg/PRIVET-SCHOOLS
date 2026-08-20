@@ -13,7 +13,7 @@
   function getClient(){
     if(client) return client;
     if(!g.supabase || !g.supabase.createClient) throw new Error('مكتبة Supabase غير جاهزة');
-    client=g.supabase.createClient(C.supabaseUrl,C.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    client=g.supabase.createClient(C.supabaseUrl,C.publishableKey,{auth:{storageKey:'PRIVATE_SCHOOLS_SCHOOL_USER_AUTH_V1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     return client;
   }
   function clean(v){return String(v??'').trim()}
@@ -23,6 +23,8 @@
     try{ g.PrivateSessionReset?.clearActiveSchoolContext?.({}); }catch(_){}
     sessionStorage.removeItem(C.sessionStorageKey);
     sessionStorage.removeItem(C.schoolListStorageKey);
+    sessionStorage.removeItem('smart_school_private_session_v1');
+    sessionStorage.removeItem('smart_school_private_schools_v1');
     for(const k of LEGACY_KEYS){
       try{ localStorage.removeItem(k); }catch(_){}
       try{ sessionStorage.removeItem('private-owned:'+k); sessionStorage.removeItem('private-backup:'+k); sessionStorage.removeItem('private-backup:'+k+':exists'); }catch(_){}
@@ -78,6 +80,8 @@
     if(!ctx || ctx.edition!=='private') throw new Error('تعذر إنشاء سياق المدرسة الخاصة');
     sessionStorage.setItem(C.sessionStorageKey,JSON.stringify(ctx));
     sessionStorage.setItem(C.schoolListStorageKey,JSON.stringify(data.schools||[]));
+    sessionStorage.setItem('smart_school_private_session_v1',JSON.stringify(ctx));
+    sessionStorage.setItem('smart_school_private_schools_v1',JSON.stringify(data.schools||[]));
     applyCompatibility(ctx); return data;
   }
   async function login(email,password,schoolId='',actorRole=''){
@@ -95,7 +99,7 @@
     if(Array.isArray(allowedRoles)&&allowedRoles.length&&!allowedRoles.includes(ctx.role)) throw new Error('لا تملك صلاحية فتح هذه الصفحة');
     applyCompatibility(ctx); return ctx;
   }
-  function roleLanding(ctx){return clean(ctx?.landingPath)||'school-login.html'}
+  function roleLanding(ctx){const map={owner:'private-owner-portal.html',manager:'manager.html',agent:'agent.html',teacher:'teacher.html',student_advisor:'student_advisor.html',activity_leader:'activity_leader.html',kindergarten_teacher:'kindergarten_teacher.html',health_advisor:'health_advisor.html',administrative_employee:'administrative_employee_portal.html'};return clean(ctx?.landingPath)||map[ctx?.role]||'school-login.html'}
   async function inspectInvite(token){return invoke('private-school-invite',{action:'inspect',token:clean(token)},{allowAnonymous:true})}
   async function acceptInvite(payload){return invoke('private-school-invite',{action:'accept',token:clean(payload.token),password:String(payload.password||''),fullName:clean(payload.fullName)},{allowAnonymous:true})}
   async function owner(action,payload={}){const ctx=await requireContext(['owner']);return invoke('private-school-owner',{action,schoolId:ctx.schoolId,...payload})}
@@ -120,6 +124,6 @@
   async function outputs(action,payload={}){const ctx=await requireContext();return invoke('private-school-outputs',{action,schoolId:ctx.schoolId,...payload})}
   async function selfEvaluationOutput(action='snapshot',payload={}){const ctx=await requireContext(['owner','manager']);return invoke('private-school-self-evaluation-output',{action,schoolId:ctx.schoolId,...payload})}
   async function provisionPrivateSchool(payload={}){return invoke('private-school-provisioning',{action:'create',...payload})}
-  async function privateSchoolOverview(schoolId){return invoke('private-school-provisioning',{action:'overview',schoolId:clean(schoolId)})}
+  async function privateSchoolOverview(schoolId){const d=await invoke('private-school-provisioning',{action:'overview',schoolId:clean(schoolId)});if(d&&!d.ownerLoginPath&&d.ownerLoginUrl)d.ownerLoginPath=d.ownerLoginUrl;if(d&&!d.ownerLoginUrl&&d.ownerLoginPath)d.ownerLoginUrl=d.ownerLoginPath;return d}
   g.PrivateSchoolBridge=Object.freeze({getClient,login,logout,establishContext,requireContext,privateContext,roleLanding,inspectInvite,acceptInvite,owner,manager,staff,workflows,compliance,performance,messages,tasks,directory,files,uploadModuleFile,template,outputs,selfEvaluationOutput,provisionPrivateSchool,privateSchoolOverview,applyCompatibility,clearPrivateCompat,ROLE_MAP});
 })(window);

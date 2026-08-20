@@ -55,6 +55,8 @@ setTimeout(function(){ window.dispatchEvent(new CustomEvent('authReady')); }, 0)
             setTimeout(() => t.remove(), 3000);
         };
 
+        const getPrivateSystemAdminClient = (()=>{let c=null;return ()=>{if(c)return c;const cfg=window.StandalonePrivateConfig||{};if(!window.supabase?.createClient)throw new Error('Supabase غير جاهز');c=window.supabase.createClient(cfg.supabaseUrl,cfg.publishableKey,{auth:{storageKey:'PRIVATE_SCHOOLS_SYSTEM_ADMIN_AUTH_V1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});return c;}})();
+
         // SECURITY: لا توجد أي صلاحية مدير نظام مبنية على الاسم/البريد/localStorage.
         const isManagerAccount = () => false;
 
@@ -67,7 +69,7 @@ setTimeout(function(){ window.dispatchEvent(new CustomEvent('authReady')); }, 0)
             }
             if(!cfg.isConfigured) throw new Error('لم يتم ربط مشروع Supabase الخاص الجديد بعد. حدّث standalone-private-config.js');
             if (!window.SmartSchoolSupabase) throw new Error('Supabase غير جاهز');
-            const sb = window.SmartSchoolSupabase.getClient();
+            const sb = getPrivateSystemAdminClient();
             const login = await sb.auth.signInWithPassword({ email: String(email||'').trim().toLowerCase(), password: String(password||'') });
             if (login.error || !login.data?.session) throw new Error('بيانات الدخول غير صحيحة');
             const invoked = await sb.functions.invoke('system-admin', { body:{action:'verify'} });

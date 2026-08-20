@@ -1,8 +1,8 @@
 // supabase-bridge.js
 // مصدر مركزي واحد لعمليات المدارس والمستخدمين عبر Supabase.
 (function(){
-  const SUPABASE_URL = localStorage.getItem('privateStandaloneSupabaseUrl') || 'https://okjwdzvnqsdetxdsvdgr.supabase.co';
-  const SUPABASE_KEY = localStorage.getItem('privateStandaloneSupabaseKey') || 'sb_publishable_rpHL2MOBqlgOU9eNHPOWiw_RW_mhrMx';
+  const SUPABASE_URL = localStorage.getItem('privateStandaloneSupabaseUrl') || 'https://YOUR_PRIVATE_PROJECT_REF.supabase.co';
+  const SUPABASE_KEY = localStorage.getItem('privateStandaloneSupabaseKey') || 'YOUR_PRIVATE_SUPABASE_PUBLISHABLE_KEY';
   let client = null;
 
 
@@ -24,7 +24,7 @@
       console.error('Supabase library is not loaded');
       return null;
     }
-    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{storageKey:'PRIVATE_SCHOOLS_SCHOOL_USER_AUTH_V1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     return client;
   }
 
