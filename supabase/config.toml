@@ -1,0 +1,8 @@
+project_id = "private-schools-standalone"
+
+[auth]
+enabled = true
+site_url = "http://localhost:5500"
+
+[storage]
+enabled = true
