@@ -15,7 +15,7 @@ label{display:block;font-size:13px;margin-bottom:6px;font-weight:700}input,butto
 @media(max-width:720px){.wrap{padding:12px}.schools-table{display:block;overflow:auto;white-space:nowrap}}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="private-school-theme.css"><link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
-<body>
+<body><div id="private-edition-badge" style="position:fixed;left:18px;top:16px;z-index:9999;background:#0b3d2f;color:white;padding:8px 12px;border-radius:999px;font-family:Tajawal,Arial;font-size:12px;font-weight:900;box-shadow:0 8px 22px #0002">إصدار المدارس الأهلية والخاصة</div>
 <section id="loginView" class="login-shell hidden" aria-hidden="true">
   <div class="login-card">
     <h1>دخول مدير النظام</h1>
@@ -53,11 +53,26 @@ label{display:block;font-size:13px;margin-bottom:6px;font-weight:700}input,butto
     <div class="top"><h2 style="margin:0">المدارس الخاصة</h2><span id="schoolCount" class="badge">0</span></div>
     <div style="overflow:auto;margin-top:12px"><table class="schools-table"><thead><tr><th>المدرسة</th><th>الرمز</th><th>الحالة</th><th>تفاصيل</th></tr></thead><tbody id="schoolsBody"><tr><td colspan="4" class="muted">جارٍ التحميل…</td></tr></tbody></table></div>
   </div>
-  <div class="card">
-    <h2>تفاصيل المدرسة</h2>
-    <div class="grid"><input id="schoolId" placeholder="معرف المدرسة" dir="ltr"><button id="loadBtn" type="button">تحميل التفاصيل</button></div>
-    <div id="overview" class="muted" style="margin-top:14px">اختر مدرسة من القائمة أو أدخل معرفها.</div>
-  </div>
+  <div class="card"><h2>تفاصيل المدرسة وإدارتها</h2>
+<div class="grid"><input id="schoolId" placeholder="معرف المدرسة" dir="ltr"><button id="loadBtn" type="button">تحميل التفاصيل</button></div>
+<div id="overview" class="muted" style="margin-top:14px">اختر مدرسة من القائمة أو أدخل معرفها.</div>
+<div id="schoolControls" class="hidden" style="margin-top:18px;border-top:1px solid #e5ecef;padding-top:16px">
+<h3 style="margin:0 0 12px">صلاحيات مدير النظام</h3>
+<div class="grid">
+<div><label>اسم المدرسة</label><input id="editSchoolName"></div>
+<div><label>اسم المالك</label><input id="editOwnerName"></div>
+<div><label>البريد الإلكتروني للمالك</label><input id="editOwnerEmail" type="email" dir="ltr"></div>
+<div><label>كلمة مرور جديدة للمالك</label><input id="newOwnerPassword" type="password" minlength="8" autocomplete="new-password" dir="ltr" placeholder="8 أحرف على الأقل"></div>
+</div>
+<div class="toolbar" style="margin-top:12px">
+<button id="saveSchoolBtn" type="button">حفظ اسم المدرسة</button>
+<button id="saveOwnerBtn" type="button">حفظ بيانات المالك</button>
+<button id="resetOwnerPasswordBtn" type="button" class="secondary">تغيير كلمة مرور المالك</button>
+<button id="toggleSchoolBtn" type="button" class="secondary">تعطيل المدرسة</button>
+<button id="deleteSchoolBtn" type="button" class="danger">حذف المدرسة</button>
+</div>
+<p id="adminActionMsg" class="status muted"></p>
+</div></div>
 </div>
 </section>
 <script src="standalone-private-config.js"></script>
@@ -74,14 +89,74 @@ label{display:block;font-size:13px;margin-bottom:6px;font-weight:700}input,butto
  function getClient(){if(!window.PrivateSchoolBridge?.getClient)throw new Error('تعذر تهيئة اتصال Supabase');return window.PrivateSchoolBridge.getClient()}
  async function invokeSystem(body){const c=getClient();const r=await c.functions.invoke('system-admin',{body});if(r.error)throw new Error(r.data?.error||r.error.message||'فشل استدعاء مدير النظام');if(r.data?.error)throw new Error(r.data.error);return r.data} async function verify(){const c=getClient();let s=await c.auth.getSession();if(!s.data?.session)return null;try{const v=await invokeSystem({action:'verify'});return v?.ok?v:null}catch(_){await c.auth.signOut();return null}}
  async function loadSchools(){const body=$('schoolsBody');body.innerHTML='<tr><td colspan="4" class="muted">جارٍ التحميل…</td></tr>';try{const d=await invokeSystem({action:'list_schools',edition:'private'});const rows=d.schools||[];$('schoolCount').textContent=String(rows.length);body.innerHTML=rows.length?rows.map(s=>`<tr><td>${esc(s.school_name||'')}</td><td dir="ltr">${esc(s.school_code||'')}</td><td><span class="badge">${esc(s.status||'')}</span></td><td><button type="button" class="small-btn" data-school="${esc(s.id)}">فتح</button></td></tr>`).join(''):'<tr><td colspan="4" class="muted">لا توجد مدارس خاصة حتى الآن.</td></tr>';body.querySelectorAll('[data-school]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.school;$('schoolId').value=id;loadOverview(id)}));}catch(e){body.innerHTML=`<tr><td colspan="4" class="err">${esc(e.message||'تعذر تحميل المدارس')}</td></tr>`}}
- async function loadOverview(id){const box=$('overview');box.textContent='جارٍ التحميل…';box.className='muted';try{const d=await PrivateSchoolBridge.privateSchoolOverview(id);const s=d.school||{};box.innerHTML=`<div class="row"><strong>${esc(s.school_name)}</strong> <span class="badge">${esc(s.status)}</span><br><span class="muted">${esc(s.school_code||'')}</span></div><div class="row">الملاك: ${Number(d.owners?.length||0)} — الأعضاء: ${Number(d.members?.length||0)} — الدعوات: ${Number(d.invitations?.length||0)}</div>`;}catch(e){box.textContent=e.message||'تعذر تحميل التفاصيل';box.className='err'}}
+ let selectedSchool=null,selectedOwner=null;
+async function loadOverview(id){
+ const box=$('overview');box.textContent='جارٍ التحميل…';box.className='muted';
+ $('schoolControls').classList.add('hidden');selectedSchool=null;selectedOwner=null;
+ try{
+  const d=await PrivateSchoolBridge.privateSchoolOverview(id),s=d.school||{},owners=d.owners||[];
+  selectedSchool=s;selectedOwner=owners.find(o=>o.isPrimary)||owners.find(o=>o.is_primary)||owners[0]||null;
+  box.innerHTML=`<div class="row"><strong>${esc(s.school_name||'')}</strong> <span class="badge">${esc(s.status||'')}</span><br><span class="muted">${esc(s.school_code||'')}</span></div>
+  <div class="row">الملاك: ${Number(owners.length)} — الأعضاء: ${Number(d.members?.length||0)} — الدعوات: ${Number(d.invitations?.length||0)}</div>
+  ${selectedOwner?`<div class="row"><strong>المالك:</strong> ${esc(selectedOwner.name||selectedOwner.displayName||selectedOwner.display_name||'')} — <span dir="ltr">${esc(selectedOwner.email||'')}</span></div>
+  <div class="toolbar" style="margin-top:9px"><button type="button" class="small-btn" id="openOwnerLoginBtn">فتح بوابة دخول المالك</button><button type="button" class="small-btn secondary" id="copyOwnerLoginBtn">نسخ رابط دخول المالك</button></div>`:'<div class="err row">لا يوجد مالك مرتبط بهذه المدرسة.</div>'}`;
+  $('editSchoolName').value=s.school_name||'';
+  $('editOwnerName').value=selectedOwner?.name||selectedOwner?.displayName||selectedOwner?.display_name||'';
+  $('editOwnerEmail').value=selectedOwner?.email||'';
+  $('newOwnerPassword').value='';
+  $('toggleSchoolBtn').textContent=s.status==='active'?'تعطيل المدرسة':'إعادة تفعيل المدرسة';
+  $('schoolControls').classList.remove('hidden');
+  const ownerLink=d.ownerLoginPath?new URL(d.ownerLoginPath,location.href).href:'';
+  $('openOwnerLoginBtn')?.addEventListener('click',()=>{if(ownerLink)window.open(ownerLink,'_blank','noopener')});
+  $('copyOwnerLoginBtn')?.addEventListener('click',async()=>{if(ownerLink){try{await navigator.clipboard.writeText(ownerLink)}catch(_){}setMsg('adminActionMsg','تم نسخ رابط دخول المالك.',true)}});
+ }catch(e){box.textContent=e.message||'تعذر تحميل التفاصيل';box.className='err'}
+}
+async function runAdminAction(body,success){
+ setMsg('adminActionMsg','جارٍ تنفيذ العملية…',true);
+ try{const r=await invokeSystem(body);setMsg('adminActionMsg',success,true);await loadSchools();if(body.schoolId)await loadOverview(body.schoolId);return r}
+ catch(e){setMsg('adminActionMsg',e.message||'تعذر تنفيذ العملية');throw e}
+}
+$('saveSchoolBtn').addEventListener('click',async()=>{
+ if(!selectedSchool)return;const name=$('editSchoolName').value.trim();
+ if(!name)return setMsg('adminActionMsg','أدخل اسم المدرسة.');
+ await runAdminAction({action:'update_school',schoolId:selectedSchool.id,schoolName:name},'تم تحديث بيانات المدرسة.');
+});
+$('saveOwnerBtn').addEventListener('click',async()=>{
+ if(!selectedSchool||!selectedOwner)return setMsg('adminActionMsg','لا يوجد مالك مرتبط بالمدرسة.');
+ const name=$('editOwnerName').value.trim(),email=$('editOwnerEmail').value.trim().toLowerCase();
+ if(!name||!email.includes('@'))return setMsg('adminActionMsg','تحقق من اسم المالك والبريد.');
+ await runAdminAction({action:'update_owner',schoolId:selectedSchool.id,ownerUserId:selectedOwner.userId||selectedOwner.user_id,name,email},'تم تحديث اسم المالك وبريده.');
+});
+$('resetOwnerPasswordBtn').addEventListener('click',async()=>{
+ if(!selectedSchool||!selectedOwner)return setMsg('adminActionMsg','لا يوجد مالك مرتبط بالمدرسة.');
+ const password=$('newOwnerPassword').value;
+ if(password.length<8)return setMsg('adminActionMsg','كلمة المرور يجب ألا تقل عن 8 أحرف.');
+ if(!confirm('تغيير كلمة مرور مالك المدرسة الآن؟'))return;
+ await runAdminAction({action:'reset_owner_password',schoolId:selectedSchool.id,ownerUserId:selectedOwner.userId||selectedOwner.user_id,password},'تم تغيير كلمة مرور المالك.');
+ $('newOwnerPassword').value='';
+});
+$('toggleSchoolBtn').addEventListener('click',async()=>{
+ if(!selectedSchool)return;
+ const status=selectedSchool.status==='active'?'disabled':'active';
+ if(!confirm(status==='disabled'?'تعطيل المدرسة؟':'إعادة تفعيل المدرسة؟'))return;
+ await runAdminAction({action:'set_school_status',schoolId:selectedSchool.id,status},status==='disabled'?'تم تعطيل المدرسة.':'تمت إعادة تفعيل المدرسة.');
+});
+$('deleteSchoolBtn').addEventListener('click',async()=>{
+ if(!selectedSchool)return;
+ if(!confirm('سيتم حذف المدرسة وكل بياناتها المرتبطة نهائيًا. هل أنت متأكد؟'))return;
+ if(prompt('للتأكيد اكتب DELETE')!=='DELETE')return setMsg('adminActionMsg','تم إلغاء الحذف.');
+ const id=selectedSchool.id;
+ try{await invokeSystem({action:'delete_school',schoolId:id,confirmText:'DELETE'});setMsg('adminActionMsg','تم حذف المدرسة نهائيًا.',true);selectedSchool=null;selectedOwner=null;$('schoolControls').classList.add('hidden');$('overview').textContent='تم حذف المدرسة.';$('schoolId').value='';await loadSchools()}
+ catch(e){setMsg('adminActionMsg',e.message||'تعذر حذف المدرسة')}
+});
+
  $('backSectionsBtn')?.addEventListener('click',()=>{location.href='index.html?systemAdminReturn=1'});
  $('loginForm').addEventListener('submit',async ev=>{ev.preventDefault();const btn=$('loginBtn'),email=$('adminEmail').value.trim().toLowerCase(),password=$('adminPassword').value;btn.disabled=true;btn.textContent='جارٍ التحقق…';setMsg('loginMsg','جارٍ التحقق من الهوية والصلاحية…',true);try{const c=getClient();const sign=await c.auth.signInWithPassword({email,password});if(sign.error||!sign.data?.session)throw new Error('بيانات الدخول غير صحيحة أو الحساب غير مفعّل.');const v=await invokeSystem({action:'verify'});if(!v?.ok)throw new Error('هذا الحساب لا يملك صلاحية مدير النظام.');$('adminPassword').value='';$('adminIdentity').textContent='مدير النظام: '+(v.user?.email||email);showPortal();await loadSchools()}catch(e){try{await getClient().auth.signOut()}catch(_){}$('adminPassword').value='';setMsg('loginMsg',e.message||'تعذر تسجيل الدخول')}finally{btn.disabled=false;btn.textContent='دخول مدير النظام'}});
  $('createForm').addEventListener('submit',async ev=>{ev.preventDefault();const btn=$('createBtn');btn.disabled=true;setMsg('createMsg','جارٍ التحقق والإنشاء…',true);try{const data=await PrivateSchoolBridge.provisionPrivateSchool({schoolName:$('schoolName').value.trim(),ownerName:$('ownerName').value.trim(),ownerEmail:$('ownerEmail').value.trim(),password:$('password').value});$('password').value='';$('schoolId').value=data.school?.id||'';setMsg('createMsg','تم إنشاء المدرسة الخاصة وربط المالك بنجاح.',true);await loadSchools();if(data.school?.id)await loadOverview(data.school.id)}catch(e){$('password').value='';setMsg('createMsg',e.message||'تعذر إنشاء المدرسة')}finally{btn.disabled=false}});
  $('loadBtn').addEventListener('click',()=>{const id=$('schoolId').value.trim();if(id)loadOverview(id)});
  $('refreshBtn').addEventListener('click',loadSchools);
  $('logoutBtn').addEventListener('click',async()=>{try{await getClient().auth.signOut()}finally{showLogin();$('adminEmail').value='';$('adminPassword').value='';setMsg('loginMsg','')}});
- (async()=>{try{const v=await verify();if(v){$('adminIdentity').textContent='مدير النظام: '+(v.user?.email||'');showPortal();await loadSchools()}else showLogin()}catch(e){showLogin()}})();
+ (async()=>{try{const v=await verify();if(v){$('adminIdentity').textContent='مدير النظام: '+(v.user?.email||'');showPortal();await loadSchools();const sid=new URLSearchParams(location.search).get('schoolId');if(sid){$('schoolId').value=sid;await loadOverview(sid)}}else showLogin()}catch(e){showLogin()}})();
 })();
 </script>
 </body></html>
