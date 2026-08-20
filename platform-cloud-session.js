@@ -14,11 +14,11 @@
 
   const url = () =>
     (localStorage.getItem('privateStandaloneSupabaseUrl') ||
-      'https://YOUR_PRIVATE_PROJECT_REF.supabase.co').replace(/\/$/, '');
+      'https://okjwdzvnqsdetxdsvdgr.supabase.co').replace(/\/$/, '');
 
   const key = () =>
     localStorage.getItem('privateStandaloneSupabaseKey') ||
-    'YOUR_PRIVATE_SUPABASE_PUBLISHABLE_KEY';
+    'sb_publishable_rpHL2MOBqlgOU9eNHPOWiw_RW_mhrMx';
 
   async function open(login, password, schoolId) {
     const response = await fetch(`${url()}/functions/v1/platform-session`, {

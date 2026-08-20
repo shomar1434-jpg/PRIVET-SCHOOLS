@@ -1,6 +1,6 @@
 # Supabase Private-School Edge Functions — Production Manifest
 
-Project: `YOUR_PRIVATE_PROJECT_REF`
+Project: `okjwdzvnqsdetxdsvdgr`
 
 | Function | Production version | Status |
 |---|---:|---|

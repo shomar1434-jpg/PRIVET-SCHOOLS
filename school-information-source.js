@@ -3,8 +3,8 @@
 if(window.SchoolInformationSource) return;
 
 const CFG={
-  url:()=>localStorage.getItem('privateStandaloneSupabaseUrl')||'https://YOUR_PRIVATE_PROJECT_REF.supabase.co',
-  anon:()=>localStorage.getItem('privateStandaloneSupabaseKey')||'YOUR_PRIVATE_SUPABASE_PUBLISHABLE_KEY'
+  url:()=>localStorage.getItem('privateStandaloneSupabaseUrl')||'https://okjwdzvnqsdetxdsvdgr.supabase.co',
+  anon:()=>localStorage.getItem('privateStandaloneSupabaseKey')||'sb_publishable_rpHL2MOBqlgOU9eNHPOWiw_RW_mhrMx'
 };
 const SECTION_MAP={'1':'أ','2':'ب','3':'ج','4':'د','5':'هـ','6':'و','7':'ز','8':'ح','9':'ط','10':'ي','11':'ك','12':'ل'};
 const ROLE_AR={manager:'مدير/ة المدرسة',school_manager:'مدير/ة المدرسة',agent:'وكيل/ة',deputy:'وكيل/ة',teacher:'معلم/ة',student_advisor:'موجه/موجهة طلابية',counselor:'موجه/موجهة طلابية',activity_leader:'رائد/ة النشاط',admin_employee:'موظف/ة إداري/ة',administrative_employee:'موظف/ة إداري/ة',employee:'موظف/ة',health_advisor:'الموجه الصحي',kindergarten_teacher:'معلمة رياض الأطفال',principal:'مدير/ة المدرسة'};

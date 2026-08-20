@@ -1005,8 +1005,8 @@ function officialIncidentBody(type,c){let student=students.find(s=>s.name===c.pe
   async function ensureSupabaseClient(){
     try{
       if(window.supabase && window.supabase.createClient){
-        const url=localStorage.getItem('privateStandaloneSupabaseUrl')||'https://YOUR_PRIVATE_PROJECT_REF.supabase.co';
-        const key=localStorage.getItem('privateStandaloneSupabaseKey')||'YOUR_PRIVATE_SUPABASE_PUBLISHABLE_KEY';
+        const url=localStorage.getItem('privateStandaloneSupabaseUrl')||'https://okjwdzvnqsdetxdsvdgr.supabase.co';
+        const key=localStorage.getItem('privateStandaloneSupabaseKey')||'sb_publishable_rpHL2MOBqlgOU9eNHPOWiw_RW_mhrMx';
         return window.__examsSupabaseClient || (window.__examsSupabaseClient=window.supabase.createClient(url,key));
       }
       await new Promise((resolve,reject)=>{let s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});

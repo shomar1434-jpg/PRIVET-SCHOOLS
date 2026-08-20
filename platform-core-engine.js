@@ -2,8 +2,8 @@
 'use strict';
 const VERSION='1.0.0',TIMEOUT=45000;
 const config={
- base:()=> (localStorage.getItem('privateStandaloneSupabaseUrl')||'https://YOUR_PRIVATE_PROJECT_REF.supabase.co').replace(/\/$/,'')+'/functions/v1/platform-core',
- anon:()=>localStorage.getItem('privateStandaloneSupabaseKey')||'YOUR_PRIVATE_SUPABASE_PUBLISHABLE_KEY',
+ base:()=> (localStorage.getItem('privateStandaloneSupabaseUrl')||'https://okjwdzvnqsdetxdsvdgr.supabase.co').replace(/\/$/,'')+'/functions/v1/platform-core',
+ anon:()=>localStorage.getItem('privateStandaloneSupabaseKey')||'sb_publishable_rpHL2MOBqlgOU9eNHPOWiw_RW_mhrMx',
  token:()=>window.PlatformCloudSession?.token?.()||sessionStorage.getItem('platform_tab_session_token_v1')||localStorage.getItem('platform_file_session_token')||''
 };
 async function ensure(){if(window.PlatformCloudSession?.ensure){await window.PlatformCloudSession.ensure();if(config.token())return config.token()}if(config.token())return config.token();throw new Error('الجلسة السحابية غير متاحة.');}

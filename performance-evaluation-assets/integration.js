@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const cfg={url:()=> (localStorage.getItem('privateStandaloneSupabaseUrl')||'https://YOUR_PRIVATE_PROJECT_REF.supabase.co').replace(/\/$/,''),key:()=>localStorage.getItem('privateStandaloneSupabaseKey')||'YOUR_PRIVATE_SUPABASE_PUBLISHABLE_KEY'};
+const cfg={url:()=> (localStorage.getItem('privateStandaloneSupabaseUrl')||'https://okjwdzvnqsdetxdsvdgr.supabase.co').replace(/\/$/,''),key:()=>localStorage.getItem('privateStandaloneSupabaseKey')||'sb_publishable_rpHL2MOBqlgOU9eNHPOWiw_RW_mhrMx'};
 const token=()=>window.PlatformCloudSession?.token?.()||localStorage.getItem('platform_file_session_token')||'';
 const sid=()=>window.PlatformCloudSession?.schoolId?.()||localStorage.getItem('platform_file_session_school_id')||localStorage.getItem('active_school_id')||localStorage.getItem('current_school_id')||'';
 const uid=()=>window.PlatformCloudSession?.userId?.()||localStorage.getItem('platform_file_session_user_id')||'';

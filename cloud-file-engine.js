@@ -3,8 +3,8 @@
   const VERSION='3.0.0';
   const DEFAULT_TIMEOUT=45000;
   const cfg={
-    base:()=> (localStorage.getItem('privateStandaloneSupabaseUrl')||'https://YOUR_PRIVATE_PROJECT_REF.supabase.co').replace(/\/$/,'')+'/functions/v1/platform-files',
-    anon:()=>localStorage.getItem('privateStandaloneSupabaseKey')||'YOUR_PRIVATE_SUPABASE_PUBLISHABLE_KEY',
+    base:()=> (localStorage.getItem('privateStandaloneSupabaseUrl')||'https://okjwdzvnqsdetxdsvdgr.supabase.co').replace(/\/$/,'')+'/functions/v1/platform-files',
+    anon:()=>localStorage.getItem('privateStandaloneSupabaseKey')||'sb_publishable_rpHL2MOBqlgOU9eNHPOWiw_RW_mhrMx',
     token:()=>window.PlatformCloudSession?.token?.()||sessionStorage.getItem('platform_tab_session_token_v1')||localStorage.getItem('platform_file_session_token')||''
   };
   function emit(name,detail){try{window.dispatchEvent(new CustomEvent('cloudfiles:'+name,{detail}))}catch(_){} }

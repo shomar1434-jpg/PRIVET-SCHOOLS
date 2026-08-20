@@ -1,0 +1,5 @@
+PRIVET-SCHOOLS — Supabase link patch
+Project Ref: okjwdzvnqsdetxdsvdgr
+Project URL: https://okjwdzvnqsdetxdsvdgr.supabase.co
+ضع محتويات هذه الحزمة فوق جذر المستودع مع الحفاظ على نفس المسارات.
+لا تحذف الملفات الأخرى من المستودع.

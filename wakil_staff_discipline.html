@@ -446,7 +446,7 @@ let _disciplineCloudTimer=null;
 async function disciplineCloudCall(action,payload){
  const token=localStorage.getItem('platform_file_session_token')||'';
  if(!token)return null;
- const url=(localStorage.getItem('privateStandaloneSupabaseUrl')||'https://YOUR_PRIVATE_PROJECT_REF.supabase.co').replace(/\/$/,'');
+ const url=(localStorage.getItem('privateStandaloneSupabaseUrl')||'https://okjwdzvnqsdetxdsvdgr.supabase.co').replace(/\/$/,'');
  const key=localStorage.getItem('privateStandaloneSupabaseKey')||'';
  const r=await fetch(url+'/functions/v1/platform-discipline?action='+encodeURIComponent(action),{method:'POST',headers:{'content-type':'application/json','apikey':key,'x-platform-session':token},body:JSON.stringify(payload||{})});
  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'تعذر مزامنة الانضباط');return j;

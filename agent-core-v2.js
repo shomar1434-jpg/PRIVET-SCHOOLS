@@ -59,14 +59,14 @@ async function executeLocalAction(a){const c=assertContext(context());if(String(
  if(a.type==='save_memory'){return await rememberCloud(a.payload?.text||'',a.payload?.tags||[],'user')}
  if(a.type==='create_task'||a.type==='create_task_draft'){
    if(!/leadership|agency/.test(c.role))throw new Error('إنشاء التكليفات من الوكيل متاح للمدير والوكيل فقط.');
-   const base=(localStorage.getItem('privateStandaloneSupabaseUrl')||'https://YOUR_PRIVATE_PROJECT_REF.supabase.co').replace(/\/$/,'');const token=sessionToken();const r=await fetch(base+'/functions/v1/platform-tasks?action=create',{method:'POST',headers:{'content-type':'application/json','apikey':anon(),'x-platform-session':token},body:JSON.stringify(a.payload||{})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'تعذر إنشاء التكليف.');return d;
+   const base=(localStorage.getItem('privateStandaloneSupabaseUrl')||'https://okjwdzvnqsdetxdsvdgr.supabase.co').replace(/\/$/,'');const token=sessionToken();const r=await fetch(base+'/functions/v1/platform-tasks?action=create',{method:'POST',headers:{'content-type':'application/json','apikey':anon(),'x-platform-session':token},body:JSON.stringify(a.payload||{})});const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'تعذر إنشاء التكليف.');return d;
  }
  throw new Error('هذا الإجراء يحتاج تكاملًا إضافيًا قبل تنفيذه.');
 }
 async function approveAction(id){const c=context(),rows=proposedActions(),a=rows.find(x=>x.id===id);if(!a)throw new Error('الإجراء غير موجود.');if(c.academicYearStatus==='archived')throw new Error('العام الدراسي الحالي مؤرشف للقراءة فقط. لا يمكن تنفيذ إجراء يغير البيانات.');const res=await executeLocalAction(a);a.status='executed';a.executedAt=new Date().toISOString();localStorage.setItem(scopedKey(LS.actions,c),JSON.stringify(rows));audit('action.executed',{id:a.id,type:a.type});return res}
 function rejectAction(id){const c=context(),rows=proposedActions(),a=rows.find(x=>x.id===id);if(a){a.status='rejected';a.rejectedAt=new Date().toISOString();localStorage.setItem(scopedKey(LS.actions,c),JSON.stringify(rows));audit('action.rejected',{id:a.id,type:a.type})}}
-function endpoint(){const base=(localStorage.getItem('privateStandaloneSupabaseUrl')||'https://YOUR_PRIVATE_PROJECT_REF.supabase.co').replace(/\/$/,'');return base+'/functions/v1/platform-agent'}
-function anon(){return localStorage.getItem('privateStandaloneSupabaseKey')||'YOUR_PRIVATE_SUPABASE_PUBLISHABLE_KEY'}
+function endpoint(){const base=(localStorage.getItem('privateStandaloneSupabaseUrl')||'https://okjwdzvnqsdetxdsvdgr.supabase.co').replace(/\/$/,'');return base+'/functions/v1/platform-agent'}
+function anon(){return localStorage.getItem('privateStandaloneSupabaseKey')||'sb_publishable_rpHL2MOBqlgOU9eNHPOWiw_RW_mhrMx'}
 function sessionToken(){
   try{
     const managed=window.PlatformCloudSession?.token?.();
@@ -76,7 +76,7 @@ function sessionToken(){
 }
 
 function storedSupabaseAuthSession(){
-  const projectRef='YOUR_PRIVATE_PROJECT_REF';
+  const projectRef='okjwdzvnqsdetxdsvdgr';
   const stores=[localStorage,sessionStorage];
   const pick=obj=>{
     if(!obj||typeof obj!=='object')return null;
@@ -116,7 +116,7 @@ async function usableSupabaseAccessToken(base,headers){
         const r=await fetch(base+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers,body:JSON.stringify({refresh_token:stored.refresh_token})});
         const d=await r.json().catch(()=>({}));
         if(r.ok&&d.access_token){
-          try{localStorage.setItem('sb-YOUR_PRIVATE_PROJECT_REF-auth-token',JSON.stringify(d))}catch(_){}
+          try{localStorage.setItem('sb-okjwdzvnqsdetxdsvdgr-auth-token',JSON.stringify(d))}catch(_){}
           return d.access_token;
         }
       }catch(_){}
