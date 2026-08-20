@@ -1,0 +1,50 @@
+(function(){
+  'use strict';
+  if(window.PlatformStateEngine) return;
+  const VERSION='1.0.0';
+  const cfg={
+    base:()=> (localStorage.getItem('privateStandaloneSupabaseUrl')||'https://YOUR_PRIVATE_PROJECT_REF.supabase.co').replace(/\/$/,'')+'/functions/v1/platform-state',
+    anon:()=>localStorage.getItem('privateStandaloneSupabaseKey')||'YOUR_PRIVATE_SUPABASE_PUBLISHABLE_KEY',
+    token:()=>window.PlatformCloudSession?.token?.()||sessionStorage.getItem('platform_tab_session_token_v1')||localStorage.getItem('platform_file_session_token')||''
+  };
+  async function ensureSession(){
+    if(window.PlatformCloudSession&&typeof window.PlatformCloudSession.ensure==='function'){
+      try{await window.PlatformCloudSession.ensure();}catch(_){ }
+      if(cfg.token()) return cfg.token();
+    }
+    if(cfg.token()) return cfg.token();
+    return '';
+  }
+  async function request(action,body={},opts={}){
+    const token=await ensureSession();
+    if(!token) throw new Error('الجلسة السحابية غير متاحة');
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),opts.timeout||30000);
+    try{
+      const send=async()=>{
+        const r=await fetch(`${cfg.base()}?action=${encodeURIComponent(action)}`,{
+          method:'POST',
+          headers:{apikey:cfg.anon(),'x-platform-session':cfg.token(),'x-client-version':VERSION,'content-type':'application/json'},
+          body:JSON.stringify(body),
+          signal:controller.signal,
+          keepalive:!!opts.keepalive
+        });
+        const j=await r.json().catch(()=>({}));
+        return {r,j};
+      };
+      let res=await send();
+      if(res.r.status===401&&window.PlatformCloudSession?.recover){await window.PlatformCloudSession.recover();res=await send();}
+      if(!res.r.ok) throw new Error(res.j.error||`فشلت مزامنة الحالة (${res.r.status})`);
+      return res.j;
+    }finally{clearTimeout(timer)}
+  }
+  const pull=(moduleKey,scope='user',keys)=>request('pull',{moduleKey,scope,keys});
+  const pullUser=(moduleKey,ownerUserId,keys)=>request('pull-user',{moduleKey,ownerUserId,keys});
+  const pullSchoolUsers=(moduleKey,keys)=>request('pull-school-users',{moduleKey,keys});
+  const bulkUpsert=(moduleKey,scope='user',items,opts)=>request('bulk-upsert',{moduleKey,scope,items},opts);
+  const managerUpsertUser=(moduleKey,ownerUserId,items,opts)=>request('manager-upsert-user',{moduleKey,ownerUserId,items},opts);
+  const updateAdministrativeEmployeeStatus=(ownerUserId,status)=>request('admin-employee-status',{moduleKey:'admin_performance',ownerUserId,status});
+  const removeAdministrativeEmployee=(ownerUserId)=>request('admin-employee-delete',{moduleKey:'admin_performance',ownerUserId});
+  const health=()=>request('health',{});
+  window.PlatformStateEngine={VERSION:'1.3.0-admin-supervisor-actions',request,pull,pullUser,pullSchoolUsers,bulkUpsert,managerUpsertUser,updateAdministrativeEmployeeStatus,removeAdministrativeEmployee,health};
+})();

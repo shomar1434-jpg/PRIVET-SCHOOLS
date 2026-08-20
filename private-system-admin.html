@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+
+<script src="private-storage-namespace.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مدير النظام — المدارس الأهلية والخاصة</title>
+<style>
+:root{--navy:#15445A;--teal:#0DA9A6;--bg:#f4f7f9;--text:#17324d;--muted:#6a7a89;--danger:#b42318}
+*{box-sizing:border-box}body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;margin:0;background:var(--bg);color:var(--text)}
+.wrap{max-width:1180px;margin:auto;padding:24px}.card{background:#fff;border:1px solid #e4eaf0;border-radius:20px;padding:20px;margin-bottom:18px;box-shadow:0 10px 28px rgba(28,55,90,.07)}
+h1,h2{margin-top:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+label{display:block;font-size:13px;margin-bottom:6px;font-weight:700}input,button{width:100%;border-radius:12px;border:1px solid #ccd6e0;padding:12px;font:inherit}button{background:var(--navy);color:#fff;border:0;cursor:pointer;font-weight:800}button.secondary{background:#eef4f6;color:var(--navy)}button.danger{background:#fff0f0;color:var(--danger);border:1px solid #ffd2d2}.muted{color:var(--muted);font-size:13px}.ok{color:#087f5b}.err{color:var(--danger)}.row{padding:12px 0;border-bottom:1px solid #eef2f5}.row:last-child{border-bottom:0}.badge{display:inline-block;padding:4px 9px;border-radius:999px;background:#eef5f7;font-size:12px}.hidden{display:none!important}
+.login-shell{min-height:100vh;display:grid;place-items:center;padding:24px}.login-card{width:min(460px,100%);background:#fff;border-radius:24px;padding:28px;box-shadow:0 22px 60px rgba(21,68,90,.14);border:1px solid #e1e8ed}.login-card h1{text-align:center}.login-card p{text-align:center}.login-card input{margin-bottom:10px}.schools-table{width:100%;border-collapse:collapse;font-size:13px}.schools-table th,.schools-table td{padding:10px;border-bottom:1px solid #edf1f4;text-align:right}.schools-table th{background:#f6f9fa}.small-btn{width:auto;padding:7px 11px;border-radius:9px;font-size:12px}.status{min-height:20px;margin-top:10px}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar button{width:auto}
+@media(max-width:720px){.wrap{padding:12px}.schools-table{display:block;overflow:auto;white-space:nowrap}}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet"><link rel="stylesheet" href="private-school-theme.css"><link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
+<body>
+<section id="loginView" class="login-shell hidden" aria-hidden="true">
+  <div class="login-card">
+    <h1>دخول مدير النظام</h1>
+    <p class="muted">إدارة إصدار المدارس الأهلية والخاصة</p>
+    <form id="loginForm" autocomplete="on">
+      <label for="adminEmail">البريد الإلكتروني</label>
+      <input id="adminEmail" type="email" autocomplete="username" required dir="ltr" placeholder="admin@example.com">
+      <label for="adminPassword">كلمة المرور</label>
+      <input id="adminPassword" type="password" autocomplete="current-password" minlength="8" required dir="ltr">
+      <button id="loginBtn" type="submit">دخول مدير النظام</button>
+    </form>
+    <p id="loginMsg" class="status muted"></p>
+  </div>
+</section>
+
+<section id="portalView" class="hidden">
+<div class="wrap">
+  <div class="card top">
+    <div><h1 style="margin-bottom:6px">إدارة المدارس الأهلية والخاصة</h1><div class="muted">قسم تشغيلي مستقل لإنشاء المدارس وحسابات الملاك ومتابعة المدارس المسجلة.</div><div id="adminIdentity" class="muted" style="margin-top:6px"></div></div>
+    <div class="toolbar"><button id="refreshBtn" class="secondary" type="button">تحديث</button><button id="backSectionsBtn" class="secondary" type="button">العودة للأقسام</button><button id="logoutBtn" class="danger" type="button">تسجيل الخروج</button></div>
+  </div>
+  <div class="card">
+    <h2>إضافة مدرسة خاصة</h2>
+    <p class="muted">يتم الإنشاء عبر <code>private-school-provisioning</code> المعزولة، ولا توجد كتابة مباشرة من المتصفح إلى جداول المدارس أو المستخدمين.</p>
+    <form id="createForm" class="grid" autocomplete="off">
+      <div><label>اسم المدرسة</label><input id="schoolName" required maxlength="180"></div>
+      <div><label>اسم المالك</label><input id="ownerName" required maxlength="180"></div>
+      <div><label>البريد الإلكتروني للمالك</label><input id="ownerEmail" type="email" required maxlength="250" dir="ltr"></div>
+      <div><label>كلمة المرور الأولية/الحالية</label><input id="password" type="password" minlength="8" required autocomplete="new-password" dir="ltr"></div>
+      <div style="align-self:end"><button id="createBtn" type="submit">إنشاء المدرسة</button></div>
+    </form>
+    <p id="createMsg" class="status muted"></p>
+  </div>
+  <div class="card">
+    <div class="top"><h2 style="margin:0">المدارس الخاصة</h2><span id="schoolCount" class="badge">0</span></div>
+    <div style="overflow:auto;margin-top:12px"><table class="schools-table"><thead><tr><th>المدرسة</th><th>الرمز</th><th>الحالة</th><th>تفاصيل</th></tr></thead><tbody id="schoolsBody"><tr><td colspan="4" class="muted">جارٍ التحميل…</td></tr></tbody></table></div>
+  </div>
+  <div class="card">
+    <h2>تفاصيل المدرسة</h2>
+    <div class="grid"><input id="schoolId" placeholder="معرف المدرسة" dir="ltr"><button id="loadBtn" type="button">تحميل التفاصيل</button></div>
+    <div id="overview" class="muted" style="margin-top:14px">اختر مدرسة من القائمة أو أدخل معرفها.</div>
+  </div>
+</div>
+</section>
+<script src="standalone-private-config.js"></script>
+<script src="private-school-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script>
+<script src="private-school-bridge.js"></script>
+<script>
+(function(){
+ 'use strict';
+ const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const setMsg=(id,text,ok=false)=>{const e=$(id);e.textContent=text||'';e.className='status '+(ok?'ok':'err')};
+ const showLogin=()=>{location.href='index.html';};
+ const showPortal=()=>{$('loginView').classList.add('hidden');$('portalView').classList.remove('hidden')};
+ function getClient(){if(!window.PrivateSchoolBridge?.getClient)throw new Error('تعذر تهيئة اتصال Supabase');return window.PrivateSchoolBridge.getClient()}
+ async function invokeSystem(body){const c=getClient();const r=await c.functions.invoke('system-admin',{body});if(r.error)throw new Error(r.data?.error||r.error.message||'فشل استدعاء مدير النظام');if(r.data?.error)throw new Error(r.data.error);return r.data} async function verify(){const c=getClient();let s=await c.auth.getSession();if(!s.data?.session)return null;try{const v=await invokeSystem({action:'verify'});return v?.ok?v:null}catch(_){await c.auth.signOut();return null}}
+ async function loadSchools(){const body=$('schoolsBody');body.innerHTML='<tr><td colspan="4" class="muted">جارٍ التحميل…</td></tr>';try{const d=await invokeSystem({action:'list_schools',edition:'private'});const rows=d.schools||[];$('schoolCount').textContent=String(rows.length);body.innerHTML=rows.length?rows.map(s=>`<tr><td>${esc(s.school_name||'')}</td><td dir="ltr">${esc(s.school_code||'')}</td><td><span class="badge">${esc(s.status||'')}</span></td><td><button type="button" class="small-btn" data-school="${esc(s.id)}">فتح</button></td></tr>`).join(''):'<tr><td colspan="4" class="muted">لا توجد مدارس خاصة حتى الآن.</td></tr>';body.querySelectorAll('[data-school]').forEach(b=>b.addEventListener('click',()=>{const id=b.dataset.school;$('schoolId').value=id;loadOverview(id)}));}catch(e){body.innerHTML=`<tr><td colspan="4" class="err">${esc(e.message||'تعذر تحميل المدارس')}</td></tr>`}}
+ async function loadOverview(id){const box=$('overview');box.textContent='جارٍ التحميل…';box.className='muted';try{const d=await PrivateSchoolBridge.privateSchoolOverview(id);const s=d.school||{};box.innerHTML=`<div class="row"><strong>${esc(s.school_name)}</strong> <span class="badge">${esc(s.status)}</span><br><span class="muted">${esc(s.school_code||'')}</span></div><div class="row">الملاك: ${Number(d.owners?.length||0)} — الأعضاء: ${Number(d.members?.length||0)} — الدعوات: ${Number(d.invitations?.length||0)}</div>`;}catch(e){box.textContent=e.message||'تعذر تحميل التفاصيل';box.className='err'}}
+ $('backSectionsBtn')?.addEventListener('click',()=>{location.href='index.html?systemAdminReturn=1'});
+ $('loginForm').addEventListener('submit',async ev=>{ev.preventDefault();const btn=$('loginBtn'),email=$('adminEmail').value.trim().toLowerCase(),password=$('adminPassword').value;btn.disabled=true;btn.textContent='جارٍ التحقق…';setMsg('loginMsg','جارٍ التحقق من الهوية والصلاحية…',true);try{const c=getClient();const sign=await c.auth.signInWithPassword({email,password});if(sign.error||!sign.data?.session)throw new Error('بيانات الدخول غير صحيحة أو الحساب غير مفعّل.');const v=await invokeSystem({action:'verify'});if(!v?.ok)throw new Error('هذا الحساب لا يملك صلاحية مدير النظام.');$('adminPassword').value='';$('adminIdentity').textContent='مدير النظام: '+(v.user?.email||email);showPortal();await loadSchools()}catch(e){try{await getClient().auth.signOut()}catch(_){}$('adminPassword').value='';setMsg('loginMsg',e.message||'تعذر تسجيل الدخول')}finally{btn.disabled=false;btn.textContent='دخول مدير النظام'}});
+ $('createForm').addEventListener('submit',async ev=>{ev.preventDefault();const btn=$('createBtn');btn.disabled=true;setMsg('createMsg','جارٍ التحقق والإنشاء…',true);try{const data=await PrivateSchoolBridge.provisionPrivateSchool({schoolName:$('schoolName').value.trim(),ownerName:$('ownerName').value.trim(),ownerEmail:$('ownerEmail').value.trim(),password:$('password').value});$('password').value='';$('schoolId').value=data.school?.id||'';setMsg('createMsg','تم إنشاء المدرسة الخاصة وربط المالك بنجاح.',true);await loadSchools();if(data.school?.id)await loadOverview(data.school.id)}catch(e){$('password').value='';setMsg('createMsg',e.message||'تعذر إنشاء المدرسة')}finally{btn.disabled=false}});
+ $('loadBtn').addEventListener('click',()=>{const id=$('schoolId').value.trim();if(id)loadOverview(id)});
+ $('refreshBtn').addEventListener('click',loadSchools);
+ $('logoutBtn').addEventListener('click',async()=>{try{await getClient().auth.signOut()}finally{showLogin();$('adminEmail').value='';$('adminPassword').value='';setMsg('loginMsg','')}});
+ (async()=>{try{const v=await verify();if(v){$('adminIdentity').textContent='مدير النظام: '+(v.user?.email||'');showPortal();await loadSchools()}else showLogin()}catch(e){showLogin()}})();
+})();
+</script>
+</body></html>

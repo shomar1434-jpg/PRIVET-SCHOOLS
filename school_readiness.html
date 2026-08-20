@@ -1,0 +1,2336 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+
+<script src="private-storage-namespace.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script>
+<!-- PRIVATE_EDITION_BUILD_HEAD -->
+<script src="private-edition-bootstrap.js"></script>
+<style id="private-school-auth-pending-style">html.private-auth-pending body{visibility:hidden!important}</style>
+<script src="private-school-preflight.js"></script>
+
+<style id="platform-first-paint-guard">#elsPicker{display:none!important;visibility:hidden!important}html[data-system-admin-context="1"] #activeSchoolLabel{display:none!important;visibility:hidden!important}</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>محرك جاهزية المدرسة التنفيذي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="readiness-assets/css/design-system.css">
+<style>
+:root{
+ --navy:#113b47;--teal:#0b8d83;--blue:#287fa8;--gold:#b8872f;--bg:#f3f7f8;
+ --card:#fff;--text:#18343d;--muted:#6c7f85;--border:#d8e4e7;--danger:#b53d3d;
+ --warn:#b97912;--success:#18835d;--info:#246f91;--shadow:0 10px 30px rgba(21,58,70,.08)
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.65}
+button,input,select,textarea{font:inherit}button{cursor:pointer}
+.app{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+.sidebar{background:var(--navy);color:#fff;padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;gap:12px;align-items:center;padding:8px 6px 18px;border-bottom:1px solid rgba(255,255,255,.18)}
+.brand img{width:92px;height:54px;object-fit:contain;background:#fff;border-radius:10px;padding:5px}
+.brand h1{font-size:16px;margin:0}.brand p{margin:2px 0 0;color:#cde0e5;font-size:12px}
+.nav{display:grid;gap:6px;margin-top:14px}.nav button{width:100%;text-align:right;border:0;border-radius:11px;padding:10px 11px;background:transparent;color:#eaf4f5;display:flex;gap:9px;align-items:center}
+.nav button:hover,.nav button.active{background:rgba(255,255,255,.14)}.nav svg{width:19px;height:19px;fill:currentColor;flex:none}
+.main{min-width:0}.topbar{background:#fff;border-bottom:1px solid var(--border);padding:13px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar h2{margin:0;font-size:19px}.actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;color:var(--text)}
+.btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}.btn.danger{color:var(--danger);border-color:#ecc}
+.content{padding:21px}.page{display:none}.page.active{display:block}
+.hero{background:linear-gradient(135deg,var(--navy),#1e6572);color:#fff;border-radius:21px;padding:22px;display:flex;justify-content:space-between;gap:18px;align-items:center}
+.hero h3{font-size:24px;margin:0 0 5px}.hero p{margin:0;color:#dcebed}.hero-logo{width:145px;max-height:72px;object-fit:contain;background:#fff;border-radius:13px;padding:7px}
+.metrics{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:11px;margin:15px 0}
+.metric{background:#fff;border:1px solid var(--border);border-radius:15px;padding:14px;box-shadow:var(--shadow)}
+.metric span{font-size:12px;color:var(--muted)}.metric strong{display:block;font-size:24px;margin-top:4px}
+.progress{height:10px;border-radius:99px;background:#e5edef;overflow:hidden}.progress i{display:block;height:100%;background:var(--teal);width:0}
+.grid{display:grid;gap:13px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.card h4{margin:0 0 10px}.section-card{position:relative;overflow:hidden;border-top:4px solid var(--section-color,var(--teal));cursor:pointer;transition:.2s}
+.section-card:hover{transform:translateY(-2px)}.section-card-top{display:flex;gap:12px;align-items:flex-start}
+.icon-wrap{width:53px;height:53px;border-radius:15px;display:grid;place-items:center;background:var(--section-soft,#e9f4f3);color:var(--section-color,var(--teal));flex:none}
+.icon-wrap svg,.mini svg{width:25px;height:25px;fill:currentColor}.section-card p{margin:3px 0 10px;color:var(--muted);font-size:13px}
+.section-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:11px}.section-stat{background:#f8fafb;border:1px solid var(--border);border-radius:9px;padding:7px;text-align:center}
+.section-stat strong{display:block}.section-stat span{font-size:11px;color:var(--muted)}
+.toolbar{display:grid;grid-template-columns:1fr 170px 170px auto;gap:9px;margin:14px 0}.field,.select,.textarea{width:100%;border:1px solid var(--border);border-radius:10px;background:#fff;padding:9px 10px}
+.task{background:#fff;border:1px solid var(--border);border-radius:15px;overflow:hidden;box-shadow:var(--shadow)}
+.task-summary{display:grid;grid-template-columns:auto 1fr auto auto;gap:11px;align-items:center;padding:14px;cursor:pointer}.task-summary:hover{background:#fbfdfd}
+.task-no{width:35px;height:35px;border-radius:9px;background:#e4f3f1;color:var(--teal);display:grid;place-items:center;font-weight:bold}
+.task-title{font-weight:bold}.task-meta{display:flex;gap:11px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-top:4px}.mini{display:inline-flex;align-items:center;gap:4px}.mini svg{width:14px;height:14px}
+.badge{border-radius:99px;padding:4px 9px;font-size:12px;white-space:nowrap}.s-not_started{background:#edf0f2}.s-in_progress{background:#fff1d7;color:#8a5a07}.s-submitted{background:#e8efff;color:#31598f}.s-revision{background:#ffe5e5;color:#953535}.s-completed{background:#e2f4ed;color:#146c4f}.s-verified{background:#dff1f7;color:#1c6680}.s-approved{background:#dcefe6;color:#126444}.s-blocked{background:#f7dddd;color:#932d2d}.s-na{background:#eee8f5;color:#674787}
+.task-toggle{border:0;background:transparent;color:var(--muted)}.task-toggle svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;transition:.2s}.task.open .task-toggle svg{transform:rotate(90deg)}
+.task-details{display:none;padding:14px;border-top:1px solid var(--border);background:#fcfefe}.task.open .task-details{display:block}
+.task-body{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.task-body label,.form-group label{font-size:12px;color:var(--muted);display:block}.wide{grid-column:span 2}.full{grid-column:1/-1}
+.evidence-zone{border:1px dashed #aec3c7;border-radius:12px;padding:11px;background:#fbfdfd}.evidence-list{display:grid;gap:8px;margin-top:9px}.evidence-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;border:1px solid var(--border);border-radius:10px;padding:8px;background:#fff}.evidence-item small{color:var(--muted)}
+.review-box{border-radius:11px;padding:10px;background:#f5f9fa;border:1px solid var(--border)}
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.phase{background:#fff;border:1px solid var(--border);border-radius:15px;padding:13px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.phase:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.phase.active{border:2px solid var(--teal);box-shadow:0 0 0 3px #0b8d8320}
+.phase.completed{border-color:var(--success)}
+.phase.locked{opacity:.68}
+.phase strong{display:block;font-size:14px;position:relative;z-index:1}
+.phase small{color:var(--muted);position:relative;z-index:1}
+.phase .phase-progress{height:7px;background:#edf2f3;border-radius:99px;overflow:hidden;margin:10px 0 7px}
+.phase .phase-progress i{display:block;height:100%;background:var(--teal);border-radius:99px}
+.phase .phase-stats{display:flex;justify-content:space-between;gap:6px;font-size:11px;color:var(--muted)}
+.phase .phase-arrow{position:absolute;inset-inline-end:9px;top:9px;color:var(--teal)}
+.stage-procedures{margin-top:12px;border-top:1px solid var(--border);padding-top:12px}
+.stage-procedures-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.stage-procedure-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stage-procedure-group{border:1px solid var(--border);border-radius:12px;padding:11px;background:#fafcfc}
+.stage-procedure-group h5{margin:0 0 8px}
+.stage-task-link{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--border)}
+.stage-task-link:last-child{border-bottom:0}
+.stage-task-link button{white-space:nowrap}
+.stage-empty{padding:16px;text-align:center;color:var(--muted);background:#fafcfc;border-radius:12px}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;background:#fff}.table th,.table td{padding:9px;border-bottom:1px solid var(--border);text-align:right;vertical-align:top}.table th{background:#f6f9fa}
+.score-line{display:grid;grid-template-columns:210px 1fr 65px;gap:10px;align-items:center;margin:9px 0}.score-line i{background:var(--blue)}
+.callout{border-right:4px solid var(--teal);background:#eaf5f4;padding:12px;border-radius:10px}.danger-callout{border-right-color:var(--danger);background:#fbeaea}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.tabs button.active{background:var(--teal);color:#fff}
+.report-header{text-align:center;border-bottom:2px solid var(--navy);padding-bottom:12px;margin-bottom:14px}.report-header img{width:140px}.signature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:35px;text-align:center}
+.empty{text-align:center;padding:25px;color:var(--muted)}
+@media(max-width:1050px){.metrics{grid-template-columns:repeat(2,1fr)}.grid.three{grid-template-columns:repeat(2,1fr)}.task-body{grid-template-columns:repeat(2,1fr)}.timeline{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.timeline{grid-template-columns:1fr}.app{display:block}.sidebar{position:static;height:auto}.nav{grid-template-columns:repeat(2,1fr)}.topbar{position:static}.toolbar{grid-template-columns:1fr}.metrics,.grid.two,.grid.three{grid-template-columns:1fr}.task-summary{grid-template-columns:auto 1fr auto}.task-summary>.badge{grid-column:2}.task-toggle{grid-column:3}.timeline{grid-template-columns:1fr}.hero{display:block}.hero-logo{margin-top:12px}.task-body{grid-template-columns:1fr}.wide{grid-column:auto}}
+@media print{
+ body{background:#fff}.sidebar,.topbar,.toolbar,.no-print{display:none!important}.app{display:block}.content{padding:0}.page{display:none!important}.page.printing{display:block!important}
+ .hero{background:#fff!important;color:#000;border:1px solid #777;border-radius:0}.hero p{color:#333}.task-details{display:block!important}.task{box-shadow:none;border-radius:0;break-inside:avoid}
+ .card,.metric{box-shadow:none;border-radius:0}.metrics{grid-template-columns:repeat(5,1fr)}input,select,textarea{border:0!important;background:transparent!important}
+ @page{size:A4 landscape;margin:10mm}
+}
+
+.assignment-member-card{background:#fff;border:1px solid var(--border);border-radius:15px;padding:14px;margin-bottom:12px}
+.assignment-member-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.assignment-member-head h4{margin:0}.assignment-role{font-size:12px;color:var(--muted)}
+.assignment-task-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px;max-height:330px;overflow:auto}
+.readiness-team-form{margin-top:14px;padding:16px;border:1px solid var(--border);border-radius:16px;background:linear-gradient(180deg,#fbfefd,#f6fbf9)}
+.readiness-team-form .task-body{align-items:end}
+.role-task-preview{grid-column:1/-1;margin-top:4px;border:1px solid #cfe4df;border-radius:14px;background:#fff;overflow:hidden}
+.role-task-preview-head{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:12px 14px;background:#eef8f5;border-bottom:1px solid #dcebe7}
+.role-task-preview-head strong{color:#0f5e54}.role-task-preview-head small{color:var(--muted)}
+.role-task-preview-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:12px;max-height:320px;overflow:auto}
+.role-task-preview-item{display:flex;gap:9px;align-items:flex-start;border:1px solid #e2ece9;border-radius:12px;padding:10px;background:#fbfdfc}
+.role-task-preview-item:before{content:"✓";display:grid;place-items:center;flex:0 0 auto;width:22px;height:22px;border-radius:8px;background:#e5f7f1;color:#087a5b;font-weight:900}
+.role-task-preview-item strong{display:block;font-size:12.5px;line-height:1.6}.role-task-preview-item small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.role-task-preview-empty{grid-column:1/-1;padding:15px;text-align:center;color:var(--muted);font-size:12px}
+.assignment-fixed-note{font-size:11px;color:#0c6b5c;background:#edf9f5;border:1px solid #d2eee5;border-radius:10px;padding:7px 9px;margin-top:8px}
+.assignment-task-option{display:flex;align-items:flex-start;gap:8px;border:1px solid var(--border);border-radius:10px;padding:9px;background:#fafcfc}
+.assignment-task-option input{margin-top:3px}.assignment-progress{margin-top:10px}
+.exec-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.exec-btn{border:0;border-radius:9px;padding:8px 12px;cursor:pointer;font-weight:bold}
+.exec-btn.done{background:#dcefe6;color:#126444}.exec-btn.notdone{background:#fde8e6;color:#9a2e27}
+.exec-state{display:inline-flex;padding:4px 8px;border-radius:99px;font-size:12px;margin-inline-start:6px}
+.exec-state.done{background:#dcefe6;color:#126444}.exec-state.notdone{background:#fde8e6;color:#9a2e27}.exec-state.pending{background:#edf0f2;color:#6b777c}
+.exec-modal-backdrop{position:fixed;inset:0;background:#0007;display:none;align-items:center;justify-content:center;z-index:9999;padding:18px}
+.exec-modal-backdrop.show{display:flex}.exec-modal{background:#fff;border-radius:16px;width:min(620px,100%);padding:18px;box-shadow:0 20px 60px #0004}
+.exec-modal textarea{width:100%;min-height:120px}
+@media(max-width:760px){.assignment-task-picker,.role-task-preview-list{grid-template-columns:1fr}}
+
+.assignment-toggle{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#f7fafb;cursor:pointer;font-weight:bold}
+.assignment-toggle .chev{transition:.2s}
+.assignment-toggle.open .chev{transform:rotate(180deg)}
+.assignment-panel{display:none;margin-top:8px;border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff}
+.assignment-panel.open{display:block}
+.assignment-panel-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.assignment-summary{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.assignment-summary .badge{font-size:11px}
+.task-execution-choice{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px dashed var(--border)}
+.task-execution-choice .btn{min-width:90px}
+
+.execution-panel{grid-column:1/-1;border:2px solid #d7e5e7;border-radius:14px;padding:14px;background:#f8fbfb}
+.execution-panel-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.execution-panel-title strong{font-size:16px}
+.execution-buttons{display:flex;gap:10px;flex-wrap:wrap}
+.execution-buttons button{flex:1;min-width:150px;padding:12px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer}
+.execute-yes{background:#0f9488;color:#fff;border:1px solid #0f9488}
+.execute-no{background:#fff2f1;color:#9b2924;border:1px solid #e9aaa6}
+.execution-result{margin-top:10px;padding:10px 12px;border-radius:10px;font-weight:bold}
+.execution-result.pending{background:#edf2f3;color:#53646b}
+.execution-result.done{background:#dff3ea;color:#126444}
+.execution-result.notdone{background:#fde8e6;color:#962b26}
+.execution-help{display:block;margin-top:7px;color:var(--muted)}
+.task-summary .execution-badge{white-space:nowrap}
+.evidence-zone.awaiting-evidence{border:2px solid #0f9488;box-shadow:0 0 0 4px #0f94881c}
+
+.conditional-block{grid-column:1/-1;display:none}
+.conditional-block.show{display:block}
+.execution-panel{grid-column:1/-1;border:2px solid #d7e5e7;border-radius:14px;padding:14px;background:#f8fbfb}
+.execution-panel-title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.execution-panel-title strong{font-size:16px}
+.execution-buttons{display:flex;gap:10px;flex-wrap:wrap}
+.execution-buttons button{flex:1;min-width:180px;padding:12px;border-radius:11px;font-size:15px;font-weight:800;cursor:pointer}
+.execute-yes{background:#0f9488;color:#fff;border:1px solid #0f9488}
+.execute-no{background:#fff2f1;color:#9b2924;border:1px solid #e9aaa6}
+.execution-result{margin-top:10px;padding:10px 12px;border-radius:10px;font-weight:bold}
+.execution-result.pending{background:#edf2f3;color:#53646b}
+.execution-result.done{background:#dff3ea;color:#126444}
+.execution-result.notdone{background:#fde8e6;color:#962b26}
+.execution-help{display:block;margin-top:7px;color:var(--muted)}
+.evidence-zone.awaiting-evidence{border:2px solid #0f9488;box-shadow:0 0 0 4px #0f94881c}
+.execution-step-title{font-weight:800;margin-bottom:8px}
+.followup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:760px){.followup-grid{grid-template-columns:1fr}}
+
+.stage-nav-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.stage-nav-card{border:1px solid var(--border);border-radius:14px;background:#fff;padding:14px;cursor:pointer;transition:.2s;position:relative}
+.stage-nav-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.stage-nav-card.active{border:2px solid var(--teal);box-shadow:0 0 0 3px #0b8d8320}
+.stage-nav-card h4{margin:0 0 6px}.stage-nav-card small{color:var(--muted)}
+.stage-nav-progress{height:8px;background:#e8eff1;border-radius:99px;overflow:hidden;margin:10px 0 7px}
+.stage-nav-progress i{display:block;height:100%;background:var(--teal);border-radius:99px}
+.stage-nav-stats{display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.stage-page-shell{display:none}.stage-page-shell.active{display:block}
+.manager-dashboard-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.manager-kpi{background:#fff;border:1px solid var(--border);border-radius:15px;padding:14px}
+.manager-kpi strong{display:block;font-size:28px;margin-top:4px}
+.manager-section{background:#fff;border:1px solid var(--border);border-radius:15px;padding:15px;margin-top:14px}
+.manager-list{display:grid;gap:8px}
+.manager-list-item{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fafcfc}
+.assignment-status{font-size:11px;padding:3px 7px;border-radius:99px;background:#edf2f3}
+.assignment-status.assigned{background:#dff3ea;color:#126444}
+.assignment-status.unassigned{background:#fde8e6;color:#962b26}
+.stage-switcher{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.stage-switcher .btn.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+@media(max-width:980px){.manager-dashboard-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.stage-nav-bar,.manager-dashboard-grid{grid-template-columns:1fr}}
+</style>
+
+
+
+<style id="PLATFORM_MANAGER_BACK_INLINE_STYLE">
+.platform-manager-back-inline{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:1px solid #cbd5e1;background:#fff;color:#0f766e;border-radius:10px;
+  padding:8px 12px;font-family:Cairo,Tajawal,Arial,sans-serif;font-weight:900;
+  box-shadow:0 4px 14px rgba(15,23,42,.08);cursor:pointer;white-space:nowrap
+}
+.platform-manager-back-inline:hover{background:#f0fdfa;border-color:#0d9488}
+.platform-synced-field{background:#f8fafc!important;color:#334155!important;cursor:not-allowed}
+.platform-sync-note{grid-column:1/-1;background:#ecfdf5;border:1px solid #a7f3d0;color:#166534;border-radius:12px;padding:10px 12px;font-size:12px;font-weight:800}
+@media print{.platform-manager-back-inline{display:none!important}}
+</style>
+
+
+<!-- PREMIUM_UI_2026 -->
+<link rel="stylesheet" href="premium-ui.css">
+<script defer src="premium-ui.js"></script>
+<style id="PREMIUM_REDESIGN_V2">
+:root{
+ --p-navy:#082f3a;--p-navy-2:#0b4450;--p-teal:#0aa293;--p-teal-2:#4fd1c5;
+ --p-blue:#357fc1;--p-gold:#d8a13a;--p-bg:#edf4f6;--p-ink:#14343e;
+ --p-muted:#6f858d;--p-line:#d5e3e7;--p-white:#fff;
+ --p-shadow:0 18px 50px rgba(8,52,64,.10);--p-shadow-lg:0 28px 80px rgba(8,52,64,.17)
+}
+*{box-sizing:border-box}
+body{
+ font-family:"Cairo",Tahoma,Arial,sans-serif!important;
+ background:
+  radial-gradient(circle at 95% 0,rgba(10,162,147,.16),transparent 28rem),
+  radial-gradient(circle at 0 100%,rgba(53,127,193,.12),transparent 32rem),
+  linear-gradient(135deg,#f8fbfc,#edf4f6 52%,#f7fafb);
+ color:var(--p-ink);letter-spacing:-.015em
+}
+.premium-shell{grid-template-columns:310px 1fr}
+.premium-sidebar{
+ background:linear-gradient(165deg,#092f3a 0%,#0b4651 58%,#07303a 100%);
+ padding:20px 16px;box-shadow:-12px 0 45px rgba(7,42,52,.20);
+ border-left:1px solid rgba(255,255,255,.08)
+}
+.premium-sidebar::before{
+ content:"";position:absolute;inset:0;pointer-events:none;opacity:.25;
+ background-image:radial-gradient(rgba(255,255,255,.11) 1px,transparent 1px);
+ background-size:22px 22px;mask-image:linear-gradient(#000,transparent 72%)
+}
+.premium-brand{position:relative;z-index:1;gap:13px;padding:6px 5px 19px}
+.brand-logo-shell{
+ width:84px;height:64px;border-radius:18px;background:#fff;display:grid;place-items:center;
+ box-shadow:0 15px 34px rgba(0,0,0,.19);flex:none
+}
+.brand-logo-shell img{width:73px!important;height:52px!important;background:transparent!important;padding:0!important;box-shadow:none!important}
+.brand-kicker,.topbar-kicker,.eyebrow{display:block;font-size:10px;font-weight:800;letter-spacing:.04em}
+.brand-kicker{color:#81d7cf;margin-bottom:2px}
+.premium-brand h1{font-size:20px;margin:0;font-weight:900}
+.premium-brand p{font-size:11px;color:#c0dadd}
+.sidebar-status{
+ position:relative;z-index:1;display:flex;align-items:center;gap:10px;
+ margin:14px 4px 18px;padding:11px 12px;border:1px solid rgba(255,255,255,.11);
+ background:rgba(255,255,255,.07);border-radius:15px
+}
+.status-dot{width:10px;height:10px;border-radius:50%;background:#5ce0b1;box-shadow:0 0 0 5px rgba(92,224,177,.12),0 0 16px rgba(92,224,177,.7)}
+.sidebar-status strong,.sidebar-status small{display:block}.sidebar-status strong{font-size:12px}.sidebar-status small{font-size:10px;color:#b9d2d6}
+.nav{position:relative;z-index:1;gap:7px}
+.nav button{
+ border-radius:15px;padding:11px 12px;font-weight:700;transition:.24s;
+ border:1px solid transparent;position:relative;overflow:hidden
+}
+.nav button:hover{background:rgba(255,255,255,.10);transform:translateX(-4px);border-color:rgba(255,255,255,.10)}
+.nav button.active{
+ background:linear-gradient(90deg,rgba(79,209,197,.24),rgba(255,255,255,.08));
+ border-color:rgba(112,226,216,.28);box-shadow:0 12px 26px rgba(0,0,0,.14)
+}
+.nav button.active::after{content:"";position:absolute;right:0;top:8px;bottom:8px;width:4px;border-radius:8px;background:#64ded2;box-shadow:0 0 15px #64ded2}
+.nav svg{width:20px;height:20px;padding:4px;box-sizing:content-box;border-radius:10px;background:rgba(255,255,255,.08)}
+.sidebar-footer.credits-footer {
+  position: relative; z-index: 1; margin: 22px 4px 4px; padding: 12px 14px; display: flex; gap: 10px; align-items: center;
+  background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 14px; color: #d4e6e8;
+}
+.sidebar-footer.credits-footer .sidebar-footer-icon {
+  width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; background: rgba(79, 209, 197, 0.2); color: #7ce4da; font-size: 16px; flex: none;
+}
+.sidebar-footer.credits-footer .credits-text strong {
+  display: block; font-size: 11px; font-weight: 800; color: #ffffff; line-height: 1.45;
+}
+.sidebar-footer.credits-footer .credits-text small {
+  display: block; font-size: 11px; font-weight: 800; color: #ffffff; margin-top: 3px; line-height: 1.45;
+}
+
+.premium-topbar {
+  min-height: 66px; padding: 12px 24px; background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(18px) saturate(145%); border-bottom: 1px solid rgba(177, 202, 208, 0.65);
+  box-shadow: 0 8px 24px rgba(10, 55, 65, 0.05); display: flex; align-items: center;
+}
+.topbar-container {
+  display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 16px; flex-wrap: wrap;
+}
+.db-status-badge {
+  display: inline-flex; align-items: center; gap: 8px; background: #eef8f6; border: 1px solid #70d8cb; color: #0c6a5e;
+  padding: 7px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; white-space: nowrap; box-shadow: 0 2px 8px rgba(12, 106, 94, 0.06);
+}
+.db-status-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+.topbar-actions {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.topbar-card-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 38px; padding: 0 14px;
+  background: #ffffff; border: 1px solid #c9dadd; border-radius: 10px; font-size: 12px; font-weight: 700; color: #1a3a2a;
+  cursor: pointer; white-space: nowrap; transition: all 0.22s ease; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.topbar-card-btn:hover {
+  background: #f4fbf9; border-color: #0aa293; color: #0aa293; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(10, 162, 147, 0.12);
+}
+.topbar-card-btn.primary-action-btn {
+  background: linear-gradient(135deg, #0aa293, #087e78); border-color: transparent; color: #ffffff; box-shadow: 0 4px 14px rgba(10, 162, 147, 0.25);
+}
+.topbar-card-btn.primary-action-btn:hover {
+  background: linear-gradient(135deg, #0cb4a3, #098f88); color: #ffffff; transform: translateY(-2px); box-shadow: 0 8px 22px rgba(10, 162, 147, 0.35);
+}
+.topbar-card-btn .btn-icon { font-size: 14px; line-height: 1; }
+
+.rpt-footer-credits {
+  display: flex; justify-content: center; align-items: center; gap: 32px;
+  text-align: center; font-size: 11.5px; font-weight: 800; color: #1a3a2a;
+  margin-top: 18px; padding-top: 8px; border-top: 1px dashed #a8c4b2; width: 100%; box-sizing: border-box;
+}
+.rpt-credit-sep { color: #1a7a4a; font-weight: 900; font-size: 13px; }
+.content{padding:26px;max-width:1580px;margin:auto}
+.page.active{animation:pPageIn .45s cubic-bezier(.2,.8,.2,1)}
+@keyframes pPageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.executive-cockpit{
+ min-height:245px;border-radius:30px;padding:31px 34px;display:grid;
+ grid-template-columns:minmax(0,1.45fr) minmax(300px,.55fr);align-items:center;gap:30px;
+ position:relative;overflow:hidden;color:#fff;
+ background:
+  radial-gradient(circle at 84% 22%,rgba(255,255,255,.18),transparent 15rem),
+  linear-gradient(120deg,#082f3a 0%,#0b5e68 55%,#187ca0 100%);
+ box-shadow:0 28px 75px rgba(8,53,64,.23)
+}
+.executive-cockpit::before{
+ content:"";position:absolute;inset:0;opacity:.35;pointer-events:none;
+ background-image:linear-gradient(120deg,transparent 0 55%,rgba(255,255,255,.09) 55% 56%,transparent 56%),
+ radial-gradient(rgba(255,255,255,.13) 1px,transparent 1px);background-size:100% 100%,26px 26px
+}
+.cockpit-copy,.readiness-orbit{position:relative;z-index:1}
+.eyebrow{color:#84e0d7;margin-bottom:8px}
+.cockpit-copy h3{margin:0 0 9px;font-size:31px;line-height:1.35;font-weight:900;letter-spacing:-.04em}
+.cockpit-copy p{margin:0;color:#d7eaed;max-width:720px;font-size:14px}
+.cockpit-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.cockpit-chips span{padding:7px 10px;border-radius:99px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.14);font-size:11px;font-weight:700}
+.readiness-orbit{height:190px;display:grid;place-items:center}
+.orbit-ring{
+ --p:0;position:relative;width:158px;height:158px;border-radius:50%;display:grid;place-items:center;text-align:center;
+ background:conic-gradient(#66e0d4 calc(var(--p)*1%),rgba(255,255,255,.14) 0);
+ box-shadow:0 0 0 13px rgba(255,255,255,.06),0 18px 45px rgba(0,0,0,.20)
+}
+.orbit-ring::before{content:"";position:absolute;inset:12px;border-radius:50%;background:linear-gradient(145deg,#0a4350,#0c6670);box-shadow:inset 0 0 20px rgba(255,255,255,.08)}
+.orbit-value,.orbit-ring small{position:relative;z-index:1}.orbit-value{font-size:34px;font-weight:900}.orbit-ring small{display:block;color:#cde6e8;font-size:11px}
+.orbit-badge{position:absolute;padding:7px 10px;border-radius:99px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);font-size:10px;font-weight:800;backdrop-filter:blur(8px)}
+.orbit-a{top:4px;left:18px}.orbit-b{right:2px;top:84px}.orbit-c{bottom:3px;left:30px}
+.premium-summary-strip{
+ display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:-24px 24px 18px;
+ position:relative;z-index:3;background:rgba(255,255,255,.94);border:1px solid #d8e5e8;
+ border-radius:19px;box-shadow:0 18px 45px rgba(9,59,69,.12);overflow:hidden
+}
+.premium-summary-strip>div{padding:15px 18px;border-left:1px solid #e3ecee}
+.premium-summary-strip>div:last-child{border-left:0}
+.premium-summary-strip span,.premium-summary-strip strong{display:block}.premium-summary-strip span{font-size:10px;color:#758a91;font-weight:700}.premium-summary-strip strong{font-size:18px;font-weight:900;margin-top:2px}
+.premium-metrics{grid-template-columns:repeat(5,minmax(130px,1fr));gap:13px}
+.metric{
+ border-radius:20px;padding:17px;border:1px solid rgba(181,204,210,.62);
+ background:linear-gradient(145deg,#fff,#f8fbfc);box-shadow:var(--p-shadow);
+ position:relative;overflow:hidden;transition:.27s
+}
+.metric::before{content:"";position:absolute;right:0;top:0;width:5px;height:100%;background:linear-gradient(#15b8a7,#357fc1)}
+.metric:hover{transform:translateY(-5px);box-shadow:var(--p-shadow-lg)}
+.metric span{font-weight:700}.metric strong{font-size:28px;font-weight:900}
+.progress{height:8px;background:#e7f0f2}.progress i{background:linear-gradient(90deg,#0aa293,#5bd8cd);transition:width .65s}
+.card,.task,.assignment-member-card,.manager-kpi,.manager-section{
+ border-radius:22px;border-color:rgba(181,204,210,.65);box-shadow:var(--p-shadow);
+ background:linear-gradient(145deg,#fff,#f9fcfc)
+}
+.card{padding:19px}.card h4{font-weight:900;display:flex;align-items:center;gap:9px}
+.card h4::before{content:"";width:9px;height:9px;border-radius:3px;background:linear-gradient(135deg,#0aa293,#357fc1);box-shadow:0 0 0 4px rgba(10,162,147,.10)}
+.section-card{border-top:0;border-right:5px solid var(--section-color,var(--teal));border-radius:22px;transition:.28s}
+.section-card::after{content:"";position:absolute;width:130px;height:130px;left:-54px;bottom:-62px;border-radius:50%;background:var(--section-soft,#e9f4f3);opacity:.7;transition:.3s}
+.section-card:hover{transform:translateY(-7px);box-shadow:var(--p-shadow-lg)}
+.section-card:hover::after{transform:scale(1.25)}
+.icon-wrap{width:60px;height:60px;border-radius:19px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.8),0 10px 24px rgba(22,83,91,.14)}
+.section-stat{border-radius:12px;background:#f7fafb}
+.timeline{gap:14px;position:relative}
+.timeline::before{content:"";position:absolute;right:8%;left:8%;top:28px;height:3px;background:linear-gradient(90deg,#0aa293,#357fc1);opacity:.20}
+.phase{min-height:155px;border-radius:20px;padding:17px;background:linear-gradient(145deg,#fff,#f7fbfc);transition:.28s}
+.phase::before{content:"";position:absolute;right:0;left:0;top:0;height:5px;background:linear-gradient(90deg,#0aa293,#357fc1)}
+.phase:hover{transform:translateY(-6px);box-shadow:var(--p-shadow-lg)}
+.phase.active{box-shadow:0 0 0 4px rgba(10,162,147,.10),var(--p-shadow-lg)}
+.toolbar{position:sticky;top:89px;z-index:20;padding:11px;background:rgba(255,255,255,.88);backdrop-filter:blur(14px);border:1px solid #d5e4e7;border-radius:18px;box-shadow:0 12px 30px rgba(14,64,74,.07)}
+.field,.select,.textarea{border-radius:12px;border-color:#bfd3d8;transition:.2s}
+.field:focus,.select:focus,.textarea:focus{outline:none;border-color:#0aa293;box-shadow:0 0 0 4px rgba(10,162,147,.10)}
+.task{border-radius:19px;transition:.24s}.task:hover{border-color:#8fc3bf}.task.open{box-shadow:var(--p-shadow-lg)}
+.task-summary{padding:15px 16px}.task-summary:hover{background:linear-gradient(90deg,#eef9f7,transparent)}
+.task-no{width:40px;height:40px;border-radius:13px;background:linear-gradient(135deg,#e0f5f1,#dceef7)}
+.task-title{font-weight:800}.task-details{background:linear-gradient(#fbfefe,#f5fafb);padding:17px}
+.evidence-zone{border-radius:16px;background:linear-gradient(135deg,#f7fcfb,#f1f8fa);border-color:#8dbfbc}
+.table-wrap{border:1px solid #d4e3e6;border-radius:20px;overflow:auto;box-shadow:var(--p-shadow);background:#fff}
+.table{border-collapse:separate;border-spacing:0}.table th{position:sticky;top:0;background:linear-gradient(#edf6f6,#e5f0f2);font-weight:900;padding:12px}.table td{padding:11px}.table tbody tr:hover{background:#f1f9f8}
+.assignment-member-card{padding:18px}.assignment-task-option{border-radius:13px;transition:.2s}.assignment-task-option:hover{background:#eef8f7;border-color:#81bbb7}
+.exec-btn{border-radius:11px;padding:9px 14px;transition:.2s}.exec-btn:hover{transform:translateY(-2px)}
+.exec-modal{border-radius:25px;padding:22px;box-shadow:0 30px 90px rgba(6,34,41,.30)}
+.manager-kpi{border-radius:20px;padding:18px;transition:.25s}.manager-kpi:hover{transform:translateY(-5px);box-shadow:var(--p-shadow-lg)}
+.manager-section{border-radius:22px}.manager-list-item{border-radius:13px;transition:.2s}.manager-list-item:hover{background:#eef8f7;transform:translateX(-3px)}
+.tabs{background:#f7fafb;border:1px solid #d5e4e7;border-radius:16px;padding:6px}.tabs button.active{background:linear-gradient(135deg,#0aa293,#087e78);box-shadow:0 9px 20px rgba(10,162,147,.20)}
+.premium-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.5);transform:scale(0);animation:pRipple .55s ease-out;pointer-events:none}
+@keyframes pRipple{to{transform:scale(4);opacity:0}}
+/* ─────────── توافق الأداء والواجهة مع متصفحات iOS / WebKit (iPhone & iPad) ─────────── */
+html, body {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+.sidebar, .main, .content, .table-wrap, .assignment-task-picker {
+  -webkit-overflow-scrolling: touch;
+}
+.select, .field, .btn, .p-btn, .topbar-card-btn {
+  -webkit-appearance: none;
+}
+.main {
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+
+@media(max-width:1100px){.premium-metrics{grid-template-columns:repeat(2,1fr)}.executive-cockpit{grid-template-columns:1fr}.readiness-orbit{height:180px}.premium-summary-strip{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){
+ .premium-shell{display:block}.premium-sidebar{position:relative;height:auto}.sidebar-status,.sidebar-footer{display:none}
+ .nav{grid-template-columns:repeat(2,1fr)}.premium-topbar{position:static;align-items:flex-start;gap:10px}.premium-actions{justify-content:flex-end}
+ .content{padding:14px}.executive-cockpit{padding:22px;border-radius:22px}.cockpit-copy h3{font-size:23px}
+ .premium-summary-strip{margin:12px 0 16px;grid-template-columns:1fr 1fr}.premium-summary-strip>div{padding:12px}
+ .premium-metrics{grid-template-columns:1fr}.timeline::before{display:none}.toolbar{position:static}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+</style>
+<style id="SYSTEMS_V3">
+/* ── SLA Badges ── */
+.sla-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:99px;font-size:11px;font-weight:700;margin-inline-start:6px}
+.sla-ok{background:#e2f4ed;color:#146c4f}.sla-warn{background:#fff1d7;color:#8a5a07}.sla-crit{background:#fde8e6;color:#962b26}
+/* ── Monitoring Page ── */
+.mon-header{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.mon-stat{border-radius:16px;padding:16px;text-align:center;border:1px solid var(--border)}
+.mon-stat-red{background:#fef2f2;border-color:#fca5a5}.mon-stat-yel{background:#fffbeb;border-color:#fcd34d}
+.mon-stat-blu{background:#eff6ff;border-color:#93c5fd}.mon-stat-gray{background:#f8fafc;border-color:#cbd5e1}
+.mon-num{font-size:38px;font-weight:900;line-height:1}
+.mon-stat-red .mon-num{color:#dc2626}.mon-stat-yel .mon-num{color:#d97706}.mon-stat-blu .mon-num{color:#2563eb}.mon-stat-gray .mon-num{color:#475569}
+.mon-lbl{font-size:13px;color:var(--muted);margin-top:4px}
+.mon-body{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+.mon-alerts{display:grid;gap:10px}
+.mon-card{border-radius:14px;padding:14px;border:1px solid var(--border);background:#fff}
+.mon-card-critical{border-right:4px solid #dc2626;background:#fff8f8}
+.mon-card-warning{border-right:4px solid #d97706;background:#fffdf0}
+.mon-card-info{border-right:4px solid #2563eb;background:#f0f7ff}
+.mon-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.mon-badge{border-radius:99px;padding:3px 9px;font-size:12px;font-weight:700}
+.mon-badge-critical{background:#fee2e2;color:#991b1b}.mon-badge-warning{background:#fef3c7;color:#92400e}.mon-badge-info{background:#dbeafe;color:#1e40af}
+.mon-section-tag{font-size:11px;color:var(--muted);background:#f1f5f9;padding:3px 8px;border-radius:99px}
+.mon-task-title{font-weight:700;margin-bottom:4px}
+.mon-detail{font-size:13px;color:var(--muted);margin-bottom:10px}
+.mon-footer{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.mon-goto{padding:5px 10px;font-size:12px;background:var(--teal);color:#fff;border:none;border-radius:8px}
+.mon-side{display:grid;gap:12px}
+.mon-sla-list{display:grid;gap:6px;margin-top:4px}
+.mon-sla-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:10px;background:#f8fafc;border:1px solid var(--border)}
+.mon-sla-danger{background:#fef2f2;border-color:#fca5a5;color:#991b1b}
+.mon-sla-warn{background:#fffbeb;border-color:#fcd34d;color:#92400e}
+.hist-bars{display:flex;gap:8px;align-items:flex-end;height:110px;padding-top:8px}
+.hist-bar-item{display:flex;flex-direction:column;align-items:center;gap:2px;flex:1;min-width:0}
+.hist-bar-wrap{display:flex;align-items:flex-end;height:80px;width:100%}
+.hist-bar-fill{width:100%;border-radius:4px 4px 0 0;transition:.3s}
+.hist-val{font-size:10px;font-weight:700;color:var(--text)}
+.hist-date{font-size:9px;color:var(--muted)}
+.mon-nav-badge{display:inline-flex;align-items:center;justify-content:center;background:#dc2626;color:#fff;border-radius:99px;font-size:10px;font-weight:800;min-width:18px;height:18px;padding:0 4px;margin-inline-start:auto}
+@media(max-width:900px){.mon-body{grid-template-columns:1fr}.mon-header{grid-template-columns:repeat(2,1fr)}}
+
+/* ═══════════════════════════════════════════════════
+   ترويسة رسمية — وزارة التعليم (مطابق للنموذج الرسمي)
+═══════════════════════════════════════════════════ */
+.rpt-hdr{margin-bottom:18px;font-family:"Cairo",Tahoma,Arial,sans-serif;direction:rtl}
+
+/* إطار الترويسة: 3 أعمدة متوازنة */
+.rpt-hdr-box{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  border:2px solid #1a7a4a;
+  border-radius:10px;
+  background:#fff;
+  overflow:hidden
+}
+
+/* ─────────── العمود الأيمن: معلومات المملكة/المدرسة ─────────── */
+.rpt-col-right{
+  padding:8px 14px;
+  display:flex;flex-direction:column;justify-content:center;
+  align-items:center;text-align:center;
+  border-left:1px dashed #9ecfb0
+}
+.rpt-kingdom{
+  font-size:14px;font-weight:900;
+  color:#000;margin-bottom:0px
+}
+.rpt-ministry-name{
+  font-size:12px;font-weight:700;
+  color:#000;margin-bottom:8px
+}
+.rpt-field-row{
+  display:flex;align-items:center;
+  justify-content:center;
+  width:100%;margin:3px 0;gap:4px;
+  font-size:12px
+}
+.rpt-field-lbl{
+  font-weight:700;white-space:nowrap;
+  color:#000;flex:none
+}
+.rpt-dots{
+  flex:1;
+  border-bottom:1px dashed #888;
+  min-width:80px;color:#333;
+  font-size:12px;line-height:1.6;
+  text-align:center;padding-right:4px
+}
+
+/* ─────────── العمود الأوسط: الشعار فقط ─────────── */
+.rpt-col-center{
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:6px 10px;text-align:center;
+  border-left:1px dashed #9ecfb0
+}
+.rpt-logo-img{
+  width:auto;max-width:130px;
+  height:70px;object-fit:contain
+}
+.rpt-logo-text{display:none!important}
+
+/* ─────────── العمود الأيسر: التاريخ / العام ─────────── */
+.rpt-col-left{
+  padding:8px 14px;
+  display:flex;flex-direction:column;justify-content:center;
+  gap:0
+}
+.rpt-meta-row{
+  display:flex;align-items:center;
+  justify-content:flex-start;
+  gap:2px;
+  padding:4px 0;font-size:12px;
+  border-bottom:1px solid #eee;
+  white-space:nowrap
+}
+.rpt-meta-row:last-child{border-bottom:none}
+.rpt-meta-lbl{font-weight:700;color:#000;white-space:nowrap}
+.rpt-slash{color:#000;font-weight:700;margin:0 3px}
+.rpt-meta-val{color:#000;font-weight:700;white-space:nowrap}
+.rpt-select{border:none;color:#000;font-weight:700;font-size:12px;background:transparent;cursor:pointer;font-family:inherit;text-align:right}
+.rpt-meta-print-val{display:none;color:#000;font-weight:700;white-space:nowrap}
+
+/* ─────────── شريط عنوان الوثيقة الأصلي الإحاطة والتنسيق ─────────── */
+.rpt-doc-title{
+  text-align:center;
+  background:linear-gradient(135deg,#e8f5ee,#d4eddd);
+  border:1px solid #1a7a4a;border-radius:8px;
+  margin-top:10px;padding:10px;
+  font-size:20px;font-weight:900;
+  color:#1a3a2a;letter-spacing:.02em
+}
+.rpt-doc-sub{display:none!important}
+/* ── Signatures ── */
+
+
+
+.rpt-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0;padding:8px 12px;background:#f8fafb;border-radius:10px;border:1px solid var(--border)}
+.rpt-strip-item{text-align:center;font-size:11px;color:var(--muted)}
+.rpt-big-num{font-size:22px;font-weight:900;line-height:1;margin-bottom:2px}
+.rpt-section-blk{margin-bottom:16px}
+.rpt-sec-head{display:flex;justify-content:space-between;align-items:center;background:var(--navy);color:#fff;padding:6px 10px;border-radius:8px 8px 0 0;font-weight:700;font-size:12px}
+.rpt-sec-score{background:rgba(255,255,255,.2);padding:2px 8px;border-radius:99px;font-size:11px}
+.rpt-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-bottom:4px}
+.rpt-tbl th{background:#f1f5f9;padding:6px 8px;border:1px solid #c8d5da;text-align:right;font-weight:700;font-size:11px}
+.rpt-tbl td{padding:5px 7px;border:1px solid #d8e4e7;vertical-align:top}
+.rpt-tbl tr:nth-child(even) td{background:#fafcfd}
+.rpt-row-crit td{background:#fff8f8!important}
+.rpt-c{text-align:center}
+.rpt-ok{color:#126444;font-weight:700}.rpt-no{color:#962b26;font-weight:700}.rpt-pend{color:#6b777c}
+.rpt-cell-red{color:#962b26;font-weight:700}
+.rpt-badge-crit{background:#fde8e6;color:#9a2e27;border-radius:99px;padding:2px 7px;font-size:11px;font-weight:700}
+.rpt-input{color:#aaa;font-size:11px}
+.rpt-input-ph{color:#aaa;font-style:italic}
+.rpt-sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;padding-top:14px;border-top:2px solid var(--navy)}
+.rpt-sig{text-align:center}
+.rpt-sig-lbl{font-weight:700;margin-bottom:4px;font-size:13px}
+.rpt-sig-name{font-size:12px;color:var(--muted);margin-bottom:24px;min-height:18px}
+.rpt-sig-line{border-bottom:1.5px solid #000;margin:0 10px}
+.rpt-sig-stamp{font-size:10px;color:var(--muted);margin-top:4px}
+.tabs.report-tabs{flex-wrap:wrap}
+/* ═════════════════════════════════════════════════════════════════
+   نظام الطباعة الاحترافي الموحد (Professional Unified Print System)
+   - تصفير كافة الحاويات لمنع قص الحدود (Cut-off Box Borders)
+   - توزيع العناصر والجداول والتوقيعات على الصفحات بشكل سليم
+   - حماية الترويسة والعناوين والتوقيعات من الانفصال
+═════════════════════════════════════════════════════════════════ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm 12mm 10mm 12mm;
+  }
+
+  /* 1. تصفير وإلغاء قيود العرض والارتفاع والحدود الخارجية */
+  html, body, .app, .main, .content, .table-wrap {
+    display: block !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+    position: static !important;
+    float: none !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 2. إلغاء ظلال وحدود كروت الواجهة الخارجية */
+  .card, .hero, .page, #reportContent, .table-wrap, .section-card,
+  .executive-cockpit, .assignment-member-card, .manager-section, .manager-kpi {
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  /* 3. إخفاء عناصر الواجهة غير المخصصة للطباعة والعناوين الفرعية */
+  .sidebar, .topbar, .toolbar, .no-print, .actions,
+  .exec-modal-backdrop, .sidebar-status, .sidebar-footer,
+  .executive-cockpit, .readiness-orbit, .premium-summary-strip,
+  .rpt-select, button, input[type="file"], .rpt-doc-sub {
+    display: none !important;
+  }
+
+  /* 4. إظهار قيم الطباعة والصفحة النشطة فقط */
+  .print-only { display: inline !important; }
+  .rpt-meta-print-val { display: inline !important; color: #000 !important; font-weight: 700 !important; }
+  
+  .page { display: none !important; }
+  .page.active, .page.printing { display: block !important; width: 100% !important; }
+
+  /* 5. إطار وتصميم الترويسة الرسمية (مدمجة ومحمية من الانقسام) */
+  .rpt-hdr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 6px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .rpt-hdr-box {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important;
+    border: 2px solid #1a7a4a !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 6. شريط ملخص التقرير المرفوع */
+  .rpt-strip {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin: 6px 0 10px 0 !important;
+    padding: 6px 8px !important;
+    border: 1px solid #1a7a4a !important;
+    border-radius: 6px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .rpt-big-num {
+    font-size: 18px !important;
+    margin-bottom: 1px !important;
+  }
+  .rpt-strip-item {
+    font-size: 10px !important;
+  }
+
+  /* 7. تنسيق الأقسام لمنع التداخل - كل قسم يبدأ في صفحة مستقلة عدا الأول */
+  .rpt-section-blk + .rpt-section-blk {
+    page-break-before: always !important;
+    break-before: page !important;
+  }
+  .rpt-section-blk {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 12px !important;
+  }
+  .rpt-sec-head {
+    background: #113b47 !important;
+    color: #fff !important;
+    padding: 5px 8px !important;
+    border-radius: 6px 6px 0 0 !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .rpt-doc-title {
+    background: #d4eddd !important;
+    color: #1a3a2a !important;
+    border: 1px solid #1a7a4a !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    font-size: 20px !important;
+    font-weight: 900 !important;
+    text-align: center !important;
+    margin-top: 10px !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  .rpt-tbl {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 10px !important;
+    page-break-inside: auto !important;
+  }
+  .rpt-tbl thead {
+    display: table-header-group !important;
+  }
+  .rpt-tbl tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  .rpt-tbl th, .rpt-tbl td {
+    border: 1px solid #a8c4b2 !important;
+    padding: 4px 6px !important;
+    box-sizing: border-box !important;
+  }
+  .rpt-tbl th {
+    background: #e8eff1 !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .rpt-row-crit td {
+    background: #fff0f0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 8. مربع التوقيعات والاعتماد */
+  .rpt-sigs {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-top: 18px !important;
+    padding-top: 10px !important;
+    border-top: 2px solid #1a7a4a !important;
+  }
+
+  /* 9. حقوق الملكية الفكرية في تذييل التقرير */
+  .rpt-footer-credits {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 36px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    color: #000000 !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+    border-top: 1px dashed #1a7a4a !important;
+    margin-top: 14px !important;
+    padding-top: 6px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .rpt-credit-sep {
+    color: #1a7a4a !important;
+    font-weight: 900 !important;
+  }
+
+  /* 10. منع انفراد العناوين بالأسفل */
+  h1, h2, h3, h4, h5 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+}
+
+
+</style>
+<style id="PRIVATE_SCHOOL_READINESS_OVERRIDES">
+.sidebar-footer.credits-footer,.rpt-footer-credits{display:none!important}
+body{font-family:"Cairo",Tahoma,Arial,sans-serif!important}
+.sidebar-status strong::after{content:""}
+@media print{.rpt-footer-credits{display:none!important}}
+</style>
+
+
+<style id="READINESS_SCHOOL_DATA_FIX_V1">
+#page-settings .card{overflow:hidden}
+#settingsForm.readiness-school-data-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start}
+#settingsForm .platform-sync-note{grid-column:1/-1;margin:0 0 2px}
+.school-data-field{min-width:0}
+.school-data-field label{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-weight:700;color:#506b73}
+.school-data-field label::before{content:"";width:7px;height:7px;border-radius:2px;background:linear-gradient(135deg,var(--teal),var(--blue));opacity:.75}
+.school-data-field .field,.school-data-field .select{height:47px}
+.fixed-setting-field{background:#f2f7f8!important;color:#2c555f!important;font-weight:700;cursor:not-allowed}
+.school-media-card{grid-column:span 2;border:1px solid var(--border);border-radius:16px;padding:13px;background:linear-gradient(145deg,#fbfefe,#f4f9fa);min-height:150px}
+.school-media-card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.school-media-card-head strong{font-size:13px;color:#35545c}
+.school-media-card-head span{font-size:10px;padding:4px 8px;border-radius:99px;background:#e6f4f2;color:#147064;font-weight:700}
+.school-media-preview{height:92px;border:1px dashed #aac5ca;border-radius:13px;display:grid;place-items:center;background:#fff;overflow:hidden;position:relative}
+.school-media-preview img{display:block;max-width:100%;max-height:84px;width:auto;height:auto;object-fit:contain}
+.school-media-empty{display:flex;flex-direction:column;align-items:center;gap:5px;color:#82969c;font-size:11px;text-align:center}
+.school-media-empty b{font-size:25px;line-height:1;color:#8eb7b5}
+.settings-weights-block{grid-column:1/-1;margin-top:3px;border-top:1px solid var(--border);padding-top:15px}
+@media(max-width:1100px){#settingsForm.readiness-school-data-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){#settingsForm.readiness-school-data-grid{grid-template-columns:1fr}.school-media-card{grid-column:auto}}
+@media print{.school-media-preview{border:0}.school-media-card{box-shadow:none;break-inside:avoid}}
+
+.readiness-clean-box{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border:1px solid #f1c7c7;border-radius:16px;background:linear-gradient(135deg,#fffafa,#fff5f5)}
+.readiness-clean-copy strong{display:block;color:#8f2f2f;font-size:13px}.readiness-clean-copy small{display:block;color:#8b6b6b;margin-top:3px;line-height:1.6}
+.readiness-clean-btn{border:1px solid #dcaaaa;background:#fff;color:#a52f2f;border-radius:11px;padding:10px 14px;font-weight:800;white-space:nowrap;cursor:pointer}
+.readiness-clean-btn:hover{background:#a52f2f;color:#fff;border-color:#a52f2f}
+@media(max-width:700px){.readiness-clean-box{align-items:stretch;flex-direction:column}.readiness-clean-btn{width:100%}}
+@media print{.readiness-clean-box{display:none!important}}
+.cloud-save-status{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);background:#f8fafc;border-radius:99px;padding:6px 10px;font-size:11px;font-weight:800;color:#526a71;white-space:nowrap}
+.cloud-save-status::before{content:"";width:8px;height:8px;border-radius:50%;background:#94a3b8}
+.cloud-save-status.loading::before,.cloud-save-status.saving::before{background:#d79922;box-shadow:0 0 0 4px #d7992220}
+.cloud-save-status.saved::before{background:#18835d;box-shadow:0 0 0 4px #18835d20}
+.cloud-save-status.error::before{background:#b53d3d;box-shadow:0 0 0 4px #b53d3d20}
+.cloud-save-status.local::before{background:#287fa8;box-shadow:0 0 0 4px #287fa820}
+@media(max-width:900px){.cloud-save-status{order:10;width:100%;justify-content:center}}
+@media print{.cloud-save-status{display:none!important}}
+</style>
+
+<script src="platform-state-engine.js"></script>
+<script src="platform-persistence-guard.js"></script>
+<script defer src="school-base-settings-source.js"></script>
+<link rel="stylesheet" href="responsive-layout.css?v=20260818-responsive-1">
+<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
+<body>
+<div class="app premium-shell">
+<aside class="sidebar premium-sidebar">
+  <div class="brand premium-brand">
+    <div class="brand-logo-shell"><img src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg" alt="شعار وزارة التعليم"></div>
+    <div><span class="brand-kicker">منصة القيادة المدرسية</span><h1>جاهزية المدرسة</h1><p>مركز التنفيذ والاعتماد المؤسسي</p></div>
+  </div>
+  <div class="sidebar-status">
+    <span class="status-dot"></span>
+    <div><strong>النظام متصل بالمنصة</strong><small>المزامنة السحابية حسب المدرسة النشطة</small></div>
+  </div>
+  <nav class="nav" id="nav"></nav>
+</aside>
+<main class="main">
+<header class="topbar premium-topbar p-topbar">
+  <div class="topbar-container">
+    <div class="topbar-right" style="display:flex;align-items:center;gap:14px">
+      <h2 id="pageTitle" class="topbar-title" style="margin:0;font-size:18px;font-weight:900;color:#113b47">لوحة الجاهزية</h2>
+      <div id="dbStatusBadge" class="db-status-badge">
+        <span class="db-status-dot"></span>
+        <span>جاهزية المدرسة متصلة بالسحابة</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <span id="cloudSaveStatus" class="cloud-save-status loading" title="حالة مزامنة بيانات الجاهزية">جارٍ تهيئة الحفظ السحابي</span>
+      <button class="topbar-card-btn" type="button" onclick="window.location.href='manager.html'"><span class="btn-icon">←</span><span>العودة إلى قسم المدير</span></button>
+      <button class="topbar-card-btn" id="exportBtn"><span class="btn-icon">⇩</span><span>نسخة احتياطية</span></button>
+      <label class="topbar-card-btn"><span class="btn-icon">⇧</span><span>استعادة بيانات</span><input id="importInput" type="file" accept=".json" hidden></label>
+      <button class="topbar-card-btn primary-action-btn" id="printBtn"><span class="btn-icon">⎙</span><span>طباعة التقرير</span></button>
+    </div>
+  </div>
+</header>
+<div class="content">
+<section class="page active" id="page-dashboard">
+ <div class="executive-cockpit">
+   <div class="cockpit-copy">
+     <span class="eyebrow">جاهزية العام الدراسي</span>
+     <h3>مركز القيادة التنفيذي لجاهزية المدرسة</h3>
+     <p>قراءة فورية لمستوى الإنجاز، جودة الشواهد، المخاطر، ومسار الاعتماد في جميع مجالات الجاهزية.</p>
+     <div class="cockpit-chips">
+       <span>✓ تنفيذ موثق</span><span>◈ تحقق واعتماد</span><span>⚠ معالجة استباقية</span>
+     </div>
+   </div>
+   <div class="readiness-orbit">
+      <div class="orbit-ring"><div class="orbit-value" id="premiumOverallValue">0%</div><small>الجاهزية الكلية</small></div>
+      <div class="orbit-badge orbit-a">تنفيذ</div>
+      <div class="orbit-badge orbit-b">شواهد</div>
+      <div class="orbit-badge orbit-c">اعتماد</div>
+   </div>
+ </div>
+ <div class="premium-summary-strip">
+   <div><span>الحالة التشغيلية</span><strong id="premiumOperationalState">قيد التهيئة</strong></div>
+   <div><span>المهام الحرجة</span><strong id="premiumCriticalCount">0</strong></div>
+   <div><span>المهام المتأخرة</span><strong id="premiumLateCount">0</strong></div>
+   <div><span>الشواهد المرفوعة</span><strong id="premiumEvidenceCount">0</strong></div>
+ </div>
+ <div class="metrics premium-metrics" id="dashboardMetrics"></div>
+ <div class="grid two" style="margin-top:14px">
+    <div class="card"><h4>الجاهزية حسب المجال</h4><div id="sectionScores"></div></div>
+    <div class="card"><h4>مؤشرات الأداء الموزونة</h4><div id="kpiBreakdownPanel"><div class="empty">جارٍ تحليل البيانات…</div></div></div>
+  </div>
+  <div class="grid two" style="margin-top:14px">
+    <div class="card"><h4>تنبيهات تنفيذية</h4><div id="alerts"></div></div>
+    <div class="card"><h4>مؤشر الإنجاز العام المركّب</h4>
+      <div id="oaiCompositePanel" style="text-align:center;padding:18px 0">
+        <div style="font-size:62px;font-weight:900;color:var(--p-teal);line-height:1" id="oaiScore">—</div>
+        <div style="font-size:14px;color:var(--p-muted);margin:4px 0 12px" id="oaiGradeLabel">جارٍ الحساب</div>
+        <div class="progress" style="margin:0 auto;max-width:320px"><i id="oaiProgressBar" style="width:0%;background:linear-gradient(90deg,#0aa293,#357fc1)"></i></div>
+        <div style="font-size:11px;color:var(--p-muted);margin-top:10px">OAI = Σ (مؤشر × وزنه) حسب أوزان إعدادات المدرسة</div>
+      </div>
+    </div>
+  </div>
+ <div class="card"><h4>محرك مراحل خطة المتابعة</h4><p style="color:var(--muted);margin-top:-4px">اختر المرحلة لعرض إجراءاتها المرتبطة وتنفيذها داخل مجالات النظام.</p><div class="timeline" id="timeline"></div><div class="stage-procedures" id="stageProcedures"></div></div>
+ <h3>مجالات الجاهزية</h3><div class="grid three" id="sectionCards"></div>
+</section>
+<section class="page" id="page-monitoring">
+ <div class="hero">
+  <div>
+   <h3>المتابعة الذكية</h3>
+   <p>رصد استباقي للتنبيهات الحرجة، الأعمال المفتوحة، والمجالات المتراجعة — يتحدث تلقائياً كل دقيقة.</p>
+  </div>
+  <img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg">
+ </div>
+ <div style="margin-top:16px" id="monitoringContent"><div class="empty" style="padding:40px">جارٍ تحليل البيانات…</div></div>
+</section>
+<section class="page" id="page-settings"><div class="hero"><div><h3>بيانات المدرسة وإعداد الخطة</h3><p>مصدر موحد للترويسات والمسؤوليات والتقارير.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div class="card" style="margin-top:14px"><div class="task-body" id="settingsForm"></div></div></section>
+<section class="page" id="page-assignments"><div class="hero"><div><h3>المسؤوليات والصلاحيات</h3><p>إدارة فريق الاستعداد وتوزيع الأدوار التنفيذية.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div class="grid two" style="margin-top:14px"><div class="card"><h4>فريق الاستعداد</h4><div id="teamEditor"></div></div><div class="card"><h4>ملخص الإسناد</h4><div id="assignmentSummary"></div></div></div></section>
+<section class="page" id="page-risks"><div class="hero"><div><h3>محرك المخاطر والمعالجة</h3><p>اكتشاف التعثر والتأخير ونقص الشواهد وتحديد المعالجة.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div class="table-wrap" style="margin-top:14px"><table class="table"><thead><tr><th>المجال</th><th>المهمة</th><th>الخطر</th><th>المستوى</th><th>المسؤول</th><th>الإجراء التصحيحي</th><th>إجراءات المدير</th></tr></thead><tbody id="riskBody"></tbody></table></div></section>
+<section class="page" id="page-analysis"><div class="hero"><div><h3>التحليل التنفيذي الذكي</h3><p>قراءة الفجوات والأولويات والقدرة على الإغلاق في الموعد.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div id="analysisContent"></div></section>
+<section class="page" id="page-reports"><div class="hero no-print"><div><h3>مركز التقارير والطباعة</h3><p>تقارير قيادية وتنفيذية وتقارير مجالات ومتأخرات.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div class="tabs no-print" id="reportTabs"></div><div class="card" id="reportContent"></div></section>
+
+<section class="page" id="page-operational-stages">
+ <div class="hero"><div><h3>مراحل العودة الثلاث</h3><p>التنقل المرن بين المراحل مع متابعة مهام كل مرحلة ونسبة إنجازها.</p></div></div>
+ <div class="stage-nav-bar" id="operationalStageCards"></div>
+ <div class="stage-switcher" id="operationalStageSwitcher"></div>
+ <div id="operationalStageContent"></div>
+</section>
+<section class="page" id="page-manager-dashboard">
+ <div class="hero"><div><h3>لوحة مدير المدرسة</h3><p>ملخص تنفيذي لمستوى الجاهزية والمسؤوليات والمخاطر ومراحل العودة.</p></div></div>
+ <div id="managerDashboardContent"></div>
+</section>
+
+<div id="sectionPages"></div>
+</div></main></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-bridge.js"></script>
+<script src="platform-cloud-session.js?v=20260818-session-v12"></script>
+<script src="cloud-task-engine.js?v=20260818-task-v9"></script>
+<script src="platform-core-engine.js"></script>
+<script src="cloud-file-engine.js"></script>
+<script>
+const SECTIONS=[{"id": "general", "title": "الاستعداد العام للعام الدراسي", "icon": "◉", "tasks": ["استقبال الهيئة التعليمية والإدارية", "الاجتماع وتوزيع المهام", "إعداد اللجان المدرسية والتكليفات", "تنفيذ خطة الاستعداد ومتابعة تنفيذ بنود الخطة", "إعداد تقرير تفصيلي عن واقع مستوى المبنى من حيث جاهزية المدرسة للعام الدراسي، وتحديد أدوار أعضاء اللجنة وآلية التنفيذ.", "رفع تقرير جاهزية البيئة المدرسية إلى الجهة المختصة بعد التحقق من سلامة المرافق والتجهيزات.", "متابعة استلام المستلزمات المكتبية وتسليمها حسب الاحتياج.", "التأكد من تشغيل الأجهزة التقنية والبرامج والأنظمة التعليمية اللازمة.", "تفعيل برامج التوجيه الطلابي والإرشاد والخطط العلاجية والوقائية.", "تنفيذ عمليات استقبال المعلمين والطلاب المستجدين وبرامج التهيئة.", "رفع تقرير أسبوعي عن مستوى الجاهزية ونسب الإنجاز.", "تفعيل لجنة التوجيه والإرشاد ومتابعة الطلاب والطالبات.", "إعداد خطة التهيئة للطلبة المستجدين.", "تشغيل برامج الرعاية العلاجية للطلبة المحتاجين للدعم.", "تفعيل برنامج مصادر التعلم والتأكد من جاهزية مرافقه.", "التأكد من تشغيل أنظمة الاتصال الداخلي والدعم الفني.", "إعداد تقرير ختامي عن أعمال اللجنة واعتماده."]}, {"id": "organizational", "title": "المهام التنظيمية قبل الدراسة", "icon": "▦", "tasks": ["إعداد جدول الحصص.", "إعداد جدول الانتظار.", "إعداد جدول التوقيت الزمني للحصص.", "إعداد جدول الإشراف اليومي.", "إعداد جدول المناوبة اليومية.", "تنظيم ملفات المعلمين والإداريين.", "تنظيم ملفات الطلاب واستكمال النواقص.", "استلام وتسليم العهد بين القائد والوكيل.", "تنظيم الملفات الإدارية.", "ترتيب مقاعد الطلاب بحسب الاحتياجات.", "إعداد سجلات المتابعة.", "توزيع الطلاب المستجدين.", "مراجعة البريد المدرسي.", "الاطلاع على التعاميم.", "توزيع المهام حسب الاختصاص.", "تفقد مكاتب ومقرات الوكلاء.", "تهيئة المعامل وتجهيزها.", "استلام المقررات الدراسية.", "طلب الاحتياج حسب العجز.", "مطابقة المقررات المستلمة مع الاحتياج.", "التأكد من جاهزية الكهرباء والسباكة.", "التأكد من أمن وسلامة المدرسة.", "التأكد من جاهزية المعامل."]}, {"id": "admission", "title": "القبول والتسجيل", "icon": "✓", "tasks": ["بدء قبول الطلاب في المواعيد المحددة وفق نتائج اختبارات الفصل الأول.", "تفعيل قبول الطلاب ومتابعة الإجراءات النظامية وإشعار المدرسة عند الحاجة.", "القيام بإجراءات نقل الطلاب وفق الأنظمة والتعليمات.", "التحقق من العمر النظامي للقبول في المرحلة.", "متابعة قبول الطلاب المستجدين واستكمال الوثائق.", "توجيه نتائج التنفيذ التي لا تنطبق عليها شروط القبول إلى الجهة المختصة.", "مراجعة الوثائق الدراسية والتأكد من صحتها واعتمادها.", "التأكد من تسجيل جميع الطلاب في نظام نور.", "استكمال جميع الإجراءات والوثائق اللازمة للقبول.", "إعداد ملفات الطلاب وصور الوثائق المطلوبة.", "مراجعة خطاب قبول الطالب واعتماده.", "التأكد من بيانات الطلاب في المدرسة.", "معالجة حالات الطلاب القادمين من خارج المملكة.", "التحقق من وجود بيانات الطالب في كشوف المدرسة.", "إعداد سجل متابعة إجراءات القبول.", "التأكد من وجود خطاب قبول من المدرسة المحول إليها.", "تعبئة نموذج التحويل للطالب.", "التحقق من صحة المستندات المرفقة.", "توثيق الاستلام والتسليم بين المدارس.", "حصر طلبات القبول المتأخرة ومعالجتها.", "استكمال قبول الطلبة وفق الطاقة الاستيعابية."]}, {"id": "schedule", "title": "إعداد الجدول المدرسي", "icon": "▤", "tasks": ["إعداد الجدول المدرسي الأسبوعي.", "مراعاة العدل بين المعلمين عند توزيع الحصص الأولى والأخيرة.", "عدم تكرار حصص المادة الواحدة في اليوم إلا عند الحاجة.", "عدم تجزئة المادة إلى حصص متباعدة بما يخل بالخطة الدراسية.", "توزيع الحصص وفق الخطة الدراسية والأنصبة المعتمدة.", "عرض الجدول على المعلمين ومناقشته قبل اعتماده.", "رفع جدول الحصص المقترح لقائد المدرسة لاعتماده.", "اعتماد جدول الحصص المدرسي.", "وضع الجدول في أماكن بارزة داخل المدرسة وغرفة المعلمين.", "توزيع جدول الحصص على المعلمين.", "تزويد كل مشرف بصورة من الجدول.", "إعداد جدول حصص الانتظار.", "إعداد سجل الانتظار وفق النموذج المعتمد.", "اعتماد جدول الانتظار وتوزيعه.", "تدوين حصص الانتظار في جدول الحصص.", "تحديد المعلمين المنتظرين يومياً.", "تحديد الحصص التي لم يتوفر لها معلم.", "تعيين معلم بديل للحصص الشاغرة.", "توزيع المعلمين المكلفين بأعمال إضافية.", "إعداد جدول الإشراف اليومي.", "تحديد المعلمين المكلفين بالإشراف.", "توزيع الإشراف حسب الأيام والفترات.", "إبلاغ المعلمين بجدول الإشراف.", "تدوين جدول الإشراف في سجل المتابعة."]}, {"id": "books", "title": "استلام الكتب المدرسية وتوزيعها", "icon": "▥", "tasks": ["تعبئة احتياج المدرسة من المقررات الدراسية في النظام المعتمد.", "إعداد وتجهيز مستودع الكتب المدرسية وحفظه بما يناسب المخزون.", "التنسيق لاستلام الكتب الدراسية والتأكد من اكتمالها ومطابقتها للطبعة المعتمدة.", "التوقيع على محضر استلام الكتب واعتماده.", "وضع المقررات في مكان مناسب وفرزها بحسب الصفوف.", "تسليم المقررات للطلاب المنتظمين والمنقولين والتوقيع على الاستلام.", "حصر الطلاب الذين لم يتسلموا المقررات ومتابعة النقص.", "إعداد خطاب بالنواقص ورفعه إلى الجهة المختصة.", "تسليم المقررات الدراسية للطلاب بعد استلامها من إدارة المستودعات.", "استلام المقررات الناقصة والتوقيع عليها.", "استلام المقررات من الطلاب في نهاية الفصل عند الحاجة.", "حفظ الكتب المرتجعة في المستودعات المخصصة واتخاذ الإجراءات المناسبة."]}, {"id": "maintenance", "title": "الصيانة والنظافة والتعقيم", "icon": "⚒", "tasks": ["فحص وصيانة الكهرباء والإضاءة والتوصيلات والمفاتيح داخل الفصول والمبنى.", "صيانة شبكات المياه والسباكة ومعالجة الأعطال أو التسربات.", "التأكد من جاهزية أجهزة التكييف والمراوح وتنظيف فلاترها.", "إصلاح الأبواب والنوافذ والتأكد من سلامة الأسقف والجدران.", "تجهيز مرافق المدرسة والمختبرات ومصادر التعلم فنياً وتشغيلياً.", "فحص أدوات السلامة ومخارج الطوارئ وطفايات الحريق وصناديق الإسعاف الأولي.", "تنظيف شامل للفصول والمكاتب والممرات والساحات الخارجية.", "تنظيف وتعقيم دورات المياه وتجهيزها بالصابون ومواد النظافة.", "تعقيم الفصول والمكاتب والأسطح المشتركة قبل حضور الطلاب.", "التخلص من المخلفات والأثاث التالف من مرافق المدرسة.", "تأمين أدوات النظافة والتعقيم وتوزيعها على المواقع.", "تدريب عمال النظافة على أعمال التنظيف والتعقيم وتوثيق الإجراءات."]}, {"id": "transport", "title": "النقل المدرسي", "icon": "◈", "tasks": ["تعيين مسؤول للنقل المدرسي في المدرسة ومتابعة تفعيله في النظام.", "إدخال بيانات الطلاب الراغبين في النقل بدقة قبل بدء العام الدراسي.", "حصر عدد الطلاب المستحقين والمستفيدين من النقل.", "متابعة حالة الطلبات في النظام وتحديثها حسب التوجيهات.", "التواصل مع أولياء الأمور لحثهم على تسجيل أبنائهم مبكراً.", "إرسال بيانات الطلبة المعتمدين للجهة المشغلة بالتنسيق مع إدارة التعليم.", "استلام بطاقات الصعود وتوزيعها على الطلاب قبل أول يوم دراسي.", "تنظيم لقاء توعوي للطلاب حول قواعد السلامة أثناء استخدام الحافلات.", "إعداد قاعدة بيانات يومية للمركبات والسائقين وتحديثها.", "رفع تقارير أسبوعية أو شهرية عن الانتظام والملاحظات."]}, {"id": "safety", "title": "الأمن والسلامة المدرسية", "icon": "⬟", "tasks": ["تعبئة استمارة تقييم السلامة المدرسية.", "وضع خطة تطبيق الاستمارة وتحديد مواعيد التقويم والمسؤولين عنها.", "تشكيل فريق عمل لتطبيق الاستمارة برئاسة منسق الأمن والسلامة.", "إصدار قرار تشكيل فريق تطبيق الاستمارة.", "التحضير لتطبيق الاستمارة وتجهيز المتطلبات وتحديد الوقت.", "تطبيق الاستمارة في اليوم المحدد وفق النظام المعتمد.", "عرض نتائج التطبيق على لجنة السلامة المدرسية وإرفاق خطة لمعالجة الملاحظات.", "معالجة الملاحظات على ضوء السلامة في المدرسة.", "اجتماع اللجنة للاطلاع على تقرير النتائج.", "مناقشة الملاحظات والعمل على تفاديها.", "إصدار خطاب للإدارة التعليمية عند وجود ملاحظات تستدعي المعالجة.", "متابعة تنفيذ خطة المعالجة ورفع تقارير دورية.", "تعبئة سجل الأمن والسلامة بالمدرسة.", "تحديث البيانات الأساسية للمدرسة في الأنظمة المعتمدة.", "توثيق جميع صفحات السجل قبل العمل به.", "إبلاغ الدفاع المدني بأي إضافات أو تعديلات مهمة في مرافق المدرسة.", "تعبئة القرارات الخاصة بأجهزة ومعدات السلامة عند الكشف السنوي.", "تسجيل الدورات التدريبية للعاملين في البيئة الإدارية والتعليمية."]}, {"id": "environment", "title": "البيئة المدرسية", "icon": "⌂", "tasks": ["تنظيف وتعقيم الفصول الدراسية قبل حضور الطلاب.", "توزيع الطاولات والكراسي بحسب عدد الطلاب مع مراعاة المسافات.", "فحص وسائل التكييف والتأكد من جاهزيتها.", "تجهيز الوحدات التعليمية أو السبورات الذكية وتحديثها.", "وضع لوحات إرشادية في كل فصل تتضمن قواعد الانضباط.", "تحديد خطوط السير داخل المدرسة والساحات.", "تنظيف الساحة المدرسية وتجهيز أماكن جلوس مؤقتة.", "إعادة طلاء العبارات واللوحات الإرشادية بالمظهر المناسب.", "تركيب عبارات صوتية وصور داخل البيئة المدرسية.", "توفير لوحات جدارية توعوية في الممرات.", "تنظيف وتعقيم غرفة المعلمين وتحديث ترتيبها.", "تهيئة مستلزمات المكتبة المدرسية في غرفة المعلمين.", "تعليق أفكار جديدة لتطوير الاستراحة أو غرفة المعلمين.", "تركيب لوحة تحفيزية داخل غرفة المعلمين لعرض الإنجازات.", "إعداد ركن خاص بالعلاقات والخدمات المدرسية.", "تحديد موقع مناسب للإذاعة المدرسية ومراعاة التشغيل.", "تنظيم صفوف الاصطفاف بحسب الفصول أو المراحل.", "تجهيز منصة الإذاعة ورفع العلم في مكان بارز بالساحة.", "تخصيص منطقة طوارئ أو استراحة بالقرب من موقع الاصطفاف.", "ضمان وضوح الرؤية من جميع الزوايا أثناء الاصطفاف.", "تنفيذ جولة ميدانية للتأكد من جاهزية الفصول والمرافق."]}];
+const LOGO="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg";
+const ICONS={
+dashboard:`<svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9zm0 7h6v-5H4v5zm10 0h6v-9h-6v9zm0-16v5h6V4h-6z"/></svg>`,
+settings:`<svg viewBox="0 0 24 24"><path d="M19.4 13a7.8 7.8 0 000-2l2.1-1.6-2-3.4-2.5 1a8 8 0 00-1.7-1L15 3h-4l-.4 3a8 8 0 00-1.7 1l-2.5-1-2 3.4L6.5 11a7.8 7.8 0 000 2l-2.1 1.6 2 3.4 2.5-1a8 8 0 001.7 1l.4 3h4l.4-3a8 8 0 001.7-1l2.5 1 2-3.4L19.4 13zM13 15.5A3.5 3.5 0 1113 8a3.5 3.5 0 010 7.5z"/></svg>`,
+assignments:`<svg viewBox="0 0 24 24"><path d="M16 11c1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3 1.3 3 3 3zM8 11c1.7 0 3-1.3 3-3S9.7 5 8 5 5 6.3 5 8s1.3 3 3 3zm8 2c-2 0-6 1-6 3v3h12v-3c0-2-4-3-6-3zM8 13c-2.3 0-7 1.2-7 3.5V19h7v-3c0-.9.4-1.7 1.1-2.3-.4-.1-.8-.2-1.1-.2z"/></svg>`,
+risks:`<svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm1 14h-2v-2h2v2zm0-4h-2V8h2v4z"/></svg>`,
+analysis:`<svg viewBox="0 0 24 24"><path d="M3 19h18v2H3v-2zm2-2V9h3v8H5zm5 0V4h3v13h-3zm5 0v-6h3v6h-3z"/></svg>`,
+reports:`<svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6V2zm8 1.5V8h4.5L14 3.5zM9 12h8v2H9v-2zm0 4h8v2H9v-2z"/></svg>`,
+general:`<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4l-1.4-1.4L12 11.2 10.4 9.6 9 11zM2 5h10v2H2V5zm0 6h5v2H2v-2zm0 6h10v2H2v-2z"/></svg>`,
+organizational:`<svg viewBox="0 0 24 24"><path d="M9 3h6a2 2 0 012 2h3v16H4V5h3a2 2 0 012-2zm0 2v2h6V5H9zm-2 6h10V9H7v2zm0 4h10v-2H7v2z"/></svg>`,
+admission:`<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 0114 0H5zm15-9v3h-3v2h3v3h2v-3h3v-2h-3v-3h-2z"/></svg>`,
+schedule:`<svg viewBox="0 0 24 24"><path d="M7 2h2v3h6V2h2v3h3v17H4V5h3V2zm11 8H6v10h12V10z"/></svg>`,
+books:`<svg viewBox="0 0 24 24"><path d="M4 3h7a3 3 0 013 3v15a3 3 0 00-3-3H4V3zm16 0h-4a3 3 0 00-3 3v15a3 3 0 013-3h4V3z"/></svg>`,
+maintenance:`<svg viewBox="0 0 24 24"><path d="M22 19l-7.5-7.5a6 6 0 01-7.7-7.7l3.4 3.4 2.8-2.8L9.6 1A6 6 0 001.9 8.7l7.5 7.5-4.7 4.7 1.4 1.4 4.7-4.7L22 19z"/></svg>`,
+transport:`<svg viewBox="0 0 24 24"><path d="M4 16V5a3 3 0 013-3h10a3 3 0 013 3v11h1v3h-2a3 3 0 01-6 0h-2a3 3 0 01-6 0H3v-3h1z"/></svg>`,
+safety:`<svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.7-8 11-4.6-1.3-8-6-8-11V5l8-3zm-1 13l6-6-1.4-1.4L11 12.2 8.4 9.6 7 11l4 4z"/></svg>`,
+environment:`<svg viewBox="0 0 24 24"><path d="M3 21V9l9-7 9 7v12h-7v-6h-4v6H3z"/></svg>`,
+user:`<svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 0114 0H5z"/></svg>`,
+calendar:`<svg viewBox="0 0 24 24"><path d="M7 2h2v3h6V2h2v3h3v17H4V5h3V2zm11 8H6v10h12V10z"/></svg>`,
+evidence:`<svg viewBox="0 0 24 24"><path d="M7 2h7l5 5v15H7V2zm6 1.5V8h4.5L13 3.5z"/></svg>`,
+chevron:`<svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>`
+};
+const META={
+general:["متابعة الاستعداد العام ومؤشرات الجاهزية الشاملة","#247b8a"],organizational:["تنظيم الأعمال والملفات والجداول قبل بداية الدراسة","#6a5aa8"],
+admission:["استكمال قبول الطلاب والتسجيل والتحويل والوثائق","#168b78"],schedule:["بناء الجداول والأنصبة والإشراف والانتظار","#355c9a"],
+books:["استلام الكتب وفرزها وتوزيعها ومتابعة النواقص","#b47922"],maintenance:["الصيانة والنظافة والتعقيم وجاهزية المرافق","#8b6a3f"],
+transport:["إدارة الطلبات والمستفيدين وسلامة النقل المدرسي","#287fa8"],safety:["فحص السلامة وخطط المعالجة والتوثيق والاعتماد","#27805f"],
+environment:["تهيئة الفصول والساحات والهوية والبيئة التعليمية","#0d8f85"]};
+const STATUS={not_started:"لم يبدأ",in_progress:"جارٍ التنفيذ",submitted:"مرسل للمراجعة",revision:"معاد للمعالجة",completed:"مكتمل بالشواهد",verified:"تم التحقق",approved:"معتمد",blocked:"متعثر",na:"غير منطبق"};
+const PHASES=["مرحلة العودة للإداريين","مرحلة العودة للمعلمين","مرحلة العودة للطلاب"];
+
+function suggestedRoleForTask(title){
+ const principalTasks=["استقبال الهيئة التعليمية والإدارية","الاجتماع وتوزيع المهام","إعداد اللجان المدرسية والتكليفات","تنفيذ خطة الاستعداد ومتابعة تنفيذ بنود الخطة"];
+ return principalTasks.includes(title)?"مدير المدرسة":"";
+}
+const DEFAULT_SETTINGS={education:"",school:"",stage:"",year:"1448",semester:"الفصل الدراسي الأول",manager:"",startDate:"",stamp:"",signature:"",phaseSchedule:[{start:"",end:""},{start:"",end:""},{start:"",end:""}]};
+const DEFAULT_WEIGHTS={execution:35,evidence:25,quality:15,timing:10,approval:15};
+const KEY_BASE="school_readiness_v10";
+const CLOUD_TABLE="school_readiness_plans";
+let state=createDefaultReadinessState();
+let cloudPlanId="";
+let cloudSaveTimer=null;
+let cloudSaveInFlight=false;
+let cloudSaveQueued=false;
+let cloudReady=false;
+let readinessSchoolUsers=[];
+let readinessTaskSyncTimer=null;
+let readinessTaskSyncInFlight=false;
+
+function createDefaultReadinessState(){
+ return {settings:{...DEFAULT_SETTINGS},team:[],weights:{...DEFAULT_WEIGHTS},tasks:{}};
+}
+function readJsonStorage(key){
+ try{return JSON.parse(localStorage.getItem(key)||sessionStorage.getItem(key)||"null")||{}}catch(e){return {}}
+}
+function isUuid(value){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||""))}
+function currentSchoolId(){
+ const school=readJsonStorage("smartSchool.currentSchool");
+ const user=readJsonStorage("currentSchoolUser");
+ const current=readJsonStorage("currentUser");
+ const candidates=[
+  localStorage.getItem("active_school_id"),sessionStorage.getItem("active_school_id"),
+  localStorage.getItem("current_school_id"),sessionStorage.getItem("current_school_id"),
+  localStorage.getItem("school_id"),localStorage.getItem("smart_school_id"),
+  school.id,school.schoolId,user.schoolId,user.school_id,current.schoolId,current.school_id
+ ];
+ return candidates.find(isUuid)||"";
+}
+function readinessStorageKey(){
+ const sid=currentSchoolId();
+ return KEY_BASE+":"+(sid||"anonymous");
+}
+function loadLocalReadinessState(){
+ try{
+  const raw=localStorage.getItem(readinessStorageKey());
+  return raw?JSON.parse(raw):null;
+ }catch(_){return null}
+}
+function saveLocalReadinessState(){
+ try{localStorage.setItem(readinessStorageKey(),JSON.stringify(state))}catch(_){}
+}
+function clearLegacyReadinessState(){
+ try{
+  // المفتاح القديم كان مشتركاً بين جميع المدارس؛ لا يجوز توريثه لأي مدرسة أهلية/خاصة.
+  localStorage.removeItem(KEY_BASE);
+ }catch(_){}
+}
+function currentPublicUserId(){
+ const user=readJsonStorage("currentSchoolUser");
+ const current=readJsonStorage("currentUser");
+ return [user.id,current.id].find(isUuid)||null;
+}
+clearLegacyReadinessState();
+state=loadLocalReadinessState()||createDefaultReadinessState();
+
+function setCloudStatus(type,text,title){
+ const el=document.getElementById("cloudSaveStatus");
+ if(!el)return;
+ el.className="cloud-save-status "+type;
+ el.textContent=text;
+ el.title=title||text;
+}
+function normalizeReadinessState(){
+ if(!state||typeof state!=="object")state=createDefaultReadinessState();
+ state.settings=Object.assign({...DEFAULT_SETTINGS},state.settings||{});
+ state.settings.phaseSchedule=Array.from({length:3},(_,i)=>Object.assign({start:"",end:""},state.settings.phaseSchedule?.[i]||{}));
+ delete state.settings.deputy;
+ delete state.settings.schoolLogo;
+ state.settings.semester="الفصل الدراسي الأول";
+ if(!/^1[4-5]\d{2}$/.test(String(state.settings.year||""))||Number(state.settings.year)<1448||Number(state.settings.year)>1547)state.settings.year="1448";
+ syncPlatformSettingsToReadiness({persist:false});
+ state.weights=Object.assign({...DEFAULT_WEIGHTS},state.weights||{});
+ state.team=Array.isArray(state.team)?state.team:[];
+ state.team.forEach(m=>{m.cloudUserId=m.cloudUserId||"";m.cloudUserEmail=m.cloudUserEmail||"";m.cloudUserRole=m.cloudUserRole||"";m.cloudSyncStatus=m.cloudSyncStatus||"";m.assignedTasks=Array.isArray(m.assignedTasks)?m.assignedTasks:[];m.manualAssignedTasks=Array.isArray(m.manualAssignedTasks)?m.manualAssignedTasks:[]});
+ state.tasks=state.tasks&&typeof state.tasks==="object"?state.tasks:{};
+ state.stageEngineVersion=Number(state.stageEngineVersion||0);
+ for(const section of SECTIONS){
+  state.tasks[section.id]=state.tasks[section.id]||{};
+  section.tasks.forEach((task,index)=>{
+   const existing=state.tasks[section.id][index]||{};
+   state.tasks[section.id][index]=Object.assign({status:"not_started",responsible:"",reviewer:"",phase:inferOperationalStage(section.title,task),originalPhase:null,priority:index<2?"critical":"normal",start:"",due:"",done:"",notes:"",action:"",evidence:[],review:{status:"pending",comment:"",by:"",date:""},temporalBreaches:[],rolloverHistory:[],rolloverEligible:false,incompleteArchive:null},existing);
+   const item=state.tasks[section.id][index];
+   if(state.stageEngineVersion<3)item.phase=inferOperationalStage(section.title,task);
+   if(!Array.isArray(item.evidence))item.evidence=[];
+   item.review=Object.assign({status:"pending",comment:"",by:"",date:""},item.review||{});
+   item.execution=Object.assign({result:"pending",reason:"",by:"",date:""},item.execution||{});
+   item.followupDate=item.followupDate||"";
+   item.temporalBreaches=Array.isArray(item.temporalBreaches)?item.temporalBreaches:[];
+   item.rolloverHistory=Array.isArray(item.rolloverHistory)?item.rolloverHistory:[];
+   if(item.originalPhase===null||item.originalPhase===undefined)item.originalPhase=Number(item.phase||0);
+   item.rolloverEligible=!!item.rolloverEligible;
+  });
+ }
+ if(state.stageEngineVersion<3)state.stageEngineVersion=3;
+ applyPhaseScheduleToTasks();
+}
+
+function readPlatformCustomSettings(){
+ let currentSchool={};
+ try{currentSchool=JSON.parse(localStorage.getItem("smartSchool.currentSchool")||"null")||{}}catch(e){}
+ return {
+  education:localStorage.getItem("setting_region")||currentSchool.educationDepartment||currentSchool.education_department||"",
+  school:localStorage.getItem("setting_school")||localStorage.getItem("current_school_name")||localStorage.getItem("school_name")||currentSchool.schoolName||currentSchool.school_name||"",
+  manager:localStorage.getItem("def_m")||currentSchool.managerName||currentSchool.manager_name||"",
+  signature:localStorage.getItem("setting_sig")||"",
+  stamp:localStorage.getItem("setting_stamp")||"",
+  year:String(localStorage.getItem("setting_academic_year")||"").replace(/\D/g,""),
+ };
+}
+function syncPlatformSettingsToReadiness(options={}){
+ const platform=readPlatformCustomSettings();
+ const mapped=["education","school","manager","signature","stamp","year"];
+ let changed=false;
+ mapped.forEach(k=>{
+  const value=platform[k];
+  if(value && state.settings[k]!==value){state.settings[k]=value;changed=true}
+ });
+ if(changed && options.persist!==false)saveLocalReadinessState();
+ return changed
+}
+
+async function loadReadinessFromCloud(){
+ const schoolId=currentSchoolId();
+ const bridge=window.SmartSchoolSupabase;
+ const sb=bridge&&bridge.getClient?bridge.getClient():null;
+ if(!schoolId){setCloudStatus("error","لا يوجد معرف مدرسة","تعذر تحديد school_id من جلسة المنصة الحالية");return false}
+ if(!sb){setCloudStatus("local","حفظ محلي مؤقت","تعذر تهيئة اتصال Supabase");return false}
+ setCloudStatus("loading","جارٍ تحميل خطة المدرسة");
+ try{
+  const year=Number(state.settings?.year||1448);
+  const {data,error}=await sb.from(CLOUD_TABLE).select("id,readiness_data,updated_at").eq("school_id",schoolId).eq("academic_year",year).eq("semester","first").maybeSingle();
+  if(error)throw error;
+  if(data&&data.readiness_data&&typeof data.readiness_data==="object"){
+   state=data.readiness_data;
+   cloudPlanId=data.id||"";
+   normalizeReadinessState();
+   saveLocalReadinessState();
+   setCloudStatus("saved","تم تحميل البيانات السحابية",data.updated_at?"آخر تحديث: "+new Date(data.updated_at).toLocaleString("ar-SA"):"");
+  }else{
+   normalizeReadinessState();
+   await persistReadinessToCloud(true);
+  }
+  cloudReady=true;
+  return true;
+ }catch(error){
+  console.error("Readiness cloud load failed",error);
+  setCloudStatus("error","تعذر التحميل — النسخة المحلية فعالة",error.message||String(error));
+  return false;
+ }
+}
+function scheduleCloudSave(){
+ clearTimeout(cloudSaveTimer);
+ setCloudStatus("saving","بانتظار الحفظ السحابي");
+ cloudSaveTimer=setTimeout(()=>persistReadinessToCloud(false),900);
+}
+async function persistReadinessToCloud(forceCreate){
+ const schoolId=currentSchoolId();
+ const bridge=window.SmartSchoolSupabase;
+ const sb=bridge&&bridge.getClient?bridge.getClient():null;
+ if(!schoolId||!sb){setCloudStatus("local","تم الحفظ محليًا فقط");return false}
+ if(cloudSaveInFlight){cloudSaveQueued=true;return false}
+ cloudSaveInFlight=true;
+ setCloudStatus("saving","جارٍ الحفظ السحابي");
+ try{
+  const userId=currentPublicUserId();
+  const payload={
+   school_id:schoolId,
+   academic_year:Number(state.settings.year||1448),
+   semester:"first",
+   status:"active",
+   readiness_data:state,
+   updated_at:new Date().toISOString()
+  };
+  if(userId){payload.updated_by=userId;if(forceCreate||!cloudPlanId)payload.created_by=userId}
+  const {data,error}=await sb.from(CLOUD_TABLE).upsert(payload,{onConflict:"school_id,academic_year,semester"}).select("id,updated_at").single();
+  if(error)throw error;
+  cloudPlanId=data?.id||cloudPlanId;
+  cloudReady=true;
+  setCloudStatus("saved","تم الحفظ سحابيًا",data?.updated_at?"آخر حفظ: "+new Date(data.updated_at).toLocaleString("ar-SA"):"");
+  return true;
+ }catch(error){
+  console.error("Readiness cloud save failed",error);
+  setCloudStatus("error","تعذر الحفظ السحابي",error.message||String(error));
+  return false;
+ }finally{
+  cloudSaveInFlight=false;
+  if(cloudSaveQueued){cloudSaveQueued=false;scheduleCloudSave()}
+ }
+}
+
+normalizeReadinessState();
+saveLocalReadinessState();
+function save(){
+ refreshTemporalStatuses();
+ saveLocalReadinessState();
+ scheduleCloudSave();
+ scheduleReadinessTaskSync();
+ syncAllAssignments();renderAll();renderOperationalStages();renderManagerDashboard();
+}
+function esc(v){return String(v??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
+function daysUntil(date){if(!date)return null;return Math.ceil((new Date(date)-new Date(new Date().toDateString()))/86400000)}
+function localDateValue(){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
+function phaseWindow(i){return state.settings.phaseSchedule?.[Number(i)]||{start:"",end:""}}
+function phaseTemporalInfo(i){
+ const w=phaseWindow(i),today=localDateValue();if(!w.start||!w.end)return {state:"unscheduled",label:"لم يحدد الجدول الزمني",percent:0,daysLeft:null};
+ const a=new Date(w.start+'T00:00:00'),b=new Date(w.end+'T23:59:59'),n=new Date(today+'T12:00:00');
+ const total=Math.max(1,b-a),elapsed=Math.max(0,Math.min(total,n-a)),percent=Math.round(elapsed/total*100),daysLeft=Math.ceil((b-n)/86400000);
+ if(n<a)return {state:"upcoming",label:"لم تبدأ المرحلة",percent:0,daysLeft:Math.ceil((a-n)/86400000)};
+ if(n>b)return {state:"expired",label:"انتهت مدة المرحلة",percent:100,daysLeft};
+ if(percent>=90)return {state:"urgent",label:"عاجل — يقترب انتهاء المرحلة",percent,daysLeft};
+ if(percent>=70)return {state:"warning",label:"قرب الاستحقاق",percent,daysLeft};
+ return {state:"active",label:"ضمن الوقت المحدد",percent,daysLeft};
+}
+function applyPhaseScheduleToTasks(){
+ SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i],w=phaseWindow(d.phase);if(w.start)d.start=w.start;if(w.end)d.due=w.end;}));
+}
+function recordTemporalBreach(d,phase,reason){
+ const key=`${phase}:${phaseWindow(phase).end||''}`;
+ d.temporalBreaches=Array.isArray(d.temporalBreaches)?d.temporalBreaches:[];
+ if(!d.temporalBreaches.some(x=>x.key===key))d.temporalBreaches.push({key,phase:Number(phase),phaseTitle:PHASES[Number(phase)]||'',due:phaseWindow(phase).end||'',detectedAt:new Date().toISOString(),reason:reason||'لم تنفذ المهمة في الفترة المحددة'});
+}
+function refreshTemporalStatuses(){
+ applyPhaseScheduleToTasks();
+ SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i],info=phaseTemporalInfo(d.phase),closed=["verified","approved","na"].includes(d.status)||(d.execution?.result==="done"&&d.evidence?.length);
+   if(d.incompleteArchive&&closed&&d.incompleteArchive.status!=="completed_late"){
+    d.incompleteArchive.status="completed_late";d.incompleteArchive.completedLateAt=d.done||localDateValue();
+   }
+   if(!closed&&info.state==="expired"){
+    recordTemporalBreach(d,d.phase,"انتهت مدة المرحلة دون اكتمال التنفيذ بالشاهد.");
+    d.status="blocked";d.execution={result:"not_done",reason:"تجاوزت المهمة نهاية الفترة الزمنية المحددة للمرحلة دون اكتمال التنفيذ بالشاهد.",by:"النظام",date:localDateValue()};d.autoTemporalBlocked=true;
+    if(Number(d.phase)<PHASES.length-1){d.rolloverEligible=true;}
+    else{
+      d.rolloverEligible=false;
+      if(!d.incompleteArchive)d.incompleteArchive={status:"open",archivedAt:new Date().toISOString(),reason:"انتهت جميع مراحل الجاهزية دون تنفيذ المهمة في وقتها.",responsible:d.responsible||"غير مسند",phase:Number(d.phase),phaseTitle:PHASES[Number(d.phase)]||""};
+    }
+   }else if(d.autoTemporalBlocked&&info.state!=="expired"&&!d.incompleteArchive){
+    d.status="not_started";d.execution={result:"pending",reason:"",by:"",date:""};d.autoTemporalBlocked=false;
+   }
+ }));
+}
+function canRolloverTask(d){return !!d&&d.rolloverEligible&&Number(d.phase)<PHASES.length-1&&!(d.execution?.result==="done"&&d.evidence?.length)}
+function rolloverReadinessTask(sectionId,index){
+ const d=state.tasks?.[sectionId]?.[index];if(!canRolloverTask(d))return alert("هذه المهمة غير مؤهلة للترحيل إلى المرحلة التالية.");
+ const from=Number(d.phase),to=from+1,w=phaseWindow(to);
+ if(!confirm(`المهمة لم تُنفذ في ${PHASES[from]}. سيتم ترحيلها إلى ${PHASES[to]} مع الاحتفاظ بسجل أنها لم تُنفذ في وقتها. هل تريد المتابعة؟`))return;
+ recordTemporalBreach(d,from,"تم ترحيل المهمة تصحيحياً بعد عدم تنفيذها في مرحلتها الأصلية.");
+ d.rolloverHistory=Array.isArray(d.rolloverHistory)?d.rolloverHistory:[];d.rolloverHistory.push({from,to,fromTitle:PHASES[from],toTitle:PHASES[to],at:new Date().toISOString(),by:state.settings.manager||"مدير المدرسة",reason:"ترحيل تصحيحي لعدم الالتزام بالتنفيذ الزمني"});
+ d.phase=to;d.start=w.start||"";d.due=w.end||"";d.rolloverEligible=false;d.autoTemporalBlocked=false;d.status="not_started";d.execution={result:"pending",reason:"",by:"",date:""};d.followupDate="";
+ d.notes=[d.notes,`تنبيه زمني: لم تُنفذ المهمة في ${PHASES[from]} وتم ترحيلها إلى ${PHASES[to]} بتاريخ ${localDateValue()}.`].filter(Boolean).join("\n");
+ save();showPage(sectionId);const card=document.querySelector(`#tasks-${sectionId} .task[data-i="${index}"]`);card?.classList.add("open");
+}
+function incompleteReadinessTasks(){const out=[];SECTIONS.forEach(s=>s.tasks.forEach((t,i)=>{const d=state.tasks[s.id][i];if(d.incompleteArchive)out.push({section:s.title,sectionId:s.id,task:t,index:i,d,member:assignedMemberForTask(s.id,i)})}));return out}
+function messageIncompleteTask(sectionId,index,kind){
+ const d=state.tasks?.[sectionId]?.[index],member=assignedMemberForTask(sectionId,index);if(!d||!member)return alert("لا يوجد حساب مستخدم مرتبط بالمسؤول عن هذه المهمة.");
+ if(!window.InternalMessaging)return alert("نظام المراسلات الداخلية غير متاح حالياً.");
+ const sct=SECTIONS.find(x=>x.id===sectionId),title=sct?.tasks?.[index]||"مهمة جاهزية";
+ const warning=kind==="warning";
+ const subject=`${warning?"إنذار":"تنبيه"} بتنفيذ مهمة جاهزية متأخرة: ${title}`;
+ const body=`${warning?"إنذار":"تنبيه"} بشأن مهمة الجاهزية «${title}». انتهت الفترة الزمنية المحددة دون اكتمال التنفيذ، وقد سُجلت المهمة ضمن المهام غير المكتملة في وقتها. يلزم استكمال التنفيذ ورفع الشاهد، وسيبقى التأخير مثبتاً في سجل الجاهزية.`;
+ location.href=InternalMessaging.composeUrl({recipientId:member.cloudUserId||"",subject,body,linked:{module:"school_readiness",recordType:"readiness_task",recordId:d.cloudTaskId||taskKey(sectionId,index),title,url:`school_readiness.html?task=${encodeURIComponent(taskKey(sectionId,index))}`}});
+}
+function temporalCompliance(){
+ let eligible=0,onTime=0;SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i],w=phaseWindow(d.phase);if(!w.end||d.status==="na")return;eligible++;if(d.execution?.result==="done"&&d.evidence?.length&&(!d.done||d.done<=w.end))onTime++;}));return eligible?Math.round(onTime/eligible*100):0;
+}
+function taskScore(d){
+ if(d.status==="na")return 0;
+ return d.execution?.result==="done"&&Array.isArray(d.evidence)&&d.evidence.length>0?100:0
+}
+function sectionScore(s){const a=s.tasks.map((_,i)=>taskScore(state.tasks[s.id][i])).filter(v=>v!==null);return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):100}
+function overall(){const a=[];SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{let v=taskScore(state.tasks[s.id][i]);if(v!==null)a.push(v)}));return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0}
+function risks(){
+ const out=[],today=new Date().toISOString().slice(0,10);
+ SECTIONS.forEach(s=>s.tasks.forEach((t,i)=>{const d=state.tasks[s.id][i];let type="",level="متوسط";
+  const ti=phaseTemporalInfo(d.phase);
+  if(d.status==="blocked"||d.execution?.result==="not_done"){type=d.autoTemporalBlocked?"تعثر زمني — انتهت مدة المرحلة":"تعثر في التنفيذ";level="عالٍ"}
+  else if(d.due&&d.due<today&&!["verified","approved","na"].includes(d.status)){type="تأخر عن الموعد";level=d.priority==="critical"?"عالٍ":"متوسط"}
+  else if(["urgent","warning"].includes(ti.state)&&!["verified","approved","na"].includes(d.status)){type=ti.state==="urgent"?"استحقاق عاجل — بقي 10% أو أقل من مدة المرحلة":"قرب انتهاء مدة التنفيذ";level=ti.state==="urgent"?"عالٍ":"متوسط"}
+  else if(d.priority==="critical"&&!["verified","approved","na"].includes(d.status)){type="بند حرج غير مكتمل";level="عالٍ"}
+  else if(["completed","submitted"].includes(d.status)&&!d.evidence.length){type="اكتمال دون شاهد";level="متوسط"}
+  else if(d.review.status==="rejected"){type="شاهد مرفوض";level="متوسط"}
+  if(type)out.push({section:s.title,task:t,type,level,d,sid:s.id,i})
+ }));return out
+}
+
+const STAGE_META=[
+ {id:"admins",title:"مرحلة العودة للإداريين",description:"برامج الجاهزية الأساسية، توزيع المهام واللجان، وفحص المرافق والتجهيزات."},
+ {id:"teachers",title:"مرحلة العودة للمعلمين",description:"الجداول والأنصبة والتكليفات التدريسية وأعمال المعلمين وتجهيز البيئة الصفية."},
+ {id:"students",title:"مرحلة العودة للطلاب",description:"تسجيل الطلاب، توزيع الكتب، الاستقبال، الانضباط، ومتابعة أعمال الطلاب."}
+];
+let selectedTimelineStage=0;
+function inferOperationalStage(sectionTitle,taskTitle){
+ const principalTasksStage=["استقبال الهيئة التعليمية والإدارية","الاجتماع وتوزيع المهام","إعداد اللجان المدرسية والتكليفات","تنفيذ خطة الاستعداد ومتابعة تنفيذ بنود الخطة"];
+ if(principalTasksStage.includes(taskTitle))return 0;
+ const text=(sectionTitle+" "+taskTitle).replace(/\s+/g," ");
+ const studentTerms=["الطلاب","الطالب","القبول","التسجيل","المستجد","المنقول","توزيع الكتب","الكتب الدراسية","الاصطفاف","الانضباط","الحضور والغياب","أولياء الأمور","النقل المدرسي","استقبال الطلاب","الأسبوع الأول","الشعب"];
+ const teacherTerms=["المعلمين","المعلم","الجداول","الجدول الدراسي","الحصص","الأنصبة","النصاب","الانتظار","الإشراف","المناوبة","التكليفات التدريسية","التكليف","الخطط الدراسية","تحضير","مباشرة المعلمين","توزيع المواد"];
+ if(studentTerms.some(k=>text.includes(k)))return 2;
+ if(teacherTerms.some(k=>text.includes(k)))return 1;
+ return 0;
+}
+function tasksForStage(stageIndex){
+ const rows=[];
+ SECTIONS.forEach(s=>s.tasks.forEach((t,i)=>{
+  const d=state.tasks[s.id][i];
+  if(Number(d.phase)===stageIndex)rows.push({section:s,task:t,index:i,data:d});
+ }));
+ return rows;
+}
+function stageStats(stageIndex){
+ const rows=tasksForStage(stageIndex);
+ const active=rows.filter(x=>x.data.status!=="na");
+ const closed=active.filter(x=>["verified","approved"].includes(x.data.status)).length;
+ const approved=active.filter(x=>x.data.status==="approved").length;
+ const blocked=active.filter(x=>x.data.status==="blocked").length;
+ const score=active.length?Math.round(active.reduce((sum,x)=>sum+(taskScore(x.data)||0),0)/active.length):0;
+ return {total:active.length,closed,approved,blocked,score};
+}
+function openStageProcedure(sectionId,stageIndex){
+ showPage(sectionId);
+ const select=document.querySelector(`.filter-phase[data-s="${sectionId}"]`);
+ if(select){
+  select.value=String(stageIndex);
+  select.dispatchEvent(new Event("change"));
+ }
+}
+function renderStageProcedures(stageIndex){
+ selectedTimelineStage=stageIndex;
+ const host=document.getElementById("stageProcedures");
+ if(!host)return;
+ const stage=STAGE_META[stageIndex];
+ const rows=tasksForStage(stageIndex);
+ const grouped={};
+ rows.forEach(row=>{
+  if(!grouped[row.section.id])grouped[row.section.id]={section:row.section,items:[]};
+  grouped[row.section.id].items.push(row);
+ });
+ const groups=Object.values(grouped);
+ host.innerHTML=`<div class="stage-procedures-head"><div><h4 style="margin:0">${stage.title}</h4><p style="margin:3px 0 0;color:var(--muted)">${stage.description}</p></div><button class="btn" id="printStageBtn">طباعة إجراءات المرحلة</button></div>`+
+ (groups.length?`<div class="stage-procedure-groups">${groups.map(g=>`<div class="stage-procedure-group"><h5>${g.section.title} <span class="badge">${g.items.length} إجراء</span></h5>${g.items.map(x=>`<div class="stage-task-link"><div><strong>${x.task}</strong><br><small>${STATUS[x.data.status]} · ${esc(x.data.responsible||"غير مسند")}</small></div><button class="btn" data-stage-section="${g.section.id}" data-stage="${stageIndex}">فتح الإجراء</button></div>`).join("")}</div>`).join("")}</div>`:`<div class="stage-empty">لا توجد إجراءات مرتبطة بهذه المرحلة.</div>`);
+ host.querySelectorAll("[data-stage-section]").forEach(b=>b.onclick=()=>openStageProcedure(b.dataset.stageSection,+b.dataset.stage));
+ const printBtn=document.getElementById("printStageBtn");
+ if(printBtn)printBtn.onclick=()=>printStage(stageIndex);
+ document.querySelectorAll("#timeline .phase").forEach((p,i)=>p.classList.toggle("active",i===stageIndex));
+}
+function printStage(stageIndex){
+ const stage=STAGE_META[stageIndex],rows=tasksForStage(stageIndex),groups={};
+ rows.forEach(x=>(groups[x.section.title]||(groups[x.section.title]=[])).push(x));
+ const body=`<h2>${stage.title}</h2><p>${stage.description}</p>`+Object.entries(groups).map(([title,items])=>`<h3>${title}</h3><table class="table"><thead><tr><th>الإجراء</th><th>المسؤول</th><th>الحالة</th><th>الموعد</th></tr></thead><tbody>${items.map(x=>`<tr><td>${x.task}</td><td>${esc(x.data.responsible||"غير مسند")}</td><td>${STATUS[x.data.status]}</td><td>${esc(x.data.due||"—")}</td></tr>`).join("")}</tbody></table>`).join("");
+ printHtml(reportHeader(stage.title)+body);
+}
+
+function currentPhase(){
+ const today=localDateValue();
+ for(let i=0;i<3;i++){const w=phaseWindow(i);if(w.start&&w.end&&today>=w.start&&today<=w.end)return i}
+ for(let i=0;i<3;i++){const w=phaseWindow(i);if(w.start&&today<w.start)return i}
+ const scheduled=state.settings.phaseSchedule?.some(x=>x.start&&x.end);if(scheduled)return 2;
+ const sd=state.settings.startDate;if(!sd)return 0;const days=daysUntil(sd);if(days>7)return 0;if(days>0)return 1;return 2;
+}
+function initNav(){
+ const nav=document.getElementById("nav");
+ nav.innerHTML=`<button data-page="dashboard">${ICONS.dashboard}<span>لوحة الجاهزية</span></button><button data-page="settings">${ICONS.settings}<span>بيانات المدرسة</span></button><button data-page="assignments">${ICONS.assignments}<span>المسؤوليات</span></button><button data-page="operational-stages">${ICONS.calendar}<span>مراحل العودة الثلاث</span></button><button data-page="manager-dashboard">${ICONS.dashboard}<span>لوحة مدير المدرسة</span></button>`+
+ SECTIONS.map(s=>`<button data-page="${s.id}">${ICONS[s.id]}<span>${s.title}</span></button>`).join("")+
+ `<button data-page="risks">${ICONS.risks}<span>المخاطر والمعالجة</span></button><button data-page="analysis">${ICONS.analysis}<span>التحليل التنفيذي</span></button><button data-page="reports">${ICONS.reports}<span>مركز التقارير</span></button><button data-page="monitoring" style="position:relative">${ICONS.risks}<span>المتابعة الذكية</span><span id="monNavBadge" class="mon-nav-badge" style="display:none">0</span></button>`;
+ nav.querySelectorAll("button").forEach(b=>b.onclick=()=>showPage(b.dataset.page))
+}
+function initSectionPages(){
+ document.getElementById("sectionPages").innerHTML=SECTIONS.map(s=>`<section class="page" id="page-${s.id}">
+ <div class="hero" style="background:linear-gradient(135deg,var(--navy),${META[s.id][1]})"><div style="display:flex;gap:14px;align-items:center"><div class="icon-wrap" style="--section-color:${META[s.id][1]}">${ICONS[s.id]}</div><div><h3>${s.title}</h3><p>${META[s.id][0]}</p></div></div><img class="hero-logo" src="${LOGO}"></div>
+ <div class="metrics" id="metrics-${s.id}"></div>
+ <div class="toolbar no-print"><input class="field search" data-s="${s.id}" placeholder="البحث في المهام"><select class="select filter-status" data-s="${s.id}"><option value="">كل نتائج التنفيذ</option><option value="completed">نُفذ مع شاهد</option><option value="blocked">لم يُنفذ</option><option value="not_started">بانتظار التحديد</option></select><select class="select filter-phase" data-s="${s.id}"><option value="">كل مراحل العودة</option>${PHASES.map((p,i)=>`<option value="${i}">${p}</option>`).join("")}</select><button class="btn" onclick="printPage('${s.id}')">طباعة المجال</button></div>
+ <div class="grid" id="tasks-${s.id}"></div></section>`).join("")
+}
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));const targetPage=document.getElementById("page-"+id);if(!targetPage)return;targetPage.classList.add("active");
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+ document.getElementById("pageTitle").textContent=SECTIONS.find(s=>s.id===id)?.title||({dashboard:"لوحة الجاهزية",settings:"بيانات المدرسة",assignments:"المسؤوليات والصلاحيات",risks:"المخاطر والمعالجة",analysis:"التحليل التنفيذي",reports:"مركز التقارير","operational-stages":"مراحل العودة الثلاث","manager-dashboard":"لوحة مدير المدرسة",monitoring:"المتابعة الذكية"}[id]);
+ if(id==="monitoring"&&typeof window.renderMonitoring==="function")window.renderMonitoring();
+ if(id==="reports"&&typeof window.enhanceReports==="function")window.enhanceReports();
+ window.scrollTo(0,0)
+}
+function evidenceRequired(d){return d.priority==="critical"?"قرار/محضر أو شاهد ميداني معتمد":"ملف أو صورة أو سجل مرتبط بالمهمة"}
+function taskHtml(s,i,t){
+ const d=state.tasks[s.id][i],score=taskScore(d),ev=d.evidence.length;
+ const execResult=d.execution?.result==="done"&&ev?"done":d.execution?.result==="not_done"?"not_done":"pending";
+ const execText=execResult==="done"?"نُفذ مع شاهد":execResult==="not_done"?"لم يُنفذ":"بانتظار تحديد التنفيذ";
+ return `<article class="task" data-i="${i}">
+ <div class="task-summary">
+  <div class="task-no">${i+1}</div>
+  <div><div class="task-title">${t}</div><div class="task-meta">
+   <span class="mini">${ICONS.user}${esc(d.responsible||"غير مسند")}</span><span class="assignment-status ${assignedMemberForTask(s.id,i)||d.responsible?"assigned":"unassigned"}">${assignedMemberForTask(s.id,i)||d.responsible?"مسند":"غير مسند"}</span>
+   <span class="mini">${ICONS.calendar}${esc(d.due||"بلا موعد")}</span>
+   <span class="mini">${ICONS.evidence}${ev} شاهد</span>
+   <span>${PHASES[Number(d.phase)]||PHASES[inferOperationalStage(s.title,t)]}</span>
+   <span>${d.priority==="critical"?"حرج":"عادي"}</span>
+   ${(d.temporalBreaches||[]).length?`<span style="color:#b45309;font-weight:900">⚠ لم تُنفذ في وقتها</span>`:""}
+   ${d.incompleteArchive?`<span style="color:#b91c1c;font-weight:900">أرشيف غير مكتمل</span>`:""}
+  </div></div>
+  <span class="badge ${execResult==="done"?"s-approved":execResult==="not_done"?"s-blocked":"s-not_started"}">${execText} · ${score}%</span>
+  <button class="task-toggle no-print">${ICONS.chevron}</button>
+ </div>
+ <div class="task-details"><div class="task-body">
+  <div class="execution-panel">
+   <div class="execution-panel-title"><strong>قياس تنفيذ البند</strong><span>${score}%</span></div>
+   <div class="execution-buttons">
+    <button type="button" class="execute-yes no-print" data-exec-done="${s.id}" data-exec-index="${i}">✓ نُفذ</button>
+    <button type="button" class="execute-no no-print" data-exec-notdone="${s.id}" data-exec-index="${i}">✕ لم يُنفذ</button>
+   </div>
+   <div class="execution-result ${execResult==="done"?"done":execResult==="not_done"?"notdone":"pending"}">
+    ${execResult==="done"?`تم تنفيذ البند وإرفاق ${ev} شاهد.`:execResult==="not_done"?`تم تسجيل عدم التنفيذ: ${esc(d.execution.reason||"")}`:"اختر نتيجة تنفيذ البند للانتقال إلى الإجراء المناسب."}
+   </div>
+   <small class="execution-help">نُفذ: يظهر رفع الشاهد ثم التحقق. لم يُنفذ: يظهر سبب عدم التنفيذ والإجراء التصحيحي والموعد الجديد.</small>
+  </div>
+
+  <div><label>الأولوية</label><select class="select bind" data-k="priority"><option value="normal" ${d.priority==="normal"?"selected":""}>عادي</option><option value="critical" ${d.priority==="critical"?"selected":""}>حرج</option></select></div>
+  <div><label>مرحلة خطة المتابعة</label><select class="select bind" data-k="phase">${PHASES.map((p,x)=>`<option value="${x}" ${+d.phase===x?"selected":""}>${p}</option>`).join("")}</select></div>
+  <div><label>مسؤول التنفيذ</label><select class="select task-assignee"><option value="">غير مسند</option>${state.team.map(x=>`<option value="${esc(x.id)}" ${(assignedMemberForTask(s.id,i)?.id===x.id)||(!assignedMemberForTask(s.id,i)&&d.responsible===x.name)?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div>
+  <div><label>تاريخ البدء</label><input class="field bind" data-k="start" type="date" value="${d.start}"></div>
+  <div><label>الموعد المستهدف</label><input class="field bind" data-k="due" type="date" value="${d.due}"></div>
+  <div class="wide"><label>الملاحظات العامة</label><textarea class="textarea bind" data-k="notes">${esc(d.notes)}</textarea></div>
+
+  <div class="conditional-block ${execResult==="done"?"show":""}" data-done-block="${s.id}-${i}">
+   <div class="execution-step-title">استكمال إثبات التنفيذ</div>
+   <div class="full evidence-zone" data-evidence-zone="${s.id}-${i}">
+    <strong>شاهد التنفيذ:</strong> ${evidenceRequired(d)}<br>
+    <input class="evidence-input no-print" data-evidence-library="off" data-evidence-section="${s.id}" data-evidence-index="${i}" type="file" multiple style="display:none" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
+    <div class="evidence-list">${d.evidence.map((e,x)=>`<div class="evidence-item"><div><strong>${esc(e.name)}</strong><br><small>${esc(e.type||"ملف")} · ${esc(e.date||"")} · ${e.storage==="cloud"?"سحابي":"محلي"}</small></div><div><button class="btn preview-evidence" data-x="${x}">معاينة</button><button class="btn danger remove-evidence" data-x="${x}">حذف</button></div></div>`).join("")||'<span class="empty">لم يُرفق شاهد تنفيذ بعد.</span>'}</div>
+   </div>
+   <div class="full review-box" style="margin-top:10px;display:${ev?"block":"none"}">
+    <strong>التحقق من الشاهد</strong>
+    <div class="task-body" style="margin-top:8px">
+     <div><label>مسؤول التحقق</label><select class="select bind" data-k="reviewer"><option value="">غير محدد</option>${state.team.map(x=>`<option ${d.reviewer===x.name?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div>
+     <div><label>حالة المراجعة</label><select class="select review-bind" data-k="status"><option value="pending" ${d.review.status==="pending"?"selected":""}>قيد المراجعة</option><option value="accepted" ${d.review.status==="accepted"?"selected":""}>مقبول</option><option value="rejected" ${d.review.status==="rejected"?"selected":""}>مرفوض</option></select></div>
+     <div><label>المراجع</label><input class="field review-bind" data-k="by" value="${esc(d.review.by)}"></div>
+     <div><label>التاريخ</label><input class="field review-bind" data-k="date" type="date" value="${d.review.date}"></div>
+     <div class="wide"><label>ملاحظة المراجعة</label><textarea class="textarea review-bind" data-k="comment">${esc(d.review.comment)}</textarea></div>
+    </div>
+   </div>
+  </div>
+
+  <div class="conditional-block ${execResult==="not_done"?"show":""}" data-notdone-block="${s.id}-${i}">
+   <div class="execution-step-title">معالجة عدم التنفيذ</div>
+   <div class="followup-grid">
+    <div class="wide"><label>سبب عدم التنفيذ</label><textarea class="textarea execution-reason" readonly>${esc(d.execution.reason||"")}</textarea></div>
+    <div class="wide"><label>الإجراء التصحيحي</label><textarea class="textarea bind" data-k="action">${esc(d.action)}</textarea></div>
+    <div><label>الموعد الجديد للمتابعة</label><input class="field bind" data-k="followupDate" type="date" value="${d.followupDate||""}"></div>
+    ${canRolloverTask(d)?`<div class="full no-print"><div class="callout" style="border-color:#f59e0b;background:#fffbeb"><strong>تنبيه للمدير:</strong> هذه المهمة لم تُنفذ في ${PHASES[Number(d.phase)]} ضمن وقتها المحدد. يمكنك ترحيلها تصحيحياً إلى ${PHASES[Number(d.phase)+1]} مع الاحتفاظ بسجل التأخير.<br><button type="button" class="btn" style="margin-top:8px" onclick="rolloverReadinessTask('${s.id}',${i})">ترحيل للمرحلة التالية</button></div></div>`:""}
+    ${d.incompleteArchive?`<div class="full no-print"><div class="callout danger-callout"><strong>مهمة غير مكتملة بعد نهاية جميع المراحل.</strong> ستبقى لدى المكلف للتنفيذ، وقد أُرشفت في تقرير المهام غير المكتملة مع إثبات المسؤولية الزمنية.<br><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><button type="button" class="btn" onclick="messageIncompleteTask('${s.id}',${i},'notice')">إرسال تنبيه</button><button type="button" class="btn danger" onclick="messageIncompleteTask('${s.id}',${i},'warning')">إرسال إنذار</button></div></div></div>`:""}
+   </div>
+  </div>
+ </div></div>
+ </article>`
+}
+function renderSection(s){
+ const box=document.getElementById("tasks-"+s.id);
+ box.innerHTML=s.tasks.map((t,i)=>taskHtml(s,i,t)).join("");
+ box.querySelectorAll("[data-exec-done]").forEach(b=>b.onclick=e=>{e.stopPropagation();markTaskExecuted(b.dataset.execDone,+b.dataset.execIndex)});
+ box.querySelectorAll("[data-exec-notdone]").forEach(b=>b.onclick=e=>{e.stopPropagation();askNotExecuted(b.dataset.execNotdone,+b.dataset.execIndex)});
+ box.querySelectorAll(".task").forEach(card=>{
+  const i=+card.dataset.i,d=state.tasks[s.id][i];
+  card.querySelector(".task-summary").onclick=e=>{if(e.target.closest("button,select,input,textarea"))return;card.classList.toggle("open")};
+  card.querySelectorAll(".bind").forEach(el=>el.onchange=()=>{d[el.dataset.k]=el.dataset.k==="phase"?+el.value:el.value;save()});
+  const assigneeSelect=card.querySelector(".task-assignee");if(assigneeSelect)assigneeSelect.onchange=()=>assignTaskToMember(taskKey(s.id,i),assigneeSelect.value,{manual:true});
+  card.querySelectorAll(".review-bind").forEach(el=>el.onchange=()=>{d.review[el.dataset.k]=el.value;if(el.dataset.k==="status"&&el.value==="rejected")d.status="revision";save()});
+  const input=card.querySelector(".evidence-input");
+  if(input)input.onchange=async e=>{
+   const files=[...e.target.files];
+   if(!files.length)return;
+   const committed=[];
+   try{
+    for(const f of files){
+     const uploaded=await dbPut(f,s.id,i,d.phase);
+     committed.push({file:f,uploaded});
+    }
+    const unifiedTaskKey=taskKey(s.id,i);
+    committed.forEach(({file:f,uploaded})=>d.evidence.push({
+     id:uploaded.id,
+     platformFileId:uploaded.platformFileId||"",
+     evidenceRecordId:uploaded.evidenceRecordId||"",
+     name:f.name,
+     type:f.type,
+     size:f.size,
+     date:new Date().toISOString().slice(0,10),
+     sectionKey:s.id,
+     taskKey:unifiedTaskKey,
+     storage:uploaded.storage||"cloud"
+    }));
+    d.execution={result:"done",reason:"",by:d.responsible||"",date:new Date().toISOString()};
+    d.status="completed";d.done=new Date().toISOString().slice(0,10);
+    save();
+   }catch(err){
+    for(const row of committed){try{if(row.uploaded?.platformFileId&&window.CloudFileEngine)await CloudFileEngine.trash(row.uploaded.platformFileId)}catch(_){}}
+    console.error("Readiness evidence transaction failed",err);
+    alert(err?.message||"تعذر حفظ شاهد التنفيذ سحابيًا.");
+   }finally{input.value=""}
+  };
+  card.querySelectorAll(".remove-evidence").forEach(b=>b.onclick=async e=>{
+   e.stopPropagation();
+   const x=+b.dataset.x;
+   const evRow=d.evidence[x];
+   if(evRow?.source==="section_library"&&evRow?.linkId&&window.CloudFileEngine){await CloudFileEngine.unlink(evRow.linkId)}else{await dbDelete(evRow.id)}
+   d.evidence.splice(x,1);
+   if(!d.evidence.length){
+    d.execution={result:"pending",reason:"",by:"",date:""};
+    d.status="not_started";d.done="";
+   }
+   save()
+  });
+  card.querySelectorAll(".preview-evidence").forEach(b=>b.onclick=async e=>{
+   e.stopPropagation();
+   const evidence=d.evidence[+b.dataset.x];
+   try{
+    if(String(evidence.id).startsWith("cloud:")&&window.CloudFileEngine){
+     await CloudFileEngine.open(String(evidence.id).slice(6));
+     return;
+    }
+    const f=await dbGet(evidence.id);
+    if(!f)return alert("تعذر العثور على ملف الشاهد.");
+    window.open(URL.createObjectURL(f),"_blank");
+   }catch(err){
+    console.error("Evidence preview failed",err);
+    alert("تعذر فتح شاهد التنفيذ.");
+   }
+  });
+ });
+ const q=document.querySelector(`.search[data-s="${s.id}"]`);
+ const fs=document.querySelector(`.filter-status[data-s="${s.id}"]`);
+ const fp=document.querySelector(`.filter-phase[data-s="${s.id}"]`);
+ [q,fs,fp].forEach(el=>el.oninput=()=>{
+  box.querySelectorAll(".task").forEach(c=>{
+   const i=+c.dataset.i,d=state.tasks[s.id][i];
+   c.style.display=(!q.value||c.innerText.includes(q.value))&&(!fs.value||d.status===fs.value)&&(!fp.value||String(d.phase)===fp.value)?"":"none"
+  })
+ })
+}
+function normalizeReadinessImageSource(value){
+ const raw=String(value||"").trim();
+ if(!raw||raw==="null"||raw==="undefined")return "";
+ if(/^(data:image\/|blob:|https?:\/\/)/i.test(raw))return raw;
+ const compact=raw.replace(/\s+/g,"");
+ if(compact.length>80&&/^[A-Za-z0-9+/=_-]+$/.test(compact))return "data:image/png;base64,"+compact;
+ return "";
+}
+function readinessImageCard(key,title){
+ const src=normalizeReadinessImageSource(state.settings[key]);
+ return `<div class="school-media-card"><div class="school-media-card-head"><strong>${title}</strong><span>مزامن من إعدادات المدير</span></div><div class="school-media-preview">${src?`<img src="${esc(src)}" alt="${title}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="school-media-empty" style="display:none"><b>◇</b><span>تعذر عرض الصورة المحفوظة</span></div>`:`<div class="school-media-empty"><b>◇</b><span>لم تتم إضافة صورة ${title} في إعدادات المدير</span></div>`}</div></div>`
+}
+async function cleanReadinessYearData(){
+ const schoolId=currentSchoolId();
+ const year=String(state.settings?.year||"1448");
+ const schoolName=(state.settings?.school||"هذه المدرسة").trim()||"هذه المدرسة";
+ const archivedYears=(()=>{try{return JSON.parse(localStorage.getItem('smartSchoolAcademicYearsV1')||'[]')}catch(_){return[]}})();
+ const archived=archivedYears.some(x=>String(x.year)===year&&x.status==='archived');
+ if(archived){alert(`العام ${year}هـ مؤرشف ومحمي. لا يمكن تنظيف بيانات سنة مؤرشفة.`);return;}
+ const ok=confirm(`سيتم تنظيف بيانات بيانات الجاهزية التشغيلية للعام النشط ${year}هـ في ${schoolName}.\n\nسيتم حذف حالات التنفيذ، الشواهد المرتبطة بالخطة، الإسنادات، المتابعات والملاحظات من بيانات الجاهزية لهذا العام، مع الإبقاء على بيانات المدرسة الأساسية.\n\nهل تريد المتابعة؟`);
+ if(!ok)return;
+
+ const platform=readPlatformCustomSettings();
+ const keepStage=state.settings?.stage||"";
+ const keepYear=year;
+ state=createDefaultReadinessState();
+ state.settings=Object.assign({...DEFAULT_SETTINGS},{
+   education:platform.education||"",
+   school:platform.school||"",
+   manager:platform.manager||"",
+   signature:platform.signature||"",
+   stamp:platform.stamp||"",
+   stage:keepStage,
+   year:keepYear,
+   semester:"الفصل الدراسي الأول",
+   startDate:""
+ });
+ normalizeReadinessState();
+
+ try{localStorage.removeItem(readinessStorageKey())}catch(_){}
+ saveLocalReadinessState();
+ try{localStorage.removeItem("activeOperationalStage")}catch(_){}
+
+ // إذا كانت الخطة موجودة سحابياً، نكتب الحالة النظيفة على نفس خطة المدرسة/العام.
+ if(schoolId){
+   try{
+     await persistReadinessToCloud(false);
+   }catch(error){
+     console.warn("Cloud year cleanup failed; local cleanup completed",error);
+   }
+ }
+
+ syncAllAssignments();
+ renderAll();
+ renderOperationalStages();
+ renderManagerDashboard();
+ showPage("settings");
+ alert(`تم تنظيف بيانات الجاهزية للعام ${keepYear}هـ بنجاح.`);
+}
+window.cleanReadinessYearData=cleanReadinessYearData;
+
+function renderSettings(){
+ state.settings.semester="الفصل الدراسي الأول";
+ if(!/^1[4-5]\d{2}$/.test(String(state.settings.year||""))||Number(state.settings.year)<1448||Number(state.settings.year)>1547)state.settings.year="1448";
+ const yearOptions=Array.from({length:100},(_,i)=>1448+i).map(y=>`<option value="${y}" ${String(state.settings.year)===String(y)?"selected":""}>${y}هـ</option>`).join("");
+ const stageOptions=["رياض أطفال","ابتدائية","متوسطة","ثانوية"].map(v=>`<option value="${v}" ${state.settings.stage===v?"selected":""}>${v}</option>`).join("");
+ const host=document.getElementById("settingsForm");
+ host.classList.add("readiness-school-data-grid");
+ host.innerHTML=`
+  <div class="platform-sync-note">يتم جلب بيانات إدارة التعليم والمدرسة والمدير والتوقيع والختم تلقائياً من زر «إعدادات مخصصة» في قسم المدير، بينما يتم تحديد المرحلة والعام الدراسي من هذا النموذج.</div>
+  <div class="school-data-field"><label>إدارة التعليم</label><input class="field setting platform-synced-field" data-k="education" value="${esc(state.settings.education)}" readonly></div>
+  <div class="school-data-field"><label>اسم المدرسة</label><input class="field setting platform-synced-field" data-k="school" value="${esc(state.settings.school)}" readonly></div>
+  <div class="school-data-field"><label>المرحلة</label><select class="select setting" data-k="stage"><option value="">اختر المرحلة</option>${stageOptions}</select></div>
+  <div class="school-data-field"><label>العام الدراسي</label><select class="select setting" data-k="year">${yearOptions}</select></div>
+  <div class="school-data-field"><label>الفصل الدراسي</label><input class="field fixed-setting-field" value="الفصل الدراسي الأول" readonly aria-readonly="true"></div>
+  <div class="school-data-field"><label>مدير المدرسة</label><input class="field setting platform-synced-field" data-k="manager" value="${esc(state.settings.manager)}" readonly></div>
+  <div class="school-data-field"><label>تاريخ بداية الدراسة</label><input class="field setting" data-k="startDate" type="date" value="${esc(state.settings.startDate)}"></div>
+  <div class="school-data-field"><label>حالة المزامنة</label><input class="field fixed-setting-field" value="مرتبطة بإعدادات قسم المدير" readonly aria-readonly="true"></div>
+  ${readinessImageCard("stamp","الختم الرقمي")}
+  ${readinessImageCard("signature","توقيع مدير المدرسة")}
+  <div style="grid-column:1/-1" class="card"><h4 style="margin-top:0">الجدول الزمني لمراحل الجاهزية</h4><p style="color:var(--muted);font-size:12px">تنتقل تواريخ المرحلة تلقائياً إلى جميع مهامها وتكليفاتها. بعد نهاية المرحلة تتحول المهمة غير المكتملة إلى تعثر زمني.</p><div class="grid three">${PHASES.map((p,i)=>`<div class="school-data-field"><strong>${p}</strong><label>بداية المرحلة</label><input class="field phase-date" data-phase="${i}" data-side="start" type="date" value="${esc(phaseWindow(i).start)}"><label style="margin-top:8px">نهاية المرحلة</label><input class="field phase-date" data-phase="${i}" data-side="end" type="date" value="${esc(phaseWindow(i).end)}"><small style="display:block;margin-top:7px;color:var(--muted)">${phaseTemporalInfo(i).label}</small></div>`).join("")}</div></div>
+  <div class="readiness-clean-box no-print">
+    <div class="readiness-clean-copy">
+      <strong>تنظيف بيانات العام الدراسي</strong>
+      <small>يمسح التنفيذ والشواهد والإسنادات والمتابعات الخاصة بالعام المحدد فقط، مع الاحتفاظ ببيانات المدرسة الأساسية القادمة من «إعدادات مخصصة».</small>
+    </div>
+    <button type="button" class="readiness-clean-btn" onclick="cleanReadinessYearData()">تنظيف بيانات العام</button>
+  </div>
+  <div class="settings-weights-block"><h4>أوزان احتساب الجاهزية</h4><div class="task-body">${Object.entries({execution:"التنفيذ",evidence:"الشواهد",quality:"جودة الشاهد",timing:"الالتزام الزمني",approval:"التحقق والاعتماد"}).map(([k,l])=>`<div><label>${l} %</label><input class="field weight" data-k="${k}" type="number" min="0" max="100" value="${state.weights[k]}"></div>`).join("")}</div></div>`;
+ document.querySelectorAll(".setting").forEach(x=>x.onchange=()=>{state.settings[x.dataset.k]=x.value;state.settings.semester="الفصل الدراسي الأول";save()});
+ document.querySelectorAll(".phase-date").forEach(x=>x.onchange=()=>{const i=+x.dataset.phase,side=x.dataset.side;state.settings.phaseSchedule[i][side]=x.value;const w=phaseWindow(i);if(w.start&&w.end&&w.end<w.start){alert("تاريخ نهاية المرحلة يجب أن يكون بعد تاريخ البداية.");state.settings.phaseSchedule[i][side]="";renderSettings();return}refreshTemporalStatuses();save()});
+ document.querySelectorAll(".weight").forEach(x=>x.onchange=()=>{state.weights[x.dataset.k]=+x.value;save()});
+}
+
+function taskKey(sectionId,index){return sectionId+"::"+index}
+function parseTaskKey(key){const [sectionId,index]=String(key).split("::");return {sectionId,index:+index}}
+function allTaskOptions(){
+ const out=[];SECTIONS.forEach(s=>s.tasks.forEach((t,i)=>out.push({key:taskKey(s.id,i),sectionId:s.id,index:i,section:s.title,title:t,stage:PHASES[state.tasks[s.id][i].phase]||""})));return out
+}
+
+function normalizeTextKey(v){return String(v||"").trim().toLowerCase().replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/\s+/g," ")}
+function normalizePlatformRoleToReadiness(role){
+ const r=normalizeTextKey(role);
+ if(["manager","owner","school_manager","principal","مدير","مديره","مدير المدرسه"].some(x=>r.includes(normalizeTextKey(x))))return "مدير المدرسة";
+ if(r.includes("deputy_academic")||r.includes("الشؤون التعليميه"))return "وكيل الشؤون التعليمية";
+ if(r.includes("deputy_students")||r.includes("شؤون الطلاب"))return "وكيل شؤون الطلاب";
+ if(r.includes("deputy_admin")||r.includes("الشؤون المدرسيه"))return "وكيل الشؤون المدرسية";
+ if(r.includes("student_advisor")||r.includes("موجه")||r.includes("مرشد"))return "موجه/موجهة طلابية";
+ if(r.includes("activity")||r.includes("رائد نشاط"))return "رائد نشاط";
+ if(r.includes("safety")||r.includes("امن")||r.includes("سلامه"))return "مسؤول الأمن والسلامة";
+ if(r.includes("administrative")||r.includes("admin_employee")||r.includes("موظف اداري")||r.includes("اداري"))return "الموظف الإداري";
+ return "";
+}
+function readinessUserLabel(u){return String(u.full_name||u.name||u.email||"مستخدم").trim()}
+async function loadReadinessSchoolUsers(){
+ const merged=new Map();
+ const add=u=>{
+  if(!u)return;const id=String(u.id||u.user_id||'').trim(),email=String(u.email||u.user_email||'').trim().toLowerCase();
+  const name=String(u.full_name||u.name||u.display_name||'').trim();
+  if(!id&&!email)return;const k=id||email;
+  if(String(u.status||u.user_status||'active')==='deleted')return;
+  merged.set(k,{...u,id:id||k,email,full_name:name||String(u.email||u.user_email||'').trim()});
+ };
+ try{
+  if(window.CloudTaskEngine){const r=await CloudTaskEngine.listUsers();(r.users||[]).forEach(add)}
+ }catch(e){console.warn("Readiness cloud users load failed",e)}
+ // احتياط محلي/مركز المعلومات: لا يغيّر الفئة الوظيفية، ويُستخدم فقط لإظهار الاسم إذا تعذر المصدر السحابي.
+ try{
+  if(window.SchoolInformationSource){
+   if(typeof SchoolInformationSource.load==='function')await SchoolInformationSource.load(true);
+   const snap=typeof SchoolInformationSource.getSnapshot==='function'?await SchoolInformationSource.getSnapshot():null;
+   (snap?.staff||[]).forEach(add);
+  }
+ }catch(e){console.warn("Readiness fallback users load failed",e)}
+ readinessSchoolUsers=[...merged.values()].sort((a,b)=>readinessUserLabel(a).localeCompare(readinessUserLabel(b),'ar'));
+ resolveExistingTeamCloudUsers();
+ return readinessSchoolUsers;
+}
+function resolveMemberCloudUser(member){
+ if(member.cloudUserId){const u=readinessSchoolUsers.find(x=>String(x.id)===String(member.cloudUserId));if(u)return u}
+ const name=normalizeTextKey(member.name);
+ if(!name)return null;
+ const exact=readinessSchoolUsers.filter(u=>normalizeTextKey(u.full_name||u.name)===name);
+ return exact.length===1?exact[0]:null;
+}
+function resolveExistingTeamCloudUsers(){
+ let changed=false;
+ state.team.forEach(m=>{
+  if(m.role==="مدير المدرسة")return;
+  const u=resolveMemberCloudUser(m);
+  if(u&&(m.cloudUserId!==u.id||m.cloudUserEmail!==(u.email||""))){m.cloudUserId=u.id;m.cloudUserEmail=u.email||"";m.cloudUserRole=u.role||"";m.cloudSyncStatus="linked";changed=true}
+  else if(!u&&!m.cloudUserId)m.cloudSyncStatus="unlinked";
+ });
+ if(changed)saveLocalReadinessState();
+}
+function readinessTaskMetadata(sectionId,index,member){
+ const s=SECTIONS.find(x=>x.id===sectionId),d=state.tasks[sectionId][index];
+ return {source_type:"readiness",readinessPlanId:cloudPlanId||"",readinessTaskKey:taskKey(sectionId,index),sectionId,taskIndex:index,sectionTitle:s?.title||"",phase:Number(d.phase||0),phaseTitle:PHASES[Number(d.phase||0)]||"",originalPhase:Number(d.originalPhase??d.phase??0),temporalBreaches:d.temporalBreaches||[],rolloverHistory:d.rolloverHistory||[],rolledOver:(d.rolloverHistory||[]).length>0,incompleteArchive:d.incompleteArchive||null,academicYear:String(state.settings.year||""),semester:"first",memberId:member?.id||"",memberRole:member?.role||"",memberCustomRole:member?.customRole||""};
+}
+function scheduleReadinessTaskSync(){
+ clearTimeout(readinessTaskSyncTimer);
+ readinessTaskSyncTimer=setTimeout(()=>reconcileReadinessCloudTasks().catch(e=>console.warn("Readiness task sync deferred",e)),1100);
+}
+async function reconcileReadinessCloudTasks(){
+ if(readinessTaskSyncInFlight||!cloudPlanId||!window.CloudTaskEngine||!window.PlatformCloudSession?.token())return false;
+ readinessTaskSyncInFlight=true;
+ try{
+  await loadReadinessSchoolUsers();
+  const list=await CloudTaskEngine.list({moduleKey:"school_readiness",limit:1000});
+  const existing=(list.tasks||[]).filter(t=>t?.metadata?.source_type==="readiness");
+  const byKey=new Map(existing.map(t=>[String(t.metadata?.readinessTaskKey||""),t]));
+  let changed=false;
+  for(const member of state.team){
+   if(member.role==="مدير المدرسة")continue;
+   const u=resolveMemberCloudUser(member);
+   if(u){member.cloudUserId=u.id;member.cloudUserEmail=u.email||"";member.cloudUserRole=u.role||"";member.cloudSyncStatus="linked"}
+   else{member.cloudSyncStatus="unlinked";continue}
+   for(const row of memberAssignedRows(member)){
+    const key=row.key,d=row.d,meta=readinessTaskMetadata(row.s.id,row.i,member);let t=byKey.get(key);
+    if(t&&String(t.assigned_to||"")!==String(u.id)){
+      const rr=await CloudTaskEngine.reassign({taskId:t.id,assignedTo:u.id,assigneeEmail:u.email||"",assigneeName:u.full_name||member.name,assigneeRole:u.role||member.role,reason:"تحديث مسؤول مهمة الجاهزية حسب فريق الاستعداد"});t=rr.task||t;byKey.set(key,t)
+    }
+    if(!t||["withdrawn","archived","closed","canceled","rejected"].includes(String(t.status||""))){
+      const cr=await CloudTaskEngine.create({moduleKey:"school_readiness",recordType:"readiness_task",recordId:cloudPlanId,title:`جاهزية | ${row.t}`,description:`مهمة من محرك جاهزية المدرسة — ${row.s.title} — ${PHASES[Number(d.phase||0)]||""}. يتطلب إكمالها إثبات التنفيذ برفع شاهد.`,assignmentType:"partial",sourceOwner:"school_readiness",recordKey:key,ownerLabel:"محرك جاهزية المدرسة",assignedTo:u.id,assigneeEmail:u.email||"",assigneeName:u.full_name||member.name,assigneeRole:u.role||member.role,priority:d.priority==="critical"?"urgent":"normal",startDate:d.start||null,dueDate:d.due||null,requiresApproval:true,metadata:meta});
+      t=cr.task;byKey.set(key,t);d.cloudTaskId=t.id;d.cloudTaskStatus=t.status;changed=true;
+    }else{
+      if(String(t.start_date||"")!==String(d.start||"")||String(t.due_date||"")!==String(d.due||"")){try{const sr=await CloudTaskEngine.updateSchedule({taskId:t.id,startDate:d.start||null,dueDate:d.due||null});t=sr.task||t}catch(e){console.warn("readiness schedule sync",e)}}
+      try{const currentMeta=t.metadata||{};if(Number(currentMeta.phase)!==Number(meta.phase)||JSON.stringify(currentMeta.rolloverHistory||[])!==JSON.stringify(meta.rolloverHistory||[])||JSON.stringify(currentMeta.incompleteArchive||null)!==JSON.stringify(meta.incompleteArchive||null)){const mr=await CloudTaskEngine.updateMetadata({taskId:t.id,metadata:meta});t=mr.task||t}}catch(e){console.warn("readiness metadata sync",e)}
+      if(d.cloudTaskId!==t.id||d.cloudTaskStatus!==t.status){d.cloudTaskId=t.id;d.cloudTaskStatus=t.status;changed=true}
+    }
+   }
+  }
+  // إنهاء مهام الجاهزية التي لم تعد مسندة لأي عضو (مع استثناء مهام المدير التي لم تُنشأ أصلاً).
+  const assignedKeys=new Set(state.team.filter(m=>m.role!=="مدير المدرسة").flatMap(m=>m.assignedTasks||[]));
+  for(const t of existing){const key=String(t.metadata?.readinessTaskKey||"");if(key&&!assignedKeys.has(key)&&!["archived","withdrawn","closed"].includes(String(t.status||""))){try{await CloudTaskEngine.deleteTask(t.id,"إزالة إسناد مهمة الجاهزية من فريق الاستعداد")}catch(e){console.warn("readiness stale task cleanup",e)}}}
+  if(changed){saveLocalReadinessState();scheduleCloudSave()}
+  return true;
+ }finally{readinessTaskSyncInFlight=false}
+}
+
+function memberAssignedRows(member){
+ return (member.assignedTasks||[]).map(k=>{const p=parseTaskKey(k),s=SECTIONS.find(x=>x.id===p.sectionId);if(!s||!s.tasks[p.index])return null;return {key:k,s,t:s.tasks[p.index],i:p.index,d:state.tasks[p.sectionId][p.index]}}).filter(Boolean)
+}
+function memberCompletion(member){
+ const rows=memberAssignedRows(member);if(!rows.length)return 0;
+ const done=rows.filter(x=>x.d.execution?.result==="done"&&Array.isArray(x.d.evidence)&&x.d.evidence.length>0).length;
+ return Math.round(done/rows.length*100)
+}
+function toggleMemberTask(memberIndex,key,checked){
+ const selected=state.team[memberIndex];
+ state.team.forEach((m,idx)=>{
+  m.assignedTasks=Array.isArray(m.assignedTasks)?m.assignedTasks:[];
+  if(checked&&idx!==memberIndex)m.assignedTasks=m.assignedTasks.filter(x=>x!==key)
+ });
+ if(checked&&!selected.assignedTasks.includes(key))selected.assignedTasks.push(key);
+ if(!checked)selected.assignedTasks=selected.assignedTasks.filter(x=>x!==key);
+ const p=parseTaskKey(key),d=state.tasks[p.sectionId]?.[p.index];
+ if(d)d.responsible=checked?(selected.name||selected.role||"عضو فريق الجاهزية"):"";
+ save()
+}
+
+let executionTarget=null,pendingExecutedTarget=null;
+function markTaskExecuted(sectionId,index){
+ const d=state.tasks[sectionId][index];
+ d.action="";d.followupDate="";
+ openReadinessEvidenceModal(sectionId,index);
+}
+
+let readinessEvidenceTarget=null;
+let readinessDeviceFiles=[];
+let readinessLibraryFiles=[];
+function evidenceModalEl(){return document.getElementById("readinessEvidenceModal")}
+function renderReadinessEvidenceSelection(){
+ const box=document.getElementById("readinessEvidenceSelection");if(!box)return;
+ const rows=[...readinessDeviceFiles.map(f=>({name:f.name,source:"الجهاز"})),...readinessLibraryFiles.map(f=>({name:f.display_name||f.original_name||"ملف",source:"مكتبة القسم"}))];
+ box.innerHTML=rows.length?rows.map(x=>`<div class="evidence-item"><div><strong>${esc(x.name)}</strong><br><small>${x.source}</small></div></div>`).join(""):'<span class="empty">لم يتم اختيار شاهد بعد.</span>';
+ const saveBtn=document.getElementById("readinessEvidenceSave");if(saveBtn)saveBtn.disabled=!rows.length;
+}
+function openReadinessEvidenceModal(sectionId,index){
+ readinessEvidenceTarget={sectionId,index};readinessDeviceFiles=[];readinessLibraryFiles=[];
+ const title=document.getElementById("readinessEvidenceTaskTitle");const sec=SECTIONS.find(x=>x.id===sectionId);if(title)title.textContent=sec?.tasks?.[index]||"شاهد تنفيذ المهمة";
+ const fileInput=document.getElementById("readinessEvidenceDeviceInput");if(fileInput)fileInput.value="";
+ const status=document.getElementById("readinessEvidenceStatus");if(status){status.textContent="اختر مصدر الشاهد، ثم اضغط حفظ الشاهد.";status.className=""}
+ renderReadinessEvidenceSelection();evidenceModalEl()?.classList.add("show");
+}
+function closeReadinessEvidenceModal(){if(document.getElementById("readinessEvidenceSave")?.disabled&&readinessEvidenceTarget===null)return;evidenceModalEl()?.classList.remove("show");readinessEvidenceTarget=null;readinessDeviceFiles=[];readinessLibraryFiles=[]}
+async function linkReadinessLibraryEvidence(file,sectionId,index,stageKey){
+ if(!window.CloudFileEngine||!window.PlatformCloudSession?.token())throw new Error("الجلسة السحابية غير فعالة");
+ if(!cloudPlanId)throw new Error("لم يتم إنشاء خطة الجاهزية السحابية بعد");
+ const key=taskKey(sectionId,index);
+ const r=await CloudFileEngine.link({fileId:file.id,moduleKey:"school_readiness",recordType:"readiness_plan",recordId:cloudPlanId,relationType:"evidence",isPrimary:true,metadata:{readinessPlanId:cloudPlanId,sectionKey:sectionId,taskKey:key,readinessTaskKey:key,taskIndex:index,stageKey:stageKey==null?"":String(stageKey),academicYear:state.settings?.year||"",semester:"first"}});
+ return {id:"cloud:"+file.id,platformFileId:file.id,evidenceRecordId:r.evidence?.id||"",storage:"cloud",linkId:r.link?.id||""};
+}
+async function commitReadinessEvidenceModal(){
+ if(!readinessEvidenceTarget)return;const {sectionId,index}=readinessEvidenceTarget;const d=state.tasks[sectionId][index];
+ const saveBtn=document.getElementById("readinessEvidenceSave"),status=document.getElementById("readinessEvidenceStatus");if(saveBtn)saveBtn.disabled=true;if(status)status.textContent="جارٍ حفظ الشاهد سحابيًا...";
+ const committed=[];
+ try{
+  for(const f of readinessDeviceFiles){const uploaded=await dbPut(f,sectionId,index,d.phase);committed.push({name:f.name,type:f.type,size:f.size,uploaded});}
+  for(const f of readinessLibraryFiles){const uploaded=await linkReadinessLibraryEvidence(f,sectionId,index,d.phase);committed.push({name:f.display_name||f.original_name||"شاهد",type:f.mime_type||"ملف",size:Number(f.file_size||0),uploaded,source:"section_library"});}
+  const unifiedTaskKey=taskKey(sectionId,index);
+  for(const row of committed){if(d.evidence.some(x=>String(x.platformFileId||"")===String(row.uploaded.platformFileId||"")))continue;d.evidence.push({id:row.uploaded.id,platformFileId:row.uploaded.platformFileId||"",evidenceRecordId:row.uploaded.evidenceRecordId||"",linkId:row.uploaded.linkId||"",name:row.name,type:row.type,size:row.size,date:new Date().toISOString().slice(0,10),sectionKey:sectionId,taskKey:unifiedTaskKey,storage:"cloud",source:row.source||"device"})}
+  d.execution={result:"done",reason:"",by:d.responsible||"",date:new Date().toISOString()};d.status="completed";d.done=new Date().toISOString().slice(0,10);
+  save();if(status)status.textContent="تم حفظ الشاهد سحابيًا بنجاح.";evidenceModalEl()?.classList.remove("show");readinessEvidenceTarget=null;readinessDeviceFiles=[];readinessLibraryFiles=[];
+ }catch(err){
+  for(const row of committed){try{if(row.source!=="section_library"&&row.uploaded?.platformFileId&&window.CloudFileEngine)await CloudFileEngine.trash(row.uploaded.platformFileId)}catch(_){}}
+  console.error("Readiness evidence modal save failed",err);if(status)status.textContent=err?.message||"تعذر حفظ الشاهد سحابيًا.";alert(err?.message||"تعذر حفظ الشاهد سحابيًا.");if(saveBtn)saveBtn.disabled=false;
+ }
+}
+function askNotExecuted(sectionId,index){
+ executionTarget={sectionId,index};
+ const modal=document.getElementById("notExecutedModal"),reason=document.getElementById("notExecutedReason");
+ if(reason)reason.value=state.tasks[sectionId][index].execution?.reason||"";
+ modal?.classList.add("show")
+}
+function confirmNotExecuted(){
+ if(!executionTarget)return;
+ const reason=(document.getElementById("notExecutedReason")?.value||"").trim();
+ if(!reason)return alert("يجب توضيح سبب عدم التنفيذ قبل الحفظ.");
+ const d=state.tasks[executionTarget.sectionId][executionTarget.index];
+ d.execution={result:"not_done",reason,by:d.responsible||"",date:new Date().toISOString()};
+ d.status="blocked";d.done="";d.review={status:"pending",comment:"",by:"",date:""};
+ const sid=executionTarget.sectionId,idx=executionTarget.index;
+ save();closeNotExecuted();
+ showPage(sid);
+ const card=document.querySelector(`#tasks-${sid} .task[data-i="${idx}"]`);
+ card?.classList.add("open")
+}
+function closeNotExecuted(){document.getElementById("notExecutedModal")?.classList.remove("show");executionTarget=null}
+
+
+let activeOperationalStage=Number(localStorage.getItem("activeOperationalStage")||0);
+function assignedMemberForTask(sectionId,index){
+ const key=taskKey(sectionId,index);
+ return state.team.find(m=>(m.assignedTasks||[]).includes(key))||null
+}
+function syncTaskAssignment(sectionId,index){
+ const d=state.tasks[sectionId][index],member=assignedMemberForTask(sectionId,index);
+ if(member)d.responsible=member.name||member.role;
+ return member
+}
+function syncAllAssignments(){
+ SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>syncTaskAssignment(s.id,i)))
+}
+function tasksByStage(stageIndex){
+ const rows=[];
+ SECTIONS.forEach(s=>s.tasks.forEach((t,i)=>{
+  const d=state.tasks[s.id][i];
+  if(Number(d.phase)===Number(stageIndex))rows.push({section:s,task:t,index:i,data:d,member:assignedMemberForTask(s.id,i)})
+ }));
+ return rows
+}
+function stageExecutionSummary(stageIndex){
+ const rows=tasksByStage(stageIndex);
+ let done=0,notDone=0,pending=0,unassigned=0;
+ rows.forEach(x=>{
+  const r=x.data.execution?.result==="done"&&x.data.evidence?.length?"done":x.data.execution?.result==="not_done"?"not_done":"pending";
+  if(r==="done")done++;else if(r==="not_done")notDone++;else pending++;
+  if(!x.member&&!x.data.responsible)unassigned++;
+ });
+ return {total:rows.length,done,notDone,pending,unassigned,percent:rows.length?Math.round(done/rows.length*100):0}
+}
+function switchOperationalStage(stageIndex){
+ activeOperationalStage=Number(stageIndex);
+ localStorage.setItem("activeOperationalStage",String(activeOperationalStage));
+ document.querySelectorAll("[data-stage-switch]").forEach(b=>b.classList.toggle("active",Number(b.dataset.stageSwitch)===activeOperationalStage));
+ document.querySelectorAll(".stage-nav-card").forEach(b=>b.classList.toggle("active",Number(b.dataset.stageCard)===activeOperationalStage));
+ document.querySelectorAll(".stage-page-shell").forEach(p=>p.classList.toggle("active",Number(p.dataset.stagePage)===activeOperationalStage));
+ renderOperationalStageContent(activeOperationalStage)
+}
+function openOperationalTask(sectionId,index){
+ showPage(sectionId);
+ const card=document.querySelector(`#tasks-${sectionId} .task[data-i="${index}"]`);
+ if(card){card.classList.add("open");card.scrollIntoView({behavior:"smooth",block:"start"})}
+}
+function renderOperationalStageContent(stageIndex){
+ const host=document.getElementById("operationalStageContent");if(!host)return;
+ const rows=tasksByStage(stageIndex),summary=stageExecutionSummary(stageIndex),grouped={};
+ rows.forEach(x=>{(grouped[x.section.id]||(grouped[x.section.id]={section:x.section,items:[]})).items.push(x)});
+ host.innerHTML=`<div class="manager-dashboard-grid">
+  <div class="manager-kpi"><small>نسبة إنجاز المرحلة</small><strong>${summary.percent}%</strong></div>
+  <div class="manager-kpi"><small>نُفذ مع شاهد</small><strong>${summary.done}</strong></div>
+  <div class="manager-kpi"><small>لم يُنفذ</small><strong>${summary.notDone}</strong></div>
+  <div class="manager-kpi"><small>بانتظار التحديد</small><strong>${summary.pending}</strong></div>
+ </div>
+ ${Object.values(grouped).map(g=>`<div class="manager-section"><h4>${g.section.title}</h4><div class="manager-list">${g.items.map(x=>`<div class="manager-list-item"><div><strong>${x.task}</strong><br><small>${x.member?`المسؤول: ${esc(x.member.name||x.member.role)}`:x.data.responsible?`المسؤول: ${esc(x.data.responsible)}`:"غير مسند"} · ${x.data.execution?.result==="done"&&x.data.evidence?.length?"نُفذ مع شاهد":x.data.execution?.result==="not_done"?"لم يُنفذ":"بانتظار التحديد"}</small></div><button class="btn" data-open-operational="${g.section.id}" data-open-index="${x.index}">فتح المهمة</button></div>`).join("")}</div></div>`).join("")}`;
+ host.querySelectorAll("[data-open-operational]").forEach(b=>b.onclick=()=>openOperationalTask(b.dataset.openOperational,+b.dataset.openIndex))
+}
+
+const ROLE_TASK_RULES={
+ "مدير المدرسة":{sections:[],titles:["استقبال الهيئة التعليمية والإدارية","الاجتماع وتوزيع المهام","إعداد اللجان المدرسية والتكليفات","تنفيذ خطة الاستعداد ومتابعة تنفيذ بنود الخطة","رفع تقرير أسبوعي عن مستوى الجاهزية ونسب الإنجاز.","إعداد تقرير ختامي عن أعمال اللجنة واعتماده."],keywords:["اعتماد","رفع تقرير جاهزية"]},
+ "وكيل الشؤون التعليمية":{sections:["schedule"],keywords:["جدول الحصص","جدول الانتظار","التوقيت الزمني","المعلمين","المعامل","الخطة الدراسية","الأنصبة"]},
+ "وكيل شؤون الطلاب":{sections:["admission","books"],keywords:["الطلاب","الطلبة","القبول","التسجيل","نقل الطلاب","المقررات"]},
+ "وكيل الشؤون المدرسية":{sections:["maintenance","transport","environment"],keywords:["المرافق","التجهيزات","العهد","المستلزمات","النظافة","الصيانة","النقل المدرسي"]},
+ "موجه/موجهة طلابية":{sections:[],keywords:["التوجيه الطلابي","الإرشاد","التهيئة للطلبة","الرعاية العلاجية","الطلاب والطالبات"]},
+ "رائد نشاط":{sections:[],keywords:["التهيئة","استقبال المعلمين والطلاب","الإذاعة","تحفيزية","العلاقات والخدمات"]},
+ "مسؤول الأمن والسلامة":{sections:["safety"],keywords:["أمن وسلامة","السلامة","الطوارئ","طفايات","الدفاع المدني"]},
+ "الموظف الإداري":{sections:[],keywords:["تنظيم الملفات الإدارية","تنظيم ملفات المعلمين والإداريين","مراجعة البريد المدرسي","الاطلاع على التعاميم","المستلزمات المكتبية","سجلات المتابعة"]},
+ "عضو لجنة":{sections:[],keywords:["لجنة","فريق عمل"]}
+};
+function roleTaskOptions(role,customRole){
+ const all=allTaskOptions(),rule=ROLE_TASK_RULES[role];
+ if(!rule){
+  const q=String(customRole||"").trim();
+  if(!q)return [];
+  return all.filter(o=>o.title.includes(q)||o.section.includes(q));
+ }
+ const sections=Array.isArray(rule.sections)?rule.sections:[];
+ const titles=Array.isArray(rule.titles)?rule.titles:[];
+ const keywords=Array.isArray(rule.keywords)?rule.keywords:[];
+ return all.filter(o=>sections.includes(o.sectionId)||titles.includes(o.title)||keywords.some(k=>o.title.includes(k)));
+}
+function assignTaskToMember(key,memberId,{manual=true,skipSave=false}={}){
+ const target=state.team.find(m=>String(m.id)===String(memberId||""))||null;
+ state.team.forEach(m=>{
+  m.assignedTasks=Array.isArray(m.assignedTasks)?m.assignedTasks:[];
+  m.manualAssignedTasks=Array.isArray(m.manualAssignedTasks)?m.manualAssignedTasks:[];
+  m.assignedTasks=m.assignedTasks.filter(k=>k!==key);
+  m.manualAssignedTasks=m.manualAssignedTasks.filter(k=>k!==key);
+ });
+ if(target){
+  if(!target.assignedTasks.includes(key))target.assignedTasks.push(key);
+  if(manual&&!target.manualAssignedTasks.includes(key))target.manualAssignedTasks.push(key);
+ }
+ const p=parseTaskKey(key),d=state.tasks[p.sectionId]?.[p.index];
+ if(d)d.responsible=target?(target.name||target.customRole||target.role||""):"";
+ if(!skipSave)save();
+ return target;
+}
+function assignRoleTasks(memberIndex){
+ // أبقيت الدالة للتوافق مع أي استدعاءات قديمة، لكن التطبيع المركزي هو المرجع الفعلي.
+ normalizeTeamRoleAssignments();
+}
+function normalizeTeamRoleAssignments(){
+ if(!Array.isArray(state.team))state.team=[];
+ const manualOwners=new Map();
+ state.team.forEach(m=>{
+  m.assignedTasks=Array.isArray(m.assignedTasks)?m.assignedTasks:[];
+  m.manualAssignedTasks=Array.isArray(m.manualAssignedTasks)?m.manualAssignedTasks:[];
+  m.manualAssignedTasks.forEach(k=>{if(!manualOwners.has(k))manualOwners.set(k,m.id)});
+  m.assignedTasks=[];
+ });
+ // الإسناد اليدوي للمدير له الأولوية ولا يلغيه التصنيف الوظيفي.
+ manualOwners.forEach((memberId,key)=>{
+  const m=state.team.find(x=>String(x.id)===String(memberId));
+  if(m&&!m.assignedTasks.includes(key))m.assignedTasks.push(key);
+ });
+ // مهام الفئات تسند لأول عضو من الفئة، ولا تتجاوز أي إسناد يدوي سابق.
+ const autoOwned=new Set(manualOwners.keys());
+ state.team.forEach(m=>{
+  const allowed=roleTaskOptions(m.role,m.customRole);
+  allowed.forEach(o=>{
+   if(autoOwned.has(o.key))return;
+   if(!m.assignedTasks.includes(o.key))m.assignedTasks.push(o.key);
+   autoOwned.add(o.key);
+  });
+ });
+ // مزامنة اسم المسؤول مع العضو الحقيقي فقط، وترك غير المسند فارغاً.
+ const ownerByKey=new Map();
+ state.team.forEach(m=>(m.assignedTasks||[]).forEach(k=>{if(!ownerByKey.has(k))ownerByKey.set(k,m)}));
+ allTaskOptions().forEach(o=>{
+  const d=state.tasks[o.sectionId]?.[o.index],owner=ownerByKey.get(o.key);
+  if(!d)return;
+  if(owner)d.responsible=owner.name||owner.customRole||owner.role||"";
+  else if(!["done","not_done"].includes(String(d.execution?.result||"")))d.responsible="";
+ });
+}
+function roleTaskPreviewHtml(role,customRole){
+ const roleOpts=roleTaskOptions(role,customRole);
+ const displayRole=role==="أخرى"?(customRole||"المسمى الآخر"):role;
+ if(!role)return `<div class="role-task-preview"><div class="role-task-preview-head"><strong>المهام المرتبطة بالفئة الوظيفية</strong><small>اختر الفئة لعرض مسؤولياتها</small></div><div class="role-task-preview-list"><div class="role-task-preview-empty">بمجرد اختيار الفئة الوظيفية ستظهر هنا المهام التي ستُسند تلقائياً للعضو.</div></div></div>`;
+ return `<div class="role-task-preview"><div class="role-task-preview-head"><strong>المهام المرتبطة بالفئة — ${esc(displayRole)}</strong><small>${roleOpts.length} مهمة مصنفة</small></div><div class="role-task-preview-list">${roleOpts.length?roleOpts.map(o=>`<div class="role-task-preview-item"><div><strong>${esc(o.title)}</strong><small>${esc(o.section)} · ${esc(o.stage)}</small></div></div>`).join(""):`<div class="role-task-preview-empty">لا توجد مهام مصنفة تلقائياً لهذا المسمى حالياً. لن يتم إسناد مهام عشوائية له.</div>`}</div></div>`;
+}
+function platformUserOptionsHtml(){
+ const users=(Array.isArray(readinessSchoolUsers)?readinessSchoolUsers:[]).filter(u=>String(u?.status||"active")!=="deleted");
+ return users.map(u=>`<option value="${esc(u.id)}">${esc(readinessUserLabel(u))}</option>`).join("");
+}
+function ensureManualReadinessAssignee(userId){
+ const u=(Array.isArray(readinessSchoolUsers)?readinessSchoolUsers:[]).find(x=>String(x.id)===String(userId||""));
+ if(!u)return null;
+ let m=state.team.find(x=>String(x.cloudUserId||"")===String(u.id));
+ if(m)return m;
+ m={id:"manual-"+String(u.id),name:String(u.full_name||u.name||u.email||"مستخدم").trim(),role:"أخرى",customRole:"تكليف إضافي",scope:"manual-only",assignedTasks:[],manualAssignedTasks:[],cloudUserId:u.id||"",cloudUserEmail:u.email||"",cloudUserRole:u.role||"",cloudSyncStatus:"linked",hiddenFromTeamEditor:true};
+ state.team.push(m);
+ return m;
+}
+function renderAssignmentSummary(){
+ const host=document.getElementById("assignmentSummary");if(!host)return;
+ const team=Array.isArray(state?.team)?state.team:[];
+ const displayTeam=team.filter(m=>!m?.hiddenFromTeamEditor);
+ const all=allTaskOptions();
+ const assignedKeys=new Set();
+ team.forEach(m=>(Array.isArray(m?.assignedTasks)?m.assignedTasks:[]).forEach(k=>assignedKeys.add(k)));
+ const assigned=assignedKeys.size;
+ const unassignedRows=all.filter(o=>!assignedKeys.has(o.key));
+ const linked=displayTeam.filter(m=>m?.role==="مدير المدرسة"||m?.cloudUserId).length;
+ const unlinked=displayTeam.filter(m=>m?.role!=="مدير المدرسة"&&!m?.cloudUserId).length;
+ const completed=all.filter(o=>{const d=state?.tasks?.[o.sectionId]?.[o.index];return d?.execution?.result==="done"&&Array.isArray(d?.evidence)&&d.evidence.length>0}).length;
+ const memberOptions=platformUserOptionsHtml();
+ host.innerHTML=`<div class="assignment-summary" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+   <div class="metric"><span>أعضاء الفريق</span><strong>${displayTeam.length}</strong></div>
+   <div class="metric"><span>حسابات مرتبطة</span><strong>${linked}</strong></div>
+   <div class="metric"><span>مهام مسندة</span><strong>${assigned}</strong></div>
+   <div class="metric"><span>مهام غير مسندة</span><strong>${unassignedRows.length}</strong></div>
+   <div class="metric"><span>مهام مكتملة بالشاهد</span><strong>${completed}</strong></div>
+   <div class="metric"><span>أعضاء بحاجة للربط</span><strong>${unlinked}</strong></div>
+ </div>
+ ${displayTeam.length?`<div class="manager-list" style="margin-top:12px">${displayTeam.map(m=>{let rows=[];try{rows=memberAssignedRows(m)}catch(_){rows=[]}return `<div class="manager-list-item"><div><strong>${esc(m?.name||"عضو")}</strong><br><small>${esc(m?.role==="أخرى"?(m?.customRole||"أخرى"):(m?.role||"غير مصنف"))}</small></div><strong>${rows.length} مهمة</strong></div>`}).join("")}</div>`:`<div class="stage-empty" style="margin-top:12px">يظهر الملخص بعد إضافة أعضاء فريق الاستعداد.</div>`}
+ <div class="manager-section" style="margin-top:14px">
+  <h4>المهام التي لم يحدد لها مسؤول تنفيذ <span class="badge">${unassignedRows.length}</span></h4>
+  <small>هذه المهام لم يغطيها تصنيف الفئات الحالية. يستطيع المدير إسناد كل مهمة لأي عضو حسب حاجة المدرسة، ويظل الإسناد اليدوي محفوظاً.</small>
+  <div class="manager-list" style="margin-top:10px">${unassignedRows.length?unassignedRows.map(o=>`<div class="manager-list-item unassigned-readiness-row" data-unassigned-key="${esc(o.key)}"><div><strong>${esc(o.title)}</strong><br><small>${esc(o.section)} · ${esc(o.stage)}</small></div><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><select class="select unassigned-member-select" data-sic-ignore="1" style="min-width:150px"><option value="">اختر المسؤول</option>${memberOptions}</select><button class="btn assign-unassigned-btn">إسناد</button></div></div>`).join(""):`<div class="stage-empty">جميع مهام الجاهزية لها مسؤول تنفيذ محدد.</div>`}</div>
+ </div>`;
+ host.querySelectorAll(".assign-unassigned-btn").forEach(btn=>btn.onclick=()=>{
+  const row=btn.closest("[data-unassigned-key]"),sel=row?.querySelector(".unassigned-member-select"),key=row?.dataset.unassignedKey;
+  if(!key||!sel?.value)return alert("اختر المستخدم المسؤول عن تنفيذ المهمة.");
+  const member=ensureManualReadinessAssignee(sel.value);
+  if(!member)return alert("تعذر قراءة حساب المستخدم المحدد.");
+  assignTaskToMember(key,member.id,{manual:true});
+ });
+}
+
+function renderTeam(){
+ const editor=document.getElementById("teamEditor");if(!editor)return;
+ const availableUsers=(Array.isArray(readinessSchoolUsers)?readinessSchoolUsers:[]).filter(u=>String(u?.status||"active")!=="deleted");
+ const visibleTeam=state.team.filter(m=>!m.hiddenFromTeamEditor);
+ editor.innerHTML=(visibleTeam.length?visibleTeam.map((m)=>{const mi=state.team.indexOf(m);
+  const pct=memberCompletion(m),rows=memberAssignedRows(m);
+  const done=rows.filter(x=>x.d.execution?.result==="done"&&x.d.evidence?.length).length;
+  const notDone=rows.filter(x=>x.d.execution?.result==="not_done"&&x.d.execution?.reason).length;
+  const pending=Math.max(0,rows.length-done-notDone);
+  const roleOpts=roleTaskOptions(m.role,m.customRole);
+  const displayRole=m.role==="أخرى"?(m.customRole||"أخرى"):m.role;
+  return `<div class="assignment-member-card">
+   <div class="assignment-member-head">
+    <div><h4>${esc(m.name||"عضو بدون اسم")}</h4><div class="assignment-role">${esc(displayRole||"لم تحدد الفئة")}</div><div class="assignment-role">${m.role==="مدير المدرسة"?"تنفيذ داخلي في محرك الجاهزية":m.cloudUserId?"☁ مرتبط بحساب مستخدم المنصة — ستظهر المهام في قسمه":"⚠ الحساب غير مرتبط — أعد إضافة العضو من قائمة مستخدمي المنصة"}</div></div>
+    <div><strong>${pct}%</strong><small> إنجاز المسؤوليات</small><br><button class="btn danger remove-member" data-i="${mi}">حذف</button></div>
+   </div>
+   <div class="assignment-progress"><div class="progress"><i style="width:${pct}%"></i></div></div>
+   <div class="assignment-summary"><span class="badge">المسندة حسب الدور: ${rows.length}</span><span class="badge">نُفذ: ${done}</span><span class="badge">لم يُنفذ: ${notDone}</span><span class="badge">بانتظار التحديد: ${pending}</span></div>
+   <button class="assignment-toggle" data-assignment-toggle="${mi}"><span>عرض المسؤوليات المرتبطة بالفئة الوظيفية</span><span class="chev">⌄</span></button>
+   <div class="assignment-panel" data-assignment-panel="${mi}">
+    <div class="assignment-panel-actions"><span class="badge">${roleOpts.length?`${roleOpts.length} مسؤولية مرتبطة بهذه الفئة`:"لا توجد مسؤوليات مصنفة تلقائياً لهذا المسمى"}</span><button class="btn" data-close-assignment="${mi}">إغلاق القائمة</button></div>
+    <div class="assignment-task-picker">${roleOpts.length?roleOpts.map(o=>`<div class="assignment-task-option"><span><strong>${esc(o.title)}</strong><br><small>${esc(o.section)} · ${esc(o.stage)}</small></span></div>`).join(""):`<div class="stage-empty">هذا المسمى لا يملك مسؤوليات مصنفة حالياً، ولن تُسند إليه مهام من فئات أخرى.</div>`}</div>
+    <div class="assignment-fixed-note">هذه المهام مرتبطة بالتصنيف الوظيفي ولا يتم اختيارها عشوائياً أو تعديلها يدوياً من هذه القائمة.</div>
+   </div>
+  </div>`
+ }).join(""):`<div class="stage-empty">لم تتم إضافة أعضاء بعد. اختر مستخدماً مسجلاً في المنصة ثم فئته الوظيفية، وستظهر مسؤوليات الفئة قبل الإسناد.</div>`)+`<div class="readiness-team-form">
+   <div class="task-body">
+    <div><label>اسم العضو</label><select id="newMemberCloudUser" class="select" data-sic-ignore="1"><option value="">اختر من المستخدمين المسجلين في المنصة</option>${availableUsers.map(u=>`<option value="${esc(u.id)}">${esc(readinessUserLabel(u))}</option>`).join("")}</select></div>
+    <div><label>الفئة الوظيفية</label><select id="newMemberRole" class="select" data-sic-ignore="1"><option value="">اختر الفئة</option><option>مدير المدرسة</option><option>وكيل الشؤون المدرسية</option><option>وكيل الشؤون التعليمية</option><option>وكيل شؤون الطلاب</option><option>موجه/موجهة طلابية</option><option>رائد نشاط</option><option>مسؤول الأمن والسلامة</option><option>الموظف الإداري</option><option>عضو لجنة</option><option>أخرى</option></select></div>
+    <div id="customRoleWrap" style="display:none"><label>المسمى الوظيفي</label><input id="newMemberCustomRole" class="field" placeholder="اكتب المسمى الوظيفي"></div>
+    <div style="align-self:end"><button id="addMember" class="btn primary">إضافة العضو وإسناد مسؤولياته</button></div>
+    <div id="newRoleTaskPreview" class="full">${roleTaskPreviewHtml("","")}</div>
+   </div>
+  </div>`;
+ editor.querySelectorAll(".remove-member").forEach(b=>b.onclick=()=>{state.team.splice(+b.dataset.i,1);save()});
+ editor.querySelectorAll("[data-assignment-toggle]").forEach(b=>b.onclick=()=>{const i=b.dataset.assignmentToggle,p=editor.querySelector(`[data-assignment-panel="${i}"]`);b.classList.toggle("open");p?.classList.toggle("open")});
+ editor.querySelectorAll("[data-close-assignment]").forEach(b=>b.onclick=()=>{const i=b.dataset.closeAssignment,p=editor.querySelector(`[data-assignment-panel="${i}"]`),t=editor.querySelector(`[data-assignment-toggle="${i}"]`);p?.classList.remove("open");t?.classList.remove("open")});
+ const roleSel=document.getElementById("newMemberRole"),customWrap=document.getElementById("customRoleWrap"),cloudSel=document.getElementById("newMemberCloudUser"),preview=document.getElementById("newRoleTaskPreview"),customInput=document.getElementById("newMemberCustomRole");
+ // قائمة الفئة الوظيفية قائمة ثابتة خاصة بمحرك الجاهزية ولا يحق لأي مصدر مركزي إضافة مستخدمين إليها.
+ const fixedRoleValues=["","مدير المدرسة","وكيل الشؤون المدرسية","وكيل الشؤون التعليمية","وكيل شؤون الطلاب","موجه/موجهة طلابية","رائد نشاط","مسؤول الأمن والسلامة","الموظف الإداري","عضو لجنة","أخرى"];
+ [...roleSel.options].forEach(o=>{if(!fixedRoleValues.includes(String(o.value||o.textContent||"").trim()))o.remove()});
+ const refreshPreview=()=>{customWrap.style.display=roleSel.value==="أخرى"?"block":"none";preview.innerHTML=roleTaskPreviewHtml(roleSel.value,(customInput?.value||"").trim())};
+ roleSel.onchange=refreshPreview;
+ if(customInput)customInput.oninput=()=>{if(roleSel?.value==="أخرى")refreshPreview()};
+ cloudSel.onchange=()=>{/* اسم المستخدم مستقل تماماً عن فئته الوظيفية في محرك الجاهزية. */};
+ document.getElementById("addMember").onclick=()=>{
+  const u=availableUsers.find(x=>String(x.id)===String(cloudSel?.value||""));
+  const r=roleSel.value,c=(customInput?.value||"").trim();
+  if(!u)return alert("اختر اسم العضو من المستخدمين المسجلين في المنصة.");
+  if(!r)return alert("اختر الفئة الوظيفية.");
+  if(r==="أخرى"&&!c)return alert("اكتب المسمى الوظيفي عند اختيار «أخرى».");
+  const n=String(u.full_name||u.name||u.email||"").trim();
+  if(!n)return alert("تعذر قراءة اسم المستخدم المحدد من حساب المنصة.");
+  let member=state.team.find(m=>String(m.cloudUserId||"")===String(u.id||""));
+  if(member){
+   member.name=n;member.role=r;member.customRole=r==="أخرى"?c:"";member.scope="role";member.cloudUserEmail=u.email||"";member.cloudUserRole=u.role||"";member.cloudSyncStatus="linked";member.hiddenFromTeamEditor=false;
+   member.assignedTasks=Array.isArray(member.assignedTasks)?member.assignedTasks:[];member.manualAssignedTasks=Array.isArray(member.manualAssignedTasks)?member.manualAssignedTasks:[];
+  }else{
+   state.team.push({id:"m"+Date.now(),name:n,role:r,customRole:r==="أخرى"?c:"",scope:"role",assignedTasks:[],manualAssignedTasks:[],cloudUserId:u.id||"",cloudUserEmail:u.email||"",cloudUserRole:u.role||"",cloudSyncStatus:"linked"});
+  }
+  normalizeTeamRoleAssignments();save();
+ };
+}
+
+function renderOperationalStages(){
+ const cards=document.getElementById("operationalStageCards"),switcher=document.getElementById("operationalStageSwitcher");
+ if(!cards||!switcher)return;
+ cards.innerHTML=PHASES.map((p,i)=>{const s=stageExecutionSummary(i);return `<div class="stage-nav-card ${i===activeOperationalStage?"active":""}" data-stage-card="${i}"><h4>${p}</h4><small>يمكن الانتقال إليها مباشرة دون إغلاق المراحل الأخرى.</small><div class="stage-nav-progress"><i style="width:${s.percent}%"></i></div><div class="stage-nav-stats"><span>${s.percent}% إنجاز</span><span>${s.done} نُفذ</span><span>${s.notDone} لم يُنفذ</span><span>${s.pending} معلق</span></div></div>`}).join("");
+ switcher.innerHTML=PHASES.map((p,i)=>`<button class="btn ${i===activeOperationalStage?"active":""}" data-stage-switch="${i}">${p}</button>`).join("");
+ cards.querySelectorAll("[data-stage-card]").forEach(c=>c.onclick=()=>switchOperationalStage(+c.dataset.stageCard));
+ switcher.querySelectorAll("[data-stage-switch]").forEach(c=>c.onclick=()=>switchOperationalStage(+c.dataset.stageSwitch));
+ renderOperationalStageContent(activeOperationalStage)
+}
+function renderManagerDashboard(){
+ const host=document.getElementById("managerDashboardContent");if(!host)return;
+ const all=[];SECTIONS.forEach(s=>s.tasks.forEach((t,i)=>all.push({section:s,task:t,index:i,data:state.tasks[s.id][i],member:assignedMemberForTask(s.id,i)})));
+ const total=all.length,done=all.filter(x=>x.data.execution?.result==="done"&&x.data.evidence?.length).length;
+ const notDone=all.filter(x=>x.data.execution?.result==="not_done").length;
+ const pending=total-done-notDone;
+ const unassigned=all.filter(x=>!x.member&&!x.data.responsible).length;
+ const riskRows=all.filter(x=>x.data.execution?.result==="not_done"||(!x.data.execution?.result||x.data.execution.result==="pending")&&x.data.priority==="critical");
+ host.innerHTML=`<div class="manager-dashboard-grid">
+  <div class="manager-kpi"><small>الجاهزية العامة</small><strong>${total?Math.round(done/total*100):0}%</strong></div>
+  <div class="manager-kpi"><small>المهام المنفذة</small><strong>${done}</strong></div>
+  <div class="manager-kpi"><small>المهام غير المنفذة</small><strong>${notDone}</strong></div>
+  <div class="manager-kpi"><small>المهام غير المسندة</small><strong>${unassigned}</strong></div>
+  <div class="manager-kpi"><small>الالتزام الزمني</small><strong>${temporalCompliance()}%</strong></div>
+ </div>
+ <div class="manager-section"><h4>إنجاز مراحل العودة</h4><div class="stage-nav-bar">${PHASES.map((p,i)=>{const s=stageExecutionSummary(i);return `<div class="stage-nav-card" data-manager-stage="${i}"><h4>${p}</h4><div class="stage-nav-progress"><i style="width:${s.percent}%"></i></div><div class="stage-nav-stats"><span>${s.percent}%</span><span>${s.done}/${s.total} نُفذ</span></div></div>`}).join("")}</div></div>
+ <div class="manager-section"><h4>المهام الحرجة والمتعثرة</h4><div class="manager-list">${riskRows.length?riskRows.slice(0,12).map(x=>`<div class="manager-list-item"><div><strong>${x.task}</strong><br><small>${x.section.title} · ${x.data.execution?.result==="not_done"?esc(x.data.execution.reason||"لم يُنفذ"):"بند حرج بانتظار التنفيذ"}</small></div><button class="btn" data-manager-open="${x.section.id}" data-manager-index="${x.index}">فتح</button></div>`).join(""):'<div class="stage-empty">لا توجد بنود حرجة أو متعثرة حالياً.</div>'}</div></div>
+ <div class="manager-section"><h4>توزيع المسؤوليات</h4><div class="manager-list">${state.team.map(m=>{const rows=memberAssignedRows(m),pct=memberCompletion(m);return `<div class="manager-list-item"><div><strong>${esc(m.name||m.role)}</strong><br><small>${esc(m.role||"")} · ${rows.length} مهمة مسندة</small></div><strong>${pct}%</strong></div>`}).join("")||'<div class="stage-empty">لم تتم إضافة أعضاء.</div>'}</div></div>`;
+ host.querySelectorAll("[data-manager-stage]").forEach(c=>c.onclick=()=>{showPage("operational-stages");switchOperationalStage(+c.dataset.managerStage)});
+ host.querySelectorAll("[data-manager-open]").forEach(b=>b.onclick=()=>openOperationalTask(b.dataset.managerOpen,+b.dataset.managerIndex))
+}
+
+function renderDashboard(){
+ let total=0,approved=0,blocked=0,evidence=0;SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i];total++;if(d.status==="approved")approved++;if(d.status==="blocked"||d.execution?.result==="not_done")blocked++;evidence+=d.evidence.length}));
+ document.getElementById("dashboardMetrics").innerHTML=`<div class="metric"><span>الجاهزية العامة</span><strong>${overall()}%</strong><div class="progress"><i style="width:${overall()}%"></i></div></div><div class="metric"><span>إجمالي المهام</span><strong>${total}</strong></div><div class="metric"><span>المهام المعتمدة</span><strong>${approved}</strong></div><div class="metric"><span>المخاطر النشطة</span><strong>${risks().length}</strong></div><div class="metric"><span>الشواهد</span><strong>${evidence}</strong></div><div class="metric"><span>الالتزام الزمني</span><strong>${temporalCompliance()}%</strong></div>`;
+ const cp=currentPhase();
+ document.getElementById("timeline").innerHTML=PHASES.map((p,i)=>{
+  const st=stageStats(i);
+  const stateClass=st.score>=90?"completed":(i===cp?"active":"");
+  return `<div class="phase ${stateClass}" data-timeline-stage="${i}"><span class="phase-arrow">←</span><strong>${i+1}. ${p}</strong><small>${(()=>{const ti=phaseTemporalInfo(i),w=phaseWindow(i);return (i===cp?"المرحلة الحالية · ":"")+ti.label+(w.start&&w.end?` · ${w.start} ← ${w.end}`:"")})()}</small><div class="phase-progress"><i style="width:${st.score}%"></i></div><div class="phase-stats"><span>${st.score}% جاهزية</span><span>${st.closed}/${st.total} مغلق</span><span>${st.blocked} متعثر</span></div></div>`;
+ }).join("");
+ document.querySelectorAll("[data-timeline-stage]").forEach(card=>card.onclick=()=>renderStageProcedures(+card.dataset.timelineStage));
+ renderStageProcedures(Number.isInteger(selectedTimelineStage)?selectedTimelineStage:cp);
+ document.getElementById("sectionCards").innerHTML=SECTIONS.map(s=>{let ap=0,bl=0,ev=0;s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i];ap+=d.status==="approved";bl+=d.status==="blocked";ev+=d.evidence.length});const c=META[s.id][1];return `<div class="card section-card" data-open="${s.id}" style="--section-color:${c};--section-soft:${c}18"><div class="section-card-top"><div class="icon-wrap">${ICONS[s.id]}</div><div><h4>${s.title}</h4><p>${META[s.id][0]}</p></div></div><div class="progress"><i style="width:${sectionScore(s)}%;background:${c}"></i></div><div class="section-stats"><div class="section-stat"><strong>${ap}</strong><span>معتمد</span></div><div class="section-stat"><strong>${bl}</strong><span>متعثر</span></div><div class="section-stat"><strong>${ev}</strong><span>شواهد</span></div></div></div>`}).join("");
+ document.querySelectorAll("[data-open]").forEach(x=>x.onclick=()=>showPage(x.dataset.open));
+ document.getElementById("sectionScores").innerHTML=SECTIONS.map(s=>`<div class="score-line"><span>${s.title}</span><div class="progress"><i style="width:${sectionScore(s)}%"></i></div><strong>${sectionScore(s)}%</strong></div>`).join("");
+ const rs=risks().slice(0,6);document.getElementById("alerts").innerHTML=rs.length?rs.map(r=>`<div class="callout ${r.level==="عالٍ"?"danger-callout":""}" style="margin-bottom:8px"><strong>${r.type}</strong><br>${r.task}</div>`).join(""):'<div class="empty">لا توجد تنبيهات حالية.</div>'
+}
+function renderRisks(){
+ const rs=risks();document.getElementById("riskBody").innerHTML=rs.map(r=>`<tr><td>${r.section}</td><td>${r.task}</td><td>${r.type}</td><td>${r.level}</td><td>${esc(r.d.responsible||"غير مسند")}</td><td><textarea class="textarea risk-action" data-s="${r.sid}" data-i="${r.i}">${esc(r.d.action)}</textarea></td><td><div style="display:flex;gap:6px;flex-wrap:wrap">${canRolloverTask(r.d)?`<button class="btn" onclick="rolloverReadinessTask('${r.sid}',${r.i})">ترحيل</button>`:""}${r.d.incompleteArchive?`<button class="btn" onclick="messageIncompleteTask('${r.sid}',${r.i},'notice')">تنبيه</button><button class="btn danger" onclick="messageIncompleteTask('${r.sid}',${r.i},'warning')">إنذار</button>`:""}</div></td></tr>`).join("")||'<tr><td colspan="7" class="empty">لا توجد مخاطر نشطة.</td></tr>';document.querySelectorAll(".risk-action").forEach(x=>x.onchange=()=>{state.tasks[x.dataset.s][+x.dataset.i].action=x.value;save()})
+}
+function renderAnalysis(){
+ const rs=risks(),low=[...SECTIONS].sort((a,b)=>sectionScore(a)-sectionScore(b)).slice(0,3),critical=rs.filter(r=>r.level==="عالٍ");
+ const dueSoon=[];SECTIONS.forEach(s=>s.tasks.forEach((t,i)=>{const d=state.tasks[s.id][i],days=daysUntil(d.due);if(days!==null&&days>=0&&days<=7&&!["approved","verified","na"].includes(d.status))dueSoon.push({t,days})}));
+ const forecast=Math.max(0,Math.min(100,overall()-critical.length*4-rs.length));
+ document.getElementById("analysisContent").innerHTML=`<div class="metrics"><div class="metric"><span>الجاهزية الحالية</span><strong>${overall()}%</strong></div><div class="metric"><span>مؤشر إمكانية الإغلاق</span><strong>${forecast}%</strong></div><div class="metric"><span>مخاطر عالية</span><strong>${critical.length}</strong></div><div class="metric"><span>استحقاقات خلال 7 أيام</span><strong>${dueSoon.length}</strong></div></div><div class="grid two"><div class="card"><h4>قراءة تنفيذية</h4><p>بلغ مستوى الجاهزية ${overall()}%. ${critical.length?`لا يوصى بالاعتماد النهائي قبل معالجة ${critical.length} من البنود عالية الخطورة.`:"لا توجد حالياً بنود عالية الخطورة تمنع الاعتماد."}</p><p>أقل المجالات جاهزية: ${low.map(s=>`${s.title} (${sectionScore(s)}%)`).join("، ")}.</p></div><div class="card"><h4>أولويات التحسين</h4><ol>${low.map(s=>`<li>رفع جاهزية ${s.title} عبر إغلاق المهام غير الموثقة والمتأخرة.</li>`).join("")}${critical.slice(0,3).map(r=>`<li>${r.task}: ${r.type}.</li>`).join("")}</ol></div></div>`
+}
+function reportHeader(title){const s=state.settings;return `<div class="report-header"><img src="${LOGO}"><h2>${title}</h2><div>${esc(s.education)} — ${esc(s.school)} — ${esc(s.stage)} — ${esc(s.year)}</div></div>`}
+function reportBody(type){
+ if(type==="incomplete"){const rows=incompleteReadinessTasks();return reportHeader("تقرير المهام غير المكتملة بعد انتهاء مراحل الجاهزية")+`<div class="callout danger-callout"><strong>تنبيه إداري:</strong> هذه المهام لم تُنجز في الوقت المحدد. تبقى ظاهرة للمكلفين حتى استكمال التنفيذ، مع بقاء مخالفة التأخير محفوظة في السجل.</div><table class="table"><thead><tr><th>المجال</th><th>المهمة</th><th>المسؤول</th><th>المرحلة الأخيرة</th><th>تاريخ الأرشفة</th><th>الحالة الحالية</th><th>مرات التعثر الزمني</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.section}</td><td>${r.task}</td><td>${esc(r.d.responsible||"غير مسند")}</td><td>${esc(r.d.incompleteArchive?.phaseTitle||PHASES[2])}</td><td>${esc((r.d.incompleteArchive?.archivedAt||"").slice(0,10))}</td><td>${r.d.incompleteArchive?.status==="completed_late"?"اكتملت لاحقاً بعد الموعد":"غير مكتملة"}</td><td>${(r.d.temporalBreaches||[]).length}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">لا توجد مهام مؤرشفة كغير مكتملة.</td></tr>'}</tbody></table>`}
+ if(type==="executive")return reportHeader("التقرير التنفيذي الشامل")+`<div class="metrics"><div class="metric"><span>الجاهزية</span><strong>${overall()}%</strong></div><div class="metric"><span>المخاطر</span><strong>${risks().length}</strong></div></div>${SECTIONS.map(s=>`<h3>${s.title} — ${sectionScore(s)}%</h3><table class="table"><thead><tr><th>المهمة</th><th>الحالة</th><th>المسؤول</th><th>الشواهد</th><th>النتيجة</th></tr></thead><tbody>${s.tasks.map((t,i)=>{const d=state.tasks[s.id][i];return `<tr><td>${t}</td><td>${STATUS[d.status]}</td><td>${esc(d.responsible)}</td><td>${d.evidence.length}</td><td>${taskScore(d)}%</td></tr>`}).join("")}</tbody></table>`).join("")}`;
+ if(type==="overdue")return reportHeader("تقرير المتأخرات والمخاطر")+`<table class="table"><thead><tr><th>المجال</th><th>المهمة</th><th>الخطر</th><th>المسؤول</th><th>المعالجة</th></tr></thead><tbody>${risks().map(r=>`<tr><td>${r.section}</td><td>${r.task}</td><td>${r.type}</td><td>${esc(r.d.responsible)}</td><td>${esc(r.d.action)}</td></tr>`).join("")}</tbody></table>`;
+ if(type.startsWith("section:")){const s=SECTIONS.find(x=>x.id===type.split(":")[1]);return reportHeader("تقرير مجال: "+s.title)+`<h3>نسبة الجاهزية: ${sectionScore(s)}%</h3><table class="table"><thead><tr><th>م</th><th>المهمة</th><th>الحالة</th><th>المسؤول</th><th>الموعد</th><th>الشواهد</th></tr></thead><tbody>${s.tasks.map((t,i)=>{const d=state.tasks[s.id][i];return `<tr><td>${i+1}</td><td>${t}</td><td>${STATUS[d.status]}</td><td>${esc(d.responsible)}</td><td>${esc(d.due)}</td><td>${d.evidence.length}</td></tr>`}).join("")}</tbody></table>`}
+ return reportHeader("التقرير القيادي المختصر")+`<div class="callout"><strong>الملخص التنفيذي:</strong> جاهزية المدرسة ${overall()}%، وعدد المخاطر النشطة ${risks().length}.</div><h3>المجالات</h3>${SECTIONS.map(s=>`<div class="score-line"><span>${s.title}</span><div class="progress"><i style="width:${sectionScore(s)}%"></i></div><strong>${sectionScore(s)}%</strong></div>`).join("")}<div class="signature-grid"><div>مدير المدرسة<br><br>____________</div><div>رئيس لجنة الاستعداد<br><br>____________</div><div>الختم<br><br>____________</div></div>`
+}
+function renderReports(){
+ if(typeof window.enhanceReports==="function"){window.enhanceReports();return}
+ const tabs=[["leadership","تقرير القيادة"],["executive","التقرير الكامل"],["overdue","المتأخرات"],["incomplete","المهام غير المكتملة"],...SECTIONS.map(s=>["section:"+s.id,s.title])];
+ document.getElementById("reportTabs").innerHTML=tabs.map(([k,l],i)=>`<button class="btn report-tab ${i===0?"active":""}" data-k="${k}">${l}</button>`).join("");
+ const show=k=>{document.getElementById("reportContent").innerHTML=reportBody(k);document.querySelectorAll(".report-tab").forEach(b=>b.classList.toggle("active",b.dataset.k===k))};
+ document.querySelectorAll(".report-tab").forEach(b=>b.onclick=()=>show(b.dataset.k));show("leadership")
+}
+function renderAll(){
+ const safe=(name,fn)=>{try{fn()}catch(err){console.error("[Readiness render] "+name,err)}};
+ safe("dashboard",()=>renderDashboard());
+ safe("settings",()=>renderSettings());
+ safe("team-normalize",()=>normalizeTeamRoleAssignments());
+ safe("team",()=>renderTeam());
+ safe("assignment-summary",()=>renderAssignmentSummary());
+ safe("sections",()=>SECTIONS.forEach(sec=>{
+   renderSection(sec);
+   const ds=sec.tasks.map((_,i)=>state.tasks?.[sec.id]?.[i]).filter(Boolean);
+   const metrics=document.getElementById("metrics-"+sec.id);
+   if(metrics)metrics.innerHTML=`<div class="metric"><span>نسبة المجال</span><strong>${sectionScore(sec)}%</strong><div class="progress"><i style="width:${sectionScore(sec)}%"></i></div></div><div class="metric"><span>المهام</span><strong>${sec.tasks.length}</strong></div><div class="metric"><span>معتمدة</span><strong>${ds.filter(d=>d.status==="approved").length}</strong></div><div class="metric"><span>حرجة غير مغلقة</span><strong>${ds.filter(d=>d.priority==="critical"&&!['verified','approved','na'].includes(d.status)).length}</strong></div><div class="metric"><span>الشواهد</span><strong>${ds.reduce((a,d)=>a+(Array.isArray(d.evidence)?d.evidence.length:0),0)}</strong></div>`;
+ }));
+ safe("risks",()=>renderRisks());
+ safe("analysis",()=>renderAnalysis());
+ safe("reports",()=>renderReports());
+}
+function printPage(id){document.querySelectorAll(".page").forEach(p=>p.classList.remove("printing"));document.getElementById("page-"+id).classList.add("printing");window.print()}
+document.getElementById("printBtn").onclick=()=>printPage(document.querySelector(".page.active").id.replace("page-",""));
+document.getElementById("exportBtn").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:"application/json"}));a.download="school-readiness-backup.json";a.click()};
+document.getElementById("importInput").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=JSON.parse(r.result);normalizeReadinessState();save();alert("تم استيراد النسخة وحفظها محليًا وسحابيًا.")}catch{alert("ملف غير صالح")}};r.readAsText(f)};
+let dbPromise;function db(){return dbPromise||(dbPromise=new Promise((res,rej)=>{const q=indexedDB.open("readiness_evidence",1);q.onupgradeneeded=()=>q.result.createObjectStore("files");q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)}))}
+async function dbPut(file,sectionKey,taskIndex,stageKey){
+ try{
+  if(window.CloudFileEngine&&window.PlatformCloudSession?.token()){
+   if(!cloudPlanId)throw new Error("لم يتم إنشاء خطة الجاهزية السحابية بعد");
+   const taskKeyValue=taskKey(sectionKey,taskIndex);
+   const r=await CloudFileEngine.upload({
+    file,
+    ownershipScope:"school",
+    moduleKey:"school_readiness",
+    recordType:"readiness_plan",
+    recordId:cloudPlanId,
+    relationType:"evidence",
+    metadata:{
+     readinessPlanId:cloudPlanId||"",
+     sectionKey,
+     taskKey:taskKeyValue,
+     readinessTaskKey:taskKeyValue,
+     taskIndex,
+     stageKey:stageKey==null?"":String(stageKey),
+     academicYear:state.settings?.year||"",
+     semester:"first"
+    }
+   });
+   return {
+    id:"cloud:"+r.file.id,
+    platformFileId:r.file.id,
+    evidenceRecordId:r.evidence?.id||"",
+    storage:"cloud"
+   };
+  }
+ }catch(e){console.error("Cloud evidence upload failed",e);throw new Error("تعذر حفظ الشاهد سحابيًا. تحقق من الاتصال والجلسة ثم أعد المحاولة.")}
+ throw new Error("حفظ شواهد الجاهزية يتطلب جلسة سحابية فعالة للمدرسة المستقلة.");
+}
+async function dbGet(id){
+ if(String(id).startsWith("cloud:")&&window.CloudFileEngine){return CloudFileEngine.getBlob(String(id).slice(6))}
+ const x=await db();return new Promise((res,rej)=>{const q=x.transaction("files").objectStore("files").get(id);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})
+}
+async function dbDelete(id){
+ if(String(id).startsWith("cloud:")&&window.CloudFileEngine){return CloudFileEngine.trash(String(id).slice(6))}
+ const x=await db();return new Promise((res,rej)=>{const t=x.transaction("files","readwrite");t.objectStore("files").delete(id);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})
+}
+async function migrateLegacyReadinessEvidence(){
+ if(!window.CloudFileEngine||!window.PlatformCloudSession?.token()||!cloudPlanId)return false;
+ let changed=false;
+ for(const s of SECTIONS){
+  for(let i=0;i<s.tasks.length;i++){
+   const d=state.tasks?.[s.id]?.[i]; if(!d||!Array.isArray(d.evidence))continue;
+   for(const ev of d.evidence){
+    if(!ev?.id||String(ev.id).startsWith("cloud:"))continue;
+    try{
+     const file=await dbGet(ev.id); if(!file)continue;
+     const legacyTaskKey=taskKey(s.id,i);
+     const r=await CloudFileEngine.upload({file,ownershipScope:"school",moduleKey:"school_readiness",recordType:"readiness_plan",recordId:cloudPlanId,relationType:"evidence",displayName:ev.name||file.name,metadata:{readinessPlanId:cloudPlanId,sectionKey:s.id,taskKey:legacyTaskKey,readinessTaskKey:legacyTaskKey,taskIndex:i,stageKey:d.phase==null?"":String(d.phase),academicYear:state.settings?.year||"",semester:"first",migratedFrom:"indexeddb"}});
+     const oldId=ev.id; ev.id="cloud:"+r.file.id;ev.platformFileId=r.file.id;ev.evidenceRecordId=r.evidence?.id||"";ev.storage="cloud";changed=true;
+     const x=await db();await new Promise((res,rej)=>{const tr=x.transaction("files","readwrite");tr.objectStore("files").delete(oldId);tr.oncomplete=()=>res();tr.onerror=()=>rej(tr.error)});
+    }catch(e){console.warn("Legacy readiness evidence migration deferred",ev?.name,e?.message||e)}
+   }
+  }
+ }
+ if(changed)save();
+ return changed;
+}
+
+async function bootstrapReadiness(){
+ setCloudStatus("loading","جارٍ تهيئة قسم الجاهزية");
+ await loadReadinessFromCloud();
+ normalizeReadinessState();
+ await migrateLegacyReadinessEvidence();
+ await loadReadinessSchoolUsers();
+ initNav();initSectionPages();syncAllAssignments();renderAll();renderOperationalStages();renderManagerDashboard();showPage("dashboard");
+ await reconcileReadinessCloudTasks();
+}
+window.readinessBootstrapPromise=bootstrapReadiness();
+
+window.addEventListener("storage",e=>{
+ if(["setting_region","setting_school","def_m","setting_sig","setting_stamp","current_school_name","school_name","smartSchool.currentSchool"].includes(e.key)){
+  if(syncPlatformSettingsToReadiness({persist:true})){save()}
+ }
+});
+window.addEventListener("focus",async()=>{
+ if(syncPlatformSettingsToReadiness({persist:true})){save()}
+ try{await loadReadinessFromCloud();normalizeReadinessState();syncAllAssignments();renderAll();renderOperationalStages();renderManagerDashboard();await reconcileReadinessCloudTasks()}catch(e){console.warn("Readiness focus refresh",e)}
+});
+
+
+// واجهة تكامل آمنة للطبقة التصميمية والتحليلية المرجعية
+window.SECTIONS=SECTIONS;
+window.PHASES=PHASES;
+window.STATUS=STATUS;
+window.sectionScore=sectionScore;
+window.overall=overall;
+window.risks=risks;
+window.tasksForStage=tasksForStage;
+window.stageExecutionSummary=stageExecutionSummary;
+window.save=save;
+try{Object.defineProperty(window,'state',{get:()=>state,set:v=>{state=v},configurable:true})}catch(_){window.state=state}
+</script>
+
+<div class="exec-modal-backdrop" id="readinessEvidenceModal">
+ <div class="exec-modal" role="dialog" aria-modal="true" aria-labelledby="readinessEvidenceTaskTitle">
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><h3 style="margin:0">إضافة شاهد التنفيذ</h3><small id="readinessEvidenceTaskTitle"></small></div><button type="button" class="btn" id="readinessEvidenceClose">إغلاق</button></div>
+  <div class="callout" style="margin-top:12px">اختر شاهدًا من الجهاز أو من مكتبة القسم. ستبقى هذه النافذة مفتوحة حتى يتم حفظ الشاهد سحابيًا بنجاح.</div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0"><button type="button" class="btn" id="readinessEvidenceFromDevice">📎 اختيار من الجهاز</button><button type="button" class="btn" id="readinessEvidenceFromLibrary">📚 اختيار من مكتبة القسم</button></div>
+  <input id="readinessEvidenceDeviceInput" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" style="display:none">
+  <div class="evidence-list" id="readinessEvidenceSelection"><span class="empty">لم يتم اختيار شاهد بعد.</span></div>
+  <div id="readinessEvidenceStatus" style="margin-top:12px;font-weight:700;color:#526a6d">اختر مصدر الشاهد، ثم اضغط حفظ الشاهد.</div>
+  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button type="button" class="btn" id="readinessEvidenceCancel">إلغاء</button><button type="button" class="btn execute-yes" id="readinessEvidenceSave" disabled>حفظ الشاهد سحابيًا</button></div>
+ </div>
+</div>
+
+<div class="exec-modal-backdrop" id="notExecutedModal">
+ <div class="exec-modal">
+  <h3>سبب عدم التنفيذ</h3>
+  <p>اكتب سبب عدم تنفيذ البند. بعد الحفظ ستظهر حقول الإجراء التصحيحي والموعد الجديد للمتابعة.</p>
+  <textarea id="notExecutedReason" placeholder="اكتب سبب عدم التنفيذ..."></textarea>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn" onclick="closeNotExecuted()">إلغاء</button><button class="btn danger" onclick="confirmNotExecuted()">حفظ السبب</button></div>
+ </div>
+</div>
+
+
+<script src="readiness-assets/js/app.js"></script>
+
+<!-- Unified Comprehensive Cloud Storage -->
+<script src="cloud-file-bootstrap.js"></script>
+<script src="cloud-upload-hub.js"></script>
+<script src="cloud-file-auto-sync.js"></script>
+
+<script src="platform-record-catalog.js"></script>
+<script src="delegated-access-guard.js"></script>
+<script src="school-activity-engine.js"></script>
+
+<script src="evidence-library-source.js"></script>
+<script>
+document.getElementById("readinessEvidenceFromDevice")?.addEventListener("click",()=>document.getElementById("readinessEvidenceDeviceInput")?.click());
+document.getElementById("readinessEvidenceDeviceInput")?.addEventListener("change",e=>{readinessDeviceFiles=[...(e.target.files||[])];renderReadinessEvidenceSelection()});
+document.getElementById("readinessEvidenceFromLibrary")?.addEventListener("click",()=>{if(!window.EvidenceLibrarySource)return alert("مكتبة القسم غير متاحة حاليًا");window.EvidenceLibrarySource.open("readiness-select",{onSelect:async files=>{readinessLibraryFiles=files||[];renderReadinessEvidenceSelection()}})});
+document.getElementById("readinessEvidenceSave")?.addEventListener("click",commitReadinessEvidenceModal);
+document.getElementById("readinessEvidenceCancel")?.addEventListener("click",()=>{evidenceModalEl()?.classList.remove("show");readinessEvidenceTarget=null;readinessDeviceFiles=[];readinessLibraryFiles=[];renderReadinessEvidenceSelection()});
+document.getElementById("readinessEvidenceClose")?.addEventListener("click",()=>{evidenceModalEl()?.classList.remove("show");readinessEvidenceTarget=null;readinessDeviceFiles=[];readinessLibraryFiles=[];renderReadinessEvidenceSelection()});
+</script>
+
+<script src="school-information-source.js"></script>
+<script src="internal-messaging.js"></script>
+<script defer src="unified_workspace.js"></script>
+<script defer src="school_navigation_guard.js"></script>
+
+<!-- Agent Core V2: school/role/year scoped -->
+<script src="agent-role-profiles.js"></script>
+<script src="agent-section-adapters.js"></script>
+<script src="agent-core-v2.js"></script>
+<script src="openai-engine.js"></script>
+<script src="top-ai-center.js"></script>
+<script src="platform-page-navigation.js?v=20260818-nav1"></script>
+
+<!-- PRIVATE_EDITION_BUILD_RUNTIME -->
+<script src="private-school-runtime.js"></script>
+</body></html>

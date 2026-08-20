@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+
+<script src="private-storage-namespace.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script>
+<!-- PRIVATE_EDITION_BUILD_HEAD -->
+<script src="private-edition-bootstrap.js"></script>
+<style id="private-school-auth-pending-style">html.private-auth-pending body{visibility:hidden!important}</style>
+<script src="private-school-preflight.js"></script>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مركز الإدارة المدرسية الذكية | لوحة القيادة</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--emerald:#0f766e;--emerald-dark:#064e3b;--ink:#16302b;--muted:#64748b;--line:#e5efec;--bg:#f3f7f7}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:Tajawal,sans-serif;background:radial-gradient(circle at 90% 0,rgba(13,148,136,.10),transparent 28%),#f3f7f7;color:var(--ink);margin:0;min-height:100vh}.glass{background:rgba(255,255,255,.93);backdrop-filter:blur(14px)}.card{background:#fff;border:1px solid #e5efec;box-shadow:0 8px 30px rgba(16,70,57,.06)}.kpi{transition:.25s}.kpi:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(16,70,57,.11)}.dot{width:8px;height:8px;border-radius:50%;display:inline-block}.heat{min-height:78px;transition:.2s}.heat:hover{transform:translateY(-2px)}.navbtn.active{background:#0f766e;color:#fff}.ring{--score:0;background:conic-gradient(#6ee7b7 0 calc(var(--score)*1%),rgba(255,255,255,.20) calc(var(--score)*1%) 100%)}.ring:after{content:"";position:absolute;inset:12px;background:#fff;border-radius:50%}.ring-value{position:relative;z-index:2;color:#064e3b}.source-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;background:#f0fdfa;color:#0f766e;font-size:10px;font-weight:800;border:1px solid #ccfbf1}.empty-state{border:1px dashed #cbd5e1;border-radius:18px;padding:18px;text-align:center;color:#94a3b8;font-size:12px;font-weight:700;background:#f8fafc}.alert-card{transition:.2s}.alert-card:hover{transform:translateX(-2px);background:#f8fafc}.metric-sub{font-size:10px;color:#94a3b8;line-height:1.6;min-height:16px}.hero-orb{position:absolute;border-radius:999px;background:rgba(255,255,255,.08);pointer-events:none}.skeleton{background:linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%);background-size:200% 100%;animation:shine 1.2s infinite}@keyframes shine{to{background-position:-200% 0}}@media(max-width:700px){.hide-sm{display:none}}@media print{.no-print{display:none!important}body{background:#fff}.card{box-shadow:none}.sticky{position:static!important}}
+</style>
+<link rel="stylesheet" href="responsive-layout.css?v=20260818-responsive-1">
+<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
+<body>
+<header class="sticky top-0 z-30 glass border-b border-emerald-900/10 no-print">
+  <div class="max-w-[1600px] mx-auto px-5 py-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-2xl bg-emerald-800 text-white grid place-items-center shadow-lg"><i class="fa-solid fa-chart-line"></i></div>
+      <div><h1 class="font-black text-xl text-emerald-950">مركز الإدارة المدرسية الذكية</h1><p class="text-xs text-slate-500">لوحة القيادة ودعم القرار</p></div>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <button onclick="goManager()" class="px-4 py-2 rounded-xl bg-slate-50 border text-sm font-bold"><i class="fa-solid fa-arrow-right ml-1"></i> العودة للمدير</button>
+      <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-white border text-sm font-bold"><i class="fa-solid fa-print ml-1"></i> طباعة</button>
+      <button onclick="refreshAll()" class="px-4 py-2 rounded-xl bg-emerald-800 text-white text-sm font-bold"><i class="fa-solid fa-rotate ml-1"></i> تحديث</button>
+    </div>
+  </div>
+</header>
+<main class="max-w-[1600px] mx-auto p-5 space-y-5">
+  <section class="card rounded-3xl p-5 md:p-7 bg-gradient-to-l from-emerald-950 to-teal-700 text-white overflow-hidden relative">
+    <div class="hero-orb -left-12 -top-20 w-72 h-72"></div><div class="hero-orb -right-20 -bottom-32 w-80 h-80"></div>
+    <div class="relative flex flex-col xl:flex-row justify-between gap-5 items-center">
+      <div class="flex-1">
+        <div class="inline-flex gap-2 items-center bg-white/10 px-3 py-1.5 rounded-full text-xs mb-3"><span class="dot bg-emerald-300"></span><span id="liveBadge">قراءة تنفيذية مباشرة</span></div>
+        <h2 class="text-2xl md:text-3xl font-black">حالة المدرسة: <span id="schoolState" class="text-emerald-200">بانتظار قراءة البيانات</span></h2>
+        <p id="schoolStateDetail" class="mt-2 text-emerald-50/80 max-w-3xl leading-7">تُبنى هذه القراءة من مصادر المنصة الفعلية للمدرسة النشطة، ولا تُستخدم قيم افتراضية عند غياب البيانات.</p>
+        <div class="flex flex-wrap gap-2 mt-4"><span class="source-pill !bg-white/10 !text-white !border-white/15"><i class="fa-solid fa-school"></i><span id="activeSchoolName">المدرسة النشطة</span></span><span class="source-pill !bg-white/10 !text-white !border-white/15"><i class="fa-solid fa-database"></i><span id="dataSourceStatus">جارٍ فحص المصادر</span></span></div>
+      </div>
+      <div class="flex gap-5 items-center shrink-0">
+        <div class="relative ring w-28 h-28 rounded-full grid place-items-center" id="performanceRing"><div class="ring-value text-center"><b class="text-2xl" id="overallScore">—</b><small class="block text-emerald-900 font-bold">الأداء العام</small></div></div>
+        <div><p class="text-xs text-emerald-100">الاتجاه العام</p><p id="overallTrend" class="font-black text-xl">—</p><p id="overallTrendHint" class="text-xs text-emerald-100">لا توجد فترة سابقة كافية</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card rounded-2xl p-3 flex flex-wrap gap-2 items-center no-print">
+    <span class="text-xs font-bold px-2">تصفية اللوحة:</span>
+    <select id="period" onchange="filtersChanged()" class="bg-slate-50 border rounded-xl px-3 py-2 text-xs"><option value="month">هذا الشهر</option><option value="week">هذا الأسبوع</option><option value="term">الفصل الدراسي</option><option value="year">العام الدراسي</option></select>
+    <select id="focus" onchange="filtersChanged()" class="bg-slate-50 border rounded-xl px-3 py-2 text-xs"><option value="all">جميع المجالات</option><option value="tasks">التكليفات</option><option value="readiness">الجاهزية</option><option value="discipline">الانضباط</option><option value="operational">الخطة التشغيلية</option><option value="performance">الأداء الوظيفي</option><option value="learning">نواتج التعلم</option></select>
+    <select id="scope" onchange="filtersChanged()" class="bg-slate-50 border rounded-xl px-3 py-2 text-xs"><option value="all">جميع الفئات</option><option value="teachers">المعلمون</option><option value="admin">الإداريون</option><option value="students">الطلاب</option></select>
+    <select id="viewmode" class="hidden"><option value="analytical" selected>analytical</option></select><select id="sensitivity" class="hidden"><option value="normal" selected>normal</option></select><select id="schoolSelect" class="hidden"><option value="">active</option></select>
+    <span id="lastSync" class="mr-auto text-[11px] text-slate-400">آخر مزامنة: —</span>
+  </section>
+
+  <section class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-8 gap-3" id="kpis"></section>
+
+  <section class="grid xl:grid-cols-12 gap-5">
+    <div class="card rounded-3xl p-5 xl:col-span-8">
+      <div class="flex justify-between gap-3 mb-4"><div><h3 class="font-black">اتجاه الأداء المدرسي</h3><p class="text-xs text-slate-400">قراءة زمنية من بيانات المنصة الفعلية خلال آخر 6 أشهر</p></div><span id="trendBadge" class="text-xs bg-slate-50 text-slate-600 px-3 py-1 rounded-full h-fit">بانتظار البيانات</span></div>
+      <div class="h-72"><canvas id="trend"></canvas></div>
+    </div>
+    <div class="card rounded-3xl p-5 xl:col-span-4"><h3 class="font-black">ماذا يحتاج انتباهي؟</h3><p class="text-xs text-slate-400 mb-4">أولويات مولدة من المؤشرات الحالية حسب الأثر والاستعجال</p><div class="space-y-3" id="alerts"></div></div>
+  </section>
+
+  <section class="grid xl:grid-cols-12 gap-5">
+    <div class="card rounded-3xl p-5 xl:col-span-7"><h3 class="font-black">الخريطة الحرارية للأداء</h3><p class="text-xs text-slate-400 mb-4">قراءة بصرية سريعة للمحاور القيادية، مع إظهار غياب البيانات بوضوح</p><div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="heat"></div></div>
+    <div class="card rounded-3xl p-5 xl:col-span-5"><h3 class="font-black">توزيع الأداء</h3><p class="text-xs text-slate-400 mb-3">مقارنة المحاور التي تتوفر لها بيانات فعلية</p><div class="h-72"><canvas id="radar"></canvas></div></div>
+  </section>
+
+  <section class="grid xl:grid-cols-12 gap-5">
+    <div class="card rounded-3xl p-5 xl:col-span-8">
+      <div class="flex items-center gap-3 mb-4"><div class="w-10 h-10 rounded-xl bg-violet-100 text-violet-700 grid place-items-center"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div><h3 class="font-black">المحلل القيادي الذكي</h3><p class="text-xs text-slate-400">تحويل المؤشرات الحالية إلى قراءة قابلة للتنفيذ دون اختلاق بيانات</p></div></div>
+      <div class="bg-slate-50 rounded-2xl p-4 border"><b>ملخص القرار</b><p id="decisionSummary" class="text-sm leading-7 mt-2 text-slate-600">بانتظار اكتمال قراءة المصادر.</p></div>
+      <div class="flex flex-wrap gap-2 mt-3 no-print"><button onclick="setAnalysisMode('drop')" class="analysis-btn navbtn active px-3 py-2 rounded-xl text-xs font-bold">لماذا انخفض المؤشر؟</button><button onclick="setAnalysisMode('risk')" class="analysis-btn navbtn px-3 py-2 rounded-xl text-xs font-bold border">أعلى 3 مخاطر</button><button onclick="setAnalysisMode('compare')" class="analysis-btn navbtn px-3 py-2 rounded-xl text-xs font-bold border">قارن بالفترة السابقة</button></div>
+    </div>
+    <div class="card rounded-3xl p-5 xl:col-span-4"><h3 class="font-black">مركز القرار</h3><p class="text-xs text-slate-400 mb-4">إجراءات مرتبطة مباشرة بمصادر المؤشرات</p><div class="space-y-3" id="decisionCenter"></div></div>
+  </section>
+
+  <section class="card rounded-3xl p-5"><div class="flex flex-wrap items-center justify-between gap-3"><div><h3 class="font-black">مصادر القراءة الحالية</h3><p class="text-xs text-slate-400">يوضح النظام ما تم العثور عليه فعليًا في المدرسة النشطة</p></div><button onclick="refreshAll()" class="no-print text-xs font-bold text-emerald-700"><i class="fa-solid fa-arrows-rotate ml-1"></i> إعادة فحص المصادر</button></div><div id="sourceGrid" class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mt-4"></div></section>
+</main>
+<div id="toast" class="fixed bottom-5 left-5 translate-y-24 opacity-0 transition bg-emerald-950 text-white px-5 py-3 rounded-xl shadow-2xl text-sm z-50"></div>
+
+<script src="platform-state-engine.js"></script>
+<script src="platform-persistence-guard.js"></script>
+<script src="platform-cloud-session.js?v=20260818-session-clean-v2"></script>
+<script src="platform-core-engine.js"></script>
+<script src="platform-dashboard-bridge.js"></script>
+<script src="school-information-source.js"></script>
+<script>
+(function(){'use strict';
+const $=id=>document.getElementById(id);let trendChart=null,radarChart=null,currentModel=null,analysisMode='drop';
+const commandSources={operational:null,teacherStates:[],loaded:false};
+const COLORS={emerald:'#0f766e',teal:'#14b8a6',amber:'#d97706',rose:'#e11d48',blue:'#2563eb',violet:'#7c3aed',slate:'#94a3b8'};
+function parse(v,d=null){try{return JSON.parse(v||'')}catch(e){return d}}
+function read(k,d=null){return parse(localStorage.getItem(k),d)}
+function arr(v){return Array.isArray(v)?v:[]}
+function num(v){let n=Number(String(v??'').replace('%',''));return Number.isFinite(n)?n:null}
+function pct(v){let n=num(v);return n==null?null:Math.max(0,Math.min(100,Math.round(n)))}
+function sid(){let school=read('smartSchool.currentSchool',{})||{},u=read('currentSchoolUser',{})||read('currentUser',{})||{};return localStorage.getItem('active_school_id')||localStorage.getItem('activeSchoolId')||localStorage.getItem('current_school_id')||localStorage.getItem('school_id')||school.id||school.schoolId||u.activeSchoolId||u.schoolId||''}
+function schoolName(){let s=read('smartSchool.currentSchool',{})||{},u=read('currentSchoolUser',{})||read('currentUser',{})||{};return localStorage.getItem('active_school_name')||localStorage.getItem('current_school_name')||localStorage.getItem('school_name')||s.name||s.schoolName||u.schoolName||'المدرسة النشطة'}
+function storageArrays(rx){let out=[];for(let i=0;i<localStorage.length;i++){let k=localStorage.key(i)||'';if(!rx.test(k))continue;let v=read(k,null);if(Array.isArray(v))out=out.concat(v.map(x=>({...x,_source:k})));}return out}
+function dateOf(x){for(const k of ['occurred_at','updated_at','created_at','date','assigned_at','submitted_at','approved_at','due_date','completed_at']){if(x&&x[k]){let d=new Date(x[k]);if(!isNaN(d))return d}}return null}
+function inWindow(x,days){let d=dateOf(x);return !d||Date.now()-d.getTime()<=days*86400000}
+function periodDays(){return ({week:7,month:31,term:130,year:370})[$('period')?.value]||31}
+function normStatus(s){s=String(s||'').toLowerCase();if(/approved|معتمد/.test(s))return'approved';if(/pending|بانتظار/.test(s))return'pending';if(/return|معاد/.test(s))return'returned';if(/reject|مرفوض/.test(s))return'rejected';if(/archive|مؤرشف/.test(s))return'archived';if(/progress|تنفيذ/.test(s))return'in_progress';return'active'}
+function isOverdue(t){let d=t?.due_date?new Date(t.due_date):null;return d&&!isNaN(d)&&d<new Date()&&!['approved','archived','rejected'].includes(normStatus(t.status))}
+function average(vals){vals=vals.map(num).filter(v=>v!=null);return vals.length?pct(vals.reduce((a,b)=>a+b,0)/vals.length):null}
+function valueFields(items,fields){let vals=[];items.forEach(x=>fields.forEach(k=>{let v=num(x?.[k]);if(v!=null)vals.push(v<=5&&/evaluation|rating|score/i.test(k)?v*20:v)}));return average(vals)}
+function collectTasks(){let id=sid(),keys=['central_school_tasks_'+id,'central_school_tasks','school_tasks'];let out=[];keys.forEach(k=>out=out.concat(arr(read(k,[]))));out=out.concat(storageArrays(/central_school_tasks_|task_center|assignments/i));let seen=new Set();return out.filter(t=>t&&t.id).filter(t=>{let k=String(t.id);if(seen.has(k))return false;seen.add(k);return true}).map(t=>({...t,status:normStatus(t.status)}))}
+function collectReadiness(){let st=read('school_readiness_v10:'+sid(),null);if(!st)st=read('school_readiness_v10',null);let tasks=[];if(st?.tasks&&typeof st.tasks==='object')Object.values(st.tasks).forEach(sec=>{if(sec&&typeof sec==='object')Object.values(sec).forEach(t=>{if(t&&typeof t==='object')tasks.push(t)})});let done=tasks.filter(t=>/done|completed|approved|executed|منفذ|مكتمل|معتمد/.test(String(t.status||t.execution?.result||t.review?.status||'').toLowerCase())).length;let evidence=tasks.reduce((s,t)=>s+arr(t.evidence).length,0);let expected=tasks.filter(t=>!['canceled','archived'].includes(String(t.status||''))).length;let score=expected?Math.round(done/expected*100):null;return{raw:st,tasks,total:expected,done,evidence,score}}
+function collectDiscipline(){let st=read('school_attendance_ui_v1',null)||{};let staff=arr(st.staff),records=arr(st.records).filter(x=>inWindow(x,periodDays()));let negative=records.filter(r=>/تأخر|غياب بدون عذر|انصراف مبكر/.test(String(r.type||r.movementType||'')));let affected=new Set(negative.map(r=>String(r.employeeId||r.employee_id||r.userId||r.name||''))).size;let score=staff.length?Math.round((staff.length-Math.min(staff.length,affected))/staff.length*100):records.length?(negative.length?Math.max(0,100-Math.round(negative.length/records.length*100)):100):null;return{staff:staff.length,records,negative,affected,score}}
+function collectPerformance(){let m=read('administrative_employee_metrics',null);let scores=[];if(m){let a=num(m.averageEvaluation);if(a!=null)scores.push(a<=5?a*20:a);let e=num(m.executionProgress);if(e!=null)scores.push(e)}for(let i=0;i<localStorage.length;i++){let k=localStorage.key(i)||'';if(!/employee_eval_|performance.*evaluation|evaluation_result/i.test(k))continue;let v=read(k,null);if(v&&typeof v==='object'){let n=num(v.total??v.score??v.average??v.percentage);if(n!=null)scores.push(n<=5?n*20:n)}}return{raw:m,score:average(scores),count:m?.total||scores.length||0,improvement:m?.improvement||0}}
+function collectRecords(){let out=[];['school_manager_records_archive_v1','manager_records_archive','school_records_archive','self_evaluation_records_archive','reports_archive','school_reports'].forEach(k=>out=out.concat(arr(read(k,[])).map(x=>({...x,_source:k}))));out=out.concat(storageArrays(/records_archive|reports_archive|school_reports|evidence/i));return out.filter(x=>x&&typeof x==='object')}
+function recordText(x){return [x.title,x.name,x.label,x.folderName,x.categoryName,x.type,x.recordName,x.domain,x._source].filter(Boolean).join(' ')}
+function parseStateValue(item){try{let v=item?.payload?.value;return typeof v==='string'?JSON.parse(v):v}catch(e){return null}}
+function collectOperational(){
+  let plan=commandSources.operational||read('school_operational_execution_v1',null);
+  let rows=arr(plan?.rows);
+  if(!rows.length){let legacy=read('sa_self_eval_actual_v3',null);rows=arr(legacy?.plan?.rows);if(rows.length)plan=legacy.plan}
+  let vals=rows.map(r=>pct(r?.progress)).filter(v=>v!=null),score=vals.length?average(vals):null;
+  let completed=rows.filter(r=>num(r?.progress)>=100).length;
+  let overdue=rows.filter(r=>{let e=r?.end?new Date(r.end):null;return e&&!isNaN(e)&&e<new Date()&&num(r?.progress)<100}).length;
+  let evidence=rows.reduce((n,r)=>n+arr(r?.evidenceFiles).length+(r?.evidence?1:0),0);
+  return{plan,rows,records:rows,score,total:rows.length,completed,overdue,evidence};
+}
+function normalizedAssessment(v,max){let n=num(v);return n==null?null:Math.max(0,Math.min(100,Math.round(n/Math.max(1,max)*100)))}
+function collectLearning(){
+  let states=commandSources.teacherStates||[];
+  let owners=new Set(),classes=[],students=[];
+  states.forEach(st=>{let data=st.data;if(!Array.isArray(data))return;owners.add(String(st.ownerKey||''));data.forEach(c=>{classes.push(c);arr(c?.students).forEach(student=>students.push(student))})});
+  if(!students.length){let local=read('followup_classes_v3',[]);if(Array.isArray(local)){classes=local;local.forEach(c=>arr(c?.students).forEach(student=>students.push(student)))}}
+  const defs={diagnostic:20,period1:20,period2:20,final:40};let series={diagnostic:[],period1:[],period2:[],final:[]};
+  students.forEach(st=>Object.entries(defs).forEach(([k,max])=>{let v=normalizedAssessment(st?.assessments?.[k],max);if(v!=null)series[k].push(v)}));
+  let averages={};Object.keys(defs).forEach(k=>averages[k]=series[k].length?average(series[k]):null);
+  let order=['diagnostic','period1','period2','final'],available=order.filter(k=>averages[k]!=null),latest=available.length?available.at(-1):null,previous=available.length>1?available.at(-2):null;
+  let score=latest?averages[latest]:null,gap=(latest&&previous)?Math.round(averages[latest]-averages[previous]):null;
+  let latestVals=latest?series[latest]:[],mastery=latestVals.length?Math.round(latestVals.filter(v=>v>=70).length/latestVals.length*100):null;
+  return{records:students,score,gap,mastery,averages,students:students.length,classes:classes.length,teachers:owners.size||null,latest,previous};
+}
+function collectEvidence(records,readiness){let rs=records.filter(x=>/شاهد|evidence|archive|report/i.test(recordText(x)));let complete=rs.filter(x=>/approved|complete|مكتمل|معتمد/.test(String(x.status||x.state||''))).length;let score=rs.length?Math.round(complete/rs.length*100):(readiness.total?Math.min(100,Math.round(readiness.evidence/Math.max(1,readiness.total)*100)):null);return{records:rs,count:rs.length+readiness.evidence,score}}
+function collectAdvising(){let out=[];['student_advisor_cases','student_advisor_records','student_followup_cases','advisor_analysis_data'].forEach(k=>out=out.concat(arr(read(k,[]))));out=out.concat(storageArrays(/advisor|student_followup/i));return out}
+function cloud(){return window.PlatformDashboardData||null}
+function cloudTaskSummary(c,tasks){let s=c?.summary||{};let total=num(s.total_tasks??s.total);if(total==null||total===0)total=tasks.length;let active=num(s.active_tasks??s.active);if(active==null)active=tasks.filter(t=>['active','in_progress','pending','returned'].includes(t.status)).length;let pending=num(s.pending_approval??s.pending);if(pending==null)pending=tasks.filter(t=>t.status==='pending').length;let approved=num(s.approved_tasks??s.approved);if(approved==null)approved=tasks.filter(t=>t.status==='approved').length;let overdue=num(s.overdue_tasks??s.overdue);if(overdue==null)overdue=tasks.filter(isOverdue).length;let progress=num(c?.activity?.operational_execution_progress??s.operational_execution_progress??s.average_progress??s.completion_rate);if(progress==null&&total)progress=Math.round(approved/total*100);return{total,active,pending,approved,overdue,progress:pct(progress)}}
+function model(){let records=collectRecords(),readiness=collectReadiness(),discipline=collectDiscipline(),performance=collectPerformance(),operational=collectOperational(),learning=collectLearning(),evidence=collectEvidence(records,readiness),tasks=collectTasks(),cs=cloudTaskSummary(cloud(),tasks),advising=collectAdvising();let studentRisk=advising.length?Math.round(advising.filter(x=>/risk|critical|متعثر|حرج|متأخر|غياب|سلوك/.test(String(x.status||x.level||x.type||x.category||''))).length/advising.length*100):null;let scores={tasks:cs.progress,readiness:readiness.score,discipline:discipline.score,operational:operational.score,performance:performance.score,learning:learning.score,evidence:evidence.score};let focus=$('focus')?.value||'all';let available=(focus==='all'?Object.values(scores):[scores[focus]]).filter(v=>v!=null),overall=available.length?average(available):null;let riskCount=(cs.overdue||0)+(studentRisk==null?0:Math.round(studentRisk/20))+(readiness.total-readiness.done>0?1:0);return{records,readiness,discipline,performance,operational,learning,evidence,tasks,taskSummary:cs,advising,studentRisk,scores,overall,riskCount,sourceCount:available.length}}
+function focusAllows(key){let f=$('focus')?.value||'all';return f==='all'||f===key}
+function kpiData(m){return[
+ ['الأداء العام',m.overall,m.sourceCount?`${m.sourceCount} مصادر فعالة`:'لا توجد مصادر كافية','fa-gauge-high','overall'],
+ ['الجاهزية',m.scores.readiness,m.readiness.total?`${m.readiness.done}/${m.readiness.total} مهمة مكتملة`:'لا توجد خطة جاهزية','fa-shield-halved','readiness'],
+ ['الانضباط',m.scores.discipline,m.discipline.staff?`${m.discipline.affected} منسوب لديهم حركات سلبية`:'لا توجد بيانات منسوبين','fa-user-check','discipline'],
+ ['الخطة التشغيلية',m.scores.operational,m.operational.total?`${m.operational.completed}/${m.operational.total} مبادرة مكتملة${m.operational.overdue?` • ${m.operational.overdue} متأخرة`:''}`:'لا توجد مبادرات تنفيذية','fa-list-check','operational'],
+ ['الأداء الوظيفي',m.scores.performance,m.performance.count?`${m.performance.count} ملف/خطة أداء`:'لا توجد بيانات تقييم','fa-ranking-star','performance'],
+ ['نواتج التعلم',m.scores.learning,m.learning.students?`${m.learning.students} طالب${m.learning.gap!=null?` • فجوة ${m.learning.gap>0?'+':''}${m.learning.gap}%`:''}`:'لا توجد درجات اختبارات','fa-graduation-cap','learning'],
+ ['إنجاز المهام',m.taskSummary.progress,m.taskSummary.total?`${m.taskSummary.approved}/${m.taskSummary.total} معتمد`:'لا توجد تكليفات','fa-circle-check','tasks'],
+ ['المخاطر المفتوحة',m.riskCount,m.riskCount?`${m.taskSummary.overdue} تكليف متأخر`:'لا توجد مخاطر مرصودة','fa-triangle-exclamation','risk']];}
+function renderKpis(m){let list=kpiData(m);let f=$('focus')?.value||'all';if(f!=='all')list=list.filter(x=>x[4]===f||x[4]==='overall'||x[4]==='risk');$('kpis').innerHTML=list.map(x=>{let isRisk=x[4]==='risk',v=x[1],display=v==null?'—':isRisk?String(v):v+'%';let cls=isRisk?(v>3?'text-rose-600':'text-emerald-600'):(v==null?'text-slate-400':v>=85?'text-emerald-600':v>=70?'text-amber-600':'text-rose-600');return`<button onclick="openMetric('${x[4]}')" class="kpi card rounded-2xl p-4 text-right"><div class="flex justify-between gap-2"><i class="fa-solid ${x[3]} text-emerald-700"></i><span class="text-[10px] ${cls}">${v==null?'غير متاح':isRisk?(v?'يتطلب متابعة':'مطمئن'):(v>=85?'مطمئن':v>=70?'متابعة':'يتطلب تدخل')}</span></div><b class="text-2xl block mt-3">${display}</b><span class="text-[11px] text-slate-600 font-bold">${x[0]}</span><div class="metric-sub mt-1">${x[2]}</div></button>`}).join('')}
+function heatColor(v){return v==null?['slate','bg-slate-50 border-slate-200 text-slate-600']:v>=85?['emerald','bg-emerald-50 border-emerald-100 text-emerald-800']:v>=70?['teal','bg-teal-50 border-teal-100 text-teal-800']:v>=50?['amber','bg-amber-50 border-amber-100 text-amber-800']:['rose','bg-rose-50 border-rose-100 text-rose-800']}
+function renderHeat(m){let data=[['الجاهزية',m.scores.readiness,'readiness'],['الخطة التشغيلية',m.scores.operational,'operational'],['الانضباط',m.scores.discipline,'discipline'],['الأداء الوظيفي',m.scores.performance,'performance'],['نواتج التعلم',m.scores.learning,'learning'],['الشواهد',m.scores.evidence,'evidence'],['التكليفات',m.scores.tasks,'tasks'],['مخاطر الطلاب',m.studentRisk==null?null:100-m.studentRisk,'students']];$('heat').innerHTML=data.map(x=>{let c=heatColor(x[1]);return`<button onclick="openMetric('${x[2]}')" class="heat rounded-2xl border p-3 text-right ${c[1]}"><span class="text-xs font-bold">${x[0]}</span><b class="block text-xl">${x[1]==null?'—':x[1]+'%'}</b><small class="text-[10px] opacity-70">${x[1]==null?'لا توجد بيانات':'فتح المصدر'}</small></button>`}).join('')}
+function monthKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function lastMonths(n=6){let out=[],d=new Date();d.setDate(1);for(let i=n-1;i>=0;i--){let x=new Date(d.getFullYear(),d.getMonth()-i,1);out.push({key:monthKey(x),label:x.toLocaleDateString('ar-SA',{month:'short'})})}return out}
+function trendData(m){let months=lastMonths(),taskVals=[],discVals=[];months.forEach(mon=>{let ts=m.tasks.filter(t=>{let d=dateOf(t);return d&&monthKey(d)===mon.key});taskVals.push(ts.length?Math.round(ts.filter(t=>t.status==='approved').length/ts.length*100):null);let rs=m.discipline.records.filter(r=>{let d=dateOf(r);return d&&monthKey(d)===mon.key});let neg=rs.filter(r=>/تأخر|غياب بدون عذر|انصراف مبكر/.test(String(r.type||r.movementType||'')));discVals.push(rs.length?Math.max(0,100-Math.round(neg.length/rs.length*100)):null)});let overall=months.map((_,i)=>average([taskVals[i],discVals[i]]));return{months,taskVals,discVals,overall}}
+function renderCharts(m){if(typeof Chart==='undefined'){ $('trendBadge').textContent='تعذر تحميل محرك الرسوم'; return; }let td=trendData(m);let ctx=$('trend').getContext('2d');if(trendChart)trendChart.destroy();trendChart=new Chart(ctx,{type:'line',data:{labels:td.months.map(x=>x.label),datasets:[{label:'الأداء المركب المتاح',data:td.overall,borderColor:COLORS.emerald,backgroundColor:'rgba(15,118,110,.08)',fill:true,tension:.4,spanGaps:true},{label:'الانضباط',data:td.discVals,borderColor:COLORS.amber,tension:.4,spanGaps:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'}},scales:{y:{min:0,max:100}}}});let last=td.overall.filter(v=>v!=null);$('trendBadge').textContent=last.length>=2?(last.at(-1)>=last.at(-2)?'اتجاه إيجابي':'اتجاه يحتاج متابعة'):'بيانات زمنية غير كافية';let axes=[['الجاهزية',m.scores.readiness],['الانضباط',m.scores.discipline],['التشغيل',m.scores.operational],['الأداء',m.scores.performance],['التعلم',m.scores.learning],['المهام',m.scores.tasks]];let rctx=$('radar').getContext('2d');if(radarChart)radarChart.destroy();radarChart=new Chart(rctx,{type:'radar',data:{labels:axes.map(x=>x[0]),datasets:[{label:'الحالي',data:axes.map(x=>x[1]),borderColor:COLORS.emerald,backgroundColor:'rgba(15,118,110,.14)',pointBackgroundColor:COLORS.emerald}]},options:{responsive:true,maintainAspectRatio:false,spanGaps:true,scales:{r:{min:0,max:100,ticks:{display:false}}},plugins:{legend:{display:false}}}})}
+function buildAlerts(m){let a=[];if(m.taskSummary.overdue)a.push(['حرج',`${m.taskSummary.overdue} تكليف متأخر عن موعده`,'rose','tasks']);if(m.taskSummary.pending)a.push(['متابعة',`${m.taskSummary.pending} تكليف بانتظار الاعتماد`,'amber','tasks']);let incomplete=m.readiness.total-m.readiness.done;if(incomplete>0)a.push(['متابعة',`${incomplete} مهمة جاهزية لم تكتمل بعد`,'amber','readiness']);if(m.scores.discipline!=null&&m.scores.discipline<80)a.push(['متابعة',`مؤشر الانضباط ${m.scores.discipline}% ويحتاج مراجعة الحركات`,'amber','discipline']);if(m.studentRisk!=null&&m.studentRisk>=20)a.push(['حرج',`نسبة الحالات الطلابية ذات المخاطر ${m.studentRisk}%`,'rose','students']);if(m.operational.overdue)a.push(['حرج',`${m.operational.overdue} مبادرة في الخطة التشغيلية تجاوزت تاريخ النهاية`,'rose','operational']);else if(m.scores.operational!=null&&m.scores.operational<75)a.push(['متابعة',`تقدم الخطة التشغيلية ${m.scores.operational}%`,'amber','operational']);if(m.learning.gap!=null&&m.learning.gap<0)a.push(['حرج',`نواتج التعلم انخفضت ${Math.abs(m.learning.gap)}% بين آخر اختبارين متاحين`,'rose','learning']);if(!a.length&&m.sourceCount)a.push(['تحسن','لا توجد مؤشرات حرجة ضمن البيانات المتاحة حاليًا','emerald','overall']);return a.slice(0,5)}
+function renderAlerts(m){let a=buildAlerts(m);$('alerts').innerHTML=a.length?a.map(x=>`<button onclick="openMetric('${x[3]}')" class="alert-card w-full p-3 rounded-2xl border text-right"><span class="text-[10px] px-2 py-1 rounded-full bg-${x[2]}-50 text-${x[2]}-700">${x[0]}</span><b class="block text-xs mt-2">${x[1]}</b></button>`).join(''):'<div class="empty-state">لا توجد بيانات كافية لتوليد أولويات تنفيذية.</div>'}
+function summary(m){if(!m.sourceCount)return'لا توجد بيانات فعلية كافية لإصدار قراءة قيادية. ابدأ بتحديث المصادر المرتبطة أو تنفيذ العمليات داخل الأقسام حتى تظهر المؤشرات هنا.';let weak=Object.entries(m.scores).filter(([,v])=>v!=null&&v<75).sort((a,b)=>a[1]-b[1]);let strong=Object.entries(m.scores).filter(([,v])=>v!=null&&v>=85).sort((a,b)=>b[1]-a[1]);let names={tasks:'التكليفات',readiness:'الجاهزية',discipline:'الانضباط',operational:'الخطة التشغيلية',performance:'الأداء الوظيفي',learning:'نواتج التعلم',evidence:'الشواهد'};if(analysisMode==='risk'){let a=buildAlerts(m).filter(x=>x[0]!=='تحسن').slice(0,3);return a.length?'أعلى المخاطر الحالية: '+a.map(x=>x[1]).join('؛ ')+'.':'لا توجد مخاطر عالية ضمن البيانات المتاحة حاليًا.'}if(analysisMode==='compare'){let td=trendData(m),v=td.overall.filter(x=>x!=null);return v.length>=2?`المقارنة الزمنية تشير إلى ${v.at(-1)>=v.at(-2)?'تحسن':'انخفاض'} من ${v.at(-2)}% إلى ${v.at(-1)}% في القراءة المركبة المتاحة.`:'لا تتوفر فترتان زمنيتان مكتملتان لإجراء مقارنة موثوقة.'}if(weak.length)return`الأولوية الحالية هي ${names[weak[0][0]]} عند ${weak[0][1]}%. ${strong.length?`وفي المقابل يظهر ${names[strong[0][0]]} كأقوى محور عند ${strong[0][1]}%.`:''} يوصى بمعالجة المحور الأدنى قبل إضافة التزامات تشغيلية جديدة.`;return`الأداء العام ضمن النطاق الجيد في ${m.sourceCount} مصادر فعلية. ${strong.length?`أعلى محور حاليًا هو ${names[strong[0][0]]} عند ${strong[0][1]}%.`:''} استمر في المتابعة الدورية ومراجعة المؤشرات المتأخرة.`}
+function renderDecision(m){$('decisionSummary').textContent=summary(m);let items=[['متابعة الانضباط','فتح الحركات والإحصاءات الفعلية','staff_discipline.html','fa-user-check'],['مركز التكليفات','مراجعة المتأخرات والاعتمادات','central_task_center.html','fa-list-check'],['محرك الجاهزية','استكمال المهام والشواهد','school_readiness.html','fa-shield-halved'],['الخطة التشغيلية','فتح نموذج الخطة ومتابعة نسب تنفيذ المبادرات','self_evaluation_records.html','fa-diagram-project'],['نواتج التعلم','فتح سجل المعلم الشامل والاختبارات والتحليل','teacher_comprehensive_record.html','fa-graduation-cap'],['الأداء الوظيفي','متابعة التقييم وخطط التحسين','performance_evaluation.html','fa-ranking-star']];$('decisionCenter').innerHTML=items.map(x=>`<button onclick="location.href='${x[2]}'" class="w-full text-right p-3 rounded-xl border hover:bg-slate-50"><b class="text-sm"><i class="fa-solid ${x[3]} text-emerald-700 ml-2"></i>${x[0]}</b><span class="block text-xs text-slate-400 mt-1 mr-6">${x[1]}</span></button>`).join('')}
+function renderSources(m){let sources=[['التكليفات',m.taskSummary.total>0,'Platform Core / مركز التكليفات'],['الجاهزية',!!m.readiness.total,'محرك الجاهزية'],['الانضباط',!!(m.discipline.staff||m.discipline.records.length),'نظام الانضباط الوظيفي'],['الخطة التشغيلية',!!m.operational.total,'نموذج الخطة التشغيلية / تنفيذ المبادرات'],['الأداء الوظيفي',!!m.performance.count,'نظام الأداء الوظيفي'],['نواتج التعلم',!!m.learning.students,'سجلات المعلمين / الاختبارات والتحليل'],['الشواهد',!!m.evidence.count,'الجاهزية والأرشيف']];$('sourceGrid').innerHTML=sources.map(x=>`<div class="rounded-2xl border p-3 bg-slate-50"><div class="flex justify-between items-center"><b class="text-xs">${x[0]}</b><span class="w-2.5 h-2.5 rounded-full ${x[1]?'bg-emerald-500':'bg-slate-300'}"></span></div><small class="block text-[10px] text-slate-400 mt-2">${x[2]}</small><span class="block text-[10px] font-bold mt-1 ${x[1]?'text-emerald-700':'text-slate-400'}">${x[1]?'متصل ببيانات':'لا توجد بيانات حالية'}</span></div>`).join('');$('dataSourceStatus').textContent=`${sources.filter(x=>x[1]).length}/${sources.length} مصادر تحتوي بيانات`}
+function renderHero(m){$('activeSchoolName').textContent=schoolName();$('overallScore').textContent=m.overall==null?'—':m.overall+'%';$('performanceRing').style.setProperty('--score',m.overall||0);let state=m.overall==null?'لا توجد قراءة كافية':m.overall>=85?'مستقرة وعالية الأداء':m.overall>=70?'مستقرة مع نقاط تتطلب المتابعة':'تحتاج تدخلًا قياديًا مركزًا';$('schoolState').textContent=state;let td=trendData(m),vals=td.overall.filter(x=>x!=null);if(vals.length>=2){let diff=vals.at(-1)-vals.at(-2);$('overallTrend').textContent=(diff>=0?'↑ ':'↓ ')+Math.abs(diff)+'%';$('overallTrendHint').textContent='مقارنة بآخر فترة متاحة'}else{$('overallTrend').textContent='—';$('overallTrendHint').textContent='بيانات زمنية غير كافية'}$('schoolStateDetail').textContent=m.sourceCount?`تم بناء القراءة الحالية من ${m.sourceCount} محاور فعلية للمدرسة النشطة. المؤشرات غير المتوفرة لا تدخل في حساب الأداء العام.`:'لم تُرصد بعد بيانات كافية في المصادر المرتبطة. سيبدأ الحساب تلقائيًا بمجرد توفر بيانات فعلية.'}
+async function loadCommandSources(){
+  if(!window.PlatformStateEngine)return;
+  try{
+    let op=await PlatformStateEngine.pull('self_evaluation','school',['school_operational_execution_v1','sa_self_eval_actual_v3','school_operational_plan']);
+    let preferred=(op.items||[]).find(x=>x.state_key==='school_operational_execution_v1')||(op.items||[]).find(x=>x.state_key==='sa_self_eval_actual_v3')||(op.items||[]).find(x=>x.state_key==='school_operational_plan');
+    let val=parseStateValue(preferred);commandSources.operational=preferred?.state_key==='sa_self_eval_actual_v3'?(val?.plan||val):val;
+  }catch(e){console.warn('[CommandCenter] operational source',e?.message||e)}
+  try{
+    let lr=await PlatformStateEngine.request('pull-school-users',{moduleKey:'teacher_comprehensive',keys:['followup_classes_v3']});
+    commandSources.teacherStates=(lr.items||[]).filter(x=>x.state_key==='followup_classes_v3'&&!x.deleted_at).map(x=>({ownerKey:x.owner_key,data:parseStateValue(x),updatedAt:x.updated_at}));
+  }catch(e){console.warn('[CommandCenter] learning source',e?.message||e)}
+  commandSources.loaded=true;
+}
+function render(){currentModel=model();renderHero(currentModel);renderKpis(currentModel);renderHeat(currentModel);renderCharts(currentModel);renderAlerts(currentModel);renderDecision(currentModel);renderSources(currentModel);$('lastSync').textContent='آخر مزامنة: '+new Date().toLocaleString('ar-SA')}
+window.filtersChanged=function(){render();if(window.PlatformDashboardBridge?.refresh)PlatformDashboardBridge.refresh()}
+window.refreshAll=async function(){toast('جارٍ تحديث مصادر المؤشرات...');try{await loadCommandSources();if(window.PlatformDashboardBridge?.refresh)await PlatformDashboardBridge.refresh()}catch(e){}render();toast('تم تحديث لوحة القيادة من المصادر الفعلية')}
+window.setAnalysisMode=function(mode){analysisMode=mode;document.querySelectorAll('.analysis-btn').forEach(b=>b.classList.remove('active'));let map={drop:0,risk:1,compare:2};document.querySelectorAll('.analysis-btn')[map[mode]||0]?.classList.add('active');if(currentModel)$('decisionSummary').textContent=summary(currentModel)}
+window.openMetric=function(k){let map={tasks:'central_task_center.html',readiness:'school_readiness.html',discipline:'staff_discipline.html',operational:'self_evaluation_records.html',performance:'performance_evaluation.html',learning:'teacher_comprehensive_record.html',evidence:'manager_records.html',students:'student_advisor.html',risk:'central_task_center.html'};if(k==='overall'){toast('الأداء العام مركب من المحاور التي تتوفر لها بيانات فعلية');return}location.href=map[k]||'manager.html'}
+window.goManager=function(){location.href='manager.html'}
+window.toast=function(t){let e=$('toast');e.textContent=t;e.classList.remove('translate-y-24','opacity-0');setTimeout(()=>e.classList.add('translate-y-24','opacity-0'),1800)}
+window.addEventListener('platformdashboard:updated',()=>render());window.addEventListener('storage',e=>{if(/readiness|discipline|task|performance|evaluation|archive|report/i.test(e.key||''))render()});document.addEventListener('DOMContentLoaded',async()=>{render();await loadCommandSources();render();setTimeout(()=>{if(window.PlatformDashboardBridge?.refresh)PlatformDashboardBridge.refresh()},300)});
+})();
+</script>
+<script src="internal-messaging.js"></script>
+<script defer src="unified_workspace.js"></script>
+<script defer src="school_navigation_guard.js"></script>
+<script src="agent-role-profiles.js"></script>
+<script src="agent-section-adapters.js"></script>
+<script src="agent-core-v2.js"></script>
+<script src="openai-engine.js"></script>
+<script src="top-ai-center.js"></script>
+<script src="platform-page-navigation.js?v=20260818-nav1"></script>
+
+<!-- PRIVATE_EDITION_BUILD_RUNTIME -->
+<script src="private-school-runtime.js"></script>
+</body></html>
