@@ -1,0 +1,32 @@
+المرحلة الثانية — ملفات الاستبدال فقط
+====================================
+
+واجهة المالك والقالب وفحص الالتزام:
+- private-owner-portal.html
+- private-template-settings.html
+- private-compliance.html
+- private-output-preview.html
+
+مصادر Edge Functions المطابقة للمنشور في مشروع المدارس الخاصة:
+- supabase/functions/private-school-owner/index.ts
+- supabase/functions/private-school-template/index.ts
+- supabase/functions/private-school-compliance/index.ts
+- supabase/functions/private-school-outputs/index.ts
+- supabase/functions/private-school-files/index.ts
+
+لا تحتوي الحزمة على نسخة كاملة للمنصة، ولا على Migration جديد، ولا على ملفات من المرجع الهندسي للمدارس العامة.
+
+الوظائف المنشورة وقت الاعتماد:
+- private-school-owner v6
+- private-school-template v3
+- private-school-compliance v4
+- private-school-outputs v4
+- private-school-files v2
+
+نطاق المرحلة:
+1) إضافة مالك إضافي من المالك الأساسي وحذفه ومنع حذف المالك الأساسي.
+2) حفظ بيانات المدرسة: هاتف، بريد، عنوان، اسم المالك، اسم مدير/مديرة المدرسة.
+3) رفع وحفظ التوقيع الرقمي للمالك، توقيع مدير/مديرة المدرسة، والختم الرقمي للمدرسة.
+4) فحص الالتزام 19 متطلبًا؛ الشواهد صور أو PDF فقط.
+5) المخرج النهائي PDF متعدد الصفحات؛ كل صفحة معنونة باسم المتطلب، وصفحات PDF المرفوع تدرج صفحةً صفحة مع نفس عنوان المتطلب.
+6) إنشاء واعتماد ملف PDF النهائي ورفعه إلى مساحة المدرسة وأرشفته.

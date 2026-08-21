@@ -30,6 +30,22 @@
 
 <section class="grid">
 <article class="card">
+<h2>إضافة مالك إضافي</h2>
+<div class="muted">يستطيع المالك الأساسي فقط إضافة ملاك إضافيين إلى نفس المدرسة. المالك الإضافي يدخل من رابط المالك نفسه ويعمل داخل المدرسة المرتبطة فقط.</div>
+<div class="field"><label>اسم المالك الإضافي</label><input id="ownerName" placeholder="الاسم الكامل"></div>
+<div class="field"><label>البريد الإلكتروني</label><input id="ownerEmail" type="email" placeholder="owner@example.com"></div>
+<div class="field"><label>كلمة المرور المؤقتة</label><input id="ownerPassword" type="password" minlength="8" placeholder="8 أحرف على الأقل"></div>
+<button class="btn primary" id="addOwner">إضافة المالك</button>
+<div id="ownerMsg" class="msg"></div>
+</article>
+<article class="card" style="grid-column:span 2">
+<h2>ملاك المدرسة</h2>
+<div id="owners" class="list"><div class="muted">جارٍ التحميل...</div></div>
+</article>
+</section>
+
+<section class="grid">
+<article class="card">
 <h2>إنشاء رابط تسجيل مدير/مديرة</h2>
 <div class="field"><label>اسم المدير/المديرة</label><input id="managerName" placeholder="الاسم الكامل"></div>
 <div class="field"><label>البريد الإلكتروني</label><input id="managerEmail" type="email" placeholder="name@example.com"></div>
@@ -74,6 +90,9 @@ function render(){
  $('pendingCount').textContent=String(pending.length);
  const invs=portal?.invitations||[];
  $('inviteCount').textContent=String(invs.filter(x=>x.status==='pending').length);
+ const owners=portal?.owners||[];
+ $('owners').innerHTML=owners.length?owners.map(o=>`<div class="manager-row"><div class="row-head"><div><div class="name">${esc(o.fullName||o.name||'مالك المدرسة')} ${o.is_primary?'• المالك الأساسي':''}</div><div class="email">${esc(o.email||'')}</div></div><span class="badge ${statusClass(o.status||'active')}">${esc(statusLabel(o.status||'active'))}</span></div><div class="actions">${portal.canManageOwners&&!o.is_primary?`<button class="btn danger" data-delete-owner="${esc(o.userId||o.user_id)}">حذف المالك الإضافي</button>`:''}</div></div>`).join(''):'<div class="muted">لا توجد بيانات ملاك.</div>';
+ const addOwnerCard=$('addOwner')?.closest('.card'); if(addOwnerCard) addOwnerCard.style.display=portal?.canManageOwners?'block':'none';
  if(active){
    const login=abs(portal.managerLoginPath||active.loginPath||`private-manager-login.html?schoolId=${encodeURIComponent(ctx.schoolId)}`);
    $('activeLoginBox').innerHTML=`<div class="linkbox">${esc(login)}</div><div class="actions"><button class="btn primary" data-copy-login="${esc(login)}">نسخ رابط دخول المدير</button><button class="btn blue" data-open-login="${esc(login)}">فتح رابط الدخول</button></div>`;
@@ -99,6 +118,17 @@ async function load(){
    render();
  }catch(e){alert(e.message||'تعذر فتح بوابة المالك');const sid=new URLSearchParams(location.search).get('schoolId')||ctx?.schoolId||'';location.replace('private-owner-login.html'+(sid?'?schoolId='+encodeURIComponent(sid):''))}
 }
+$('addOwner').onclick=async()=>{
+ const msg=$('ownerMsg');msg.className='msg';msg.textContent='جارٍ إضافة المالك...';
+ try{
+   const name=$('ownerName').value.trim(),email=$('ownerEmail').value.trim(),password=$('ownerPassword').value;
+   if(!name||!email||password.length<8)throw new Error('أدخل الاسم والبريد وكلمة مرور من 8 أحرف على الأقل.');
+   await PrivateSchoolBridge.owner('add_owner',{ownerName:name,ownerEmail:email,password});
+   msg.className='msg ok';msg.textContent='تم إنشاء وربط المالك الإضافي بالمدرسة.';
+   $('ownerName').value='';$('ownerEmail').value='';$('ownerPassword').value='';await load();
+ }catch(e){msg.className='msg err';msg.textContent=ownerError(e.message)}
+};
+function ownerError(m){const map={primary_owner_required:'إضافة الملاك متاحة للمالك الأساسي فقط.',owner_email_reserved:'هذا البريد محجوز لحساب إداري.',owner_email_linked_to_other_school:'هذا البريد مرتبط بمدرسة أخرى.',owner_already_exists:'هذا المستخدم مالك في المدرسة بالفعل.',invalid_owner_input:'تحقق من الاسم والبريد وكلمة المرور.'};return map[m]||m||'تعذر إضافة المالك'}
 $('createInvite').onclick=async()=>{
  const msg=$('inviteMsg');msg.className='msg';msg.textContent='جارٍ إنشاء الرابط...';
  try{
@@ -115,6 +145,7 @@ document.addEventListener('click',async e=>{
   if(b.dataset.disable){if(confirm('تعطيل حساب مدير المدرسة؟')){await PrivateSchoolBridge.owner('disable_manager',{memberId:b.dataset.disable});await load();}}
   if(b.dataset.delete){if(confirm('سيتم حذف ارتباط هذا المدير بالمدرسة. هل أنت متأكد؟')){await PrivateSchoolBridge.owner('delete_manager',{memberId:b.dataset.delete});await load();}}
   if(b.dataset.cancel){await PrivateSchoolBridge.owner('cancel_manager_invitation',{invitationId:b.dataset.cancel});await load();}
+  if(b.dataset.deleteOwner){if(confirm('حذف هذا المالك الإضافي من المدرسة؟ سيفقد صلاحية الدخول لهذه المدرسة.')){await PrivateSchoolBridge.owner('delete_owner',{ownerUserId:b.dataset.deleteOwner});await load();}}
   if(b.dataset.copyLogin)await copyText(b.dataset.copyLogin);
   if(b.dataset.openLogin)window.open(b.dataset.openLogin,'_blank','noopener');
  }catch(err){alert(err.message||'تعذر تنفيذ العملية')}
