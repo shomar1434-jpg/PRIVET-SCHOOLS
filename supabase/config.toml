@@ -6,3 +6,23 @@ site_url = "http://localhost:5500"
 
 [storage]
 enabled = true
+
+# Phase 1 authentication contract: manager invitation inspection/acceptance is token-based
+# and must remain callable before the invited manager has a Supabase Auth session.
+[functions.private-school-invite]
+verify_jwt = false
+
+[functions.system-admin]
+verify_jwt = true
+[functions.private-school-provisioning]
+verify_jwt = true
+[functions.private-school-session]
+verify_jwt = true
+[functions.private-school-owner]
+verify_jwt = true
+[functions.private-school-messages]
+verify_jwt = true
+[functions.private-school-template]
+verify_jwt = true
+[functions.private-user-report-profile]
+verify_jwt = true

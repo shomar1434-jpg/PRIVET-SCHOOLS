@@ -1,15 +1,15 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type'};
-const json=(b:any,s=200)=>new Response(JSON.stringify(b),{status:s,headers:{...cors,'content-type':'application/json; charset=utf-8'}});
+const json=(b:any,s=200)=>new Response(JSON.stringify(b),{status:s,headers:{...cors,'content-type':'application/json; charset=utf-8'}});const clean=(v:any)=>String(v??'').trim();
+const landing=(role:string)=>({owner:'private-owner-portal.html',manager:'manager.html',agent:'agent.html',teacher:'teacher.html',student_advisor:'student_advisor.html',activity_leader:'activity_leader.html',kindergarten_teacher:'kindergarten_teacher.html',health_advisor:'health_advisor.html',administrative_employee:'administrative_employee_portal.html'} as Record<string,string>)[role]||'school-login.html';
 Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{headers:cors});try{
- const url=Deno.env.get('SUPABASE_URL')!,anon=Deno.env.get('SUPABASE_ANON_KEY')!,service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;const h=req.headers.get('authorization')||'';
- const uc=createClient(url,anon,{global:{headers:{Authorization:h}}});const {data:{user}}=await uc.auth.getUser();if(!user)return json({error:'unauthorized'},401);
- const db=createClient(url,service,{auth:{persistSession:false}});const b=await req.json().catch(()=>({}));
- const m=await db.from('school_members').select('id,school_id,role,status,schools(id,school_name,school_code,status)').eq('user_id',user.id).eq('status','active');if(m.error)throw m.error;
- const memberships=(m.data||[]).filter((x:any)=>x.schools?.status==='active');
- const requested=String(b.schoolId||'');let selected:any=requested?memberships.find((x:any)=>x.school_id===requested):memberships[0];
- if(!selected)return json({error:'no_active_membership',memberships:[]},403);
- const roles=memberships.filter((x:any)=>x.school_id===selected.school_id).map((x:any)=>x.role);const requestedRole=String(b.actorRole||b.role||'');const activeRole=requestedRole&&roles.includes(requestedRole)?requestedRole:roles[0];
- const grants=await db.from('task_access_grants').select('*').eq('school_id',selected.school_id).eq('user_id',user.id).eq('can_view',true);
- return json({ok:true,userId:user.id,email:user.email,schoolId:selected.school_id,school:selected.schools,role:activeRole,availableRoles:roles,memberships,grants:grants.data||[]});
+ const url=Deno.env.get('SUPABASE_URL')!,anon=Deno.env.get('SUPABASE_ANON_KEY')!,service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;const uc=createClient(url,anon,{global:{headers:{Authorization:req.headers.get('authorization')||''}}});const {data:{user}}=await uc.auth.getUser();if(!user)return json({error:'unauthorized'},401);
+ const db=createClient(url,service,{auth:{persistSession:false}}),b=await req.json().catch(()=>({}));
+ const q=await db.from('school_members').select('id,school_id,role,role_variant,status,supervisor_user_id,supervisor_role,display_name,deleted_at,schools(id,school_name,school_code,status,school_type)').eq('user_id',user.id).eq('status','active');if(q.error)throw q.error;
+ const memberships=(q.data||[]).filter((x:any)=>x.schools?.status==='active'&&!x.deleted_at);const requestedSchool=clean(b.schoolId);const selected:any=requestedSchool?memberships.find((x:any)=>x.school_id===requestedSchool):memberships[0];if(!selected)return json({error:'no_active_membership',memberships:[]},403);
+ const sameSchool=memberships.filter((x:any)=>x.school_id===selected.school_id),availableRoles:string[]=[...new Set<string>(sameSchool.map((x:any)=>String(x.role)))];const requestedRole=clean(b.actorRole||b.role);const role=requestedRole&&availableRoles.includes(requestedRole)?requestedRole:availableRoles[0];const selectedRole:any=sameSchool.find((x:any)=>String(x.role)===role)||selected;
+ const grants=await db.from('task_access_grants').select('*').eq('school_id',selected.school_id).eq('user_id',user.id).eq('can_view',true);if(grants.error)throw grants.error;const meta:any=user.user_metadata||{};
+ const context={edition:'private',schoolId:selected.school_id,schoolName:selected.schools.school_name,schoolCode:selected.schools.school_code,schoolType:selected.schools.school_type,userId:user.id,userEmail:user.email||'',userName:selectedRole.display_name||meta.full_name||meta.name||user.email||'',role,roleVariant:selectedRole.role_variant||'',supervisorUserId:selectedRole.supervisor_user_id||'',supervisorRole:selectedRole.supervisor_role||'',availableRoles,accessGrants:grants.data||[],authenticatedAt:new Date().toISOString(),landingPath:landing(role)};
+ const schools=[];const seen=new Set<string>();for(const m of memberships as any[]){if(seen.has(m.school_id))continue;seen.add(m.school_id);schools.push({schoolId:m.school_id,schoolName:m.schools?.school_name||'',schoolCode:m.schools?.school_code||'',status:m.schools?.status||''})}
+ return json({ok:true,context,schools,memberships});
 }catch(e){return json({error:e instanceof Error?e.message:String(e)},500)}});
