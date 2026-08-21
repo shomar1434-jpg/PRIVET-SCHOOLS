@@ -84,13 +84,18 @@
     sessionStorage.setItem('smart_school_private_schools_v1',JSON.stringify(data.schools||[]));
     applyCompatibility(ctx); return data;
   }
+  function clearSystemAdminMarkers(){
+    try{['system_admin_context','system_admin_verified','system_admin_edition','private_system_admin_entry','private_admin_handoff_pending'].forEach(k=>sessionStorage.removeItem(k));}catch(_){}
+  }
   async function login(email,password,schoolId='',actorRole=''){
+    // دخول مالك/مدير/مستخدم مدرسة يجب أن يبدأ بسياق مدرسة نظيف لا يحمل صلاحيات مدير النظام.
     clearPrivateCompat();
+    clearSystemAdminMarkers();
     const sb=getClient(); const r=await sb.auth.signInWithPassword({email:clean(email).toLowerCase(),password:String(password||'')});
     if(r.error) throw new Error('بيانات الدخول غير صحيحة أو الحساب غير متاح');
     try{return await establishContext(schoolId,actorRole)}catch(e){await sb.auth.signOut();clearPrivateCompat();throw e}
   }
-  async function logout(){try{await getClient().auth.signOut()}finally{clearPrivateCompat()}}
+  async function logout(){try{await getClient().auth.signOut()}finally{clearPrivateCompat();clearSystemAdminMarkers()}}
   async function requireContext(allowedRoles){
     let ctx=privateContext();
     const {data:{session}}=await getClient().auth.getSession();

@@ -1,1 +1,49 @@
-<!doctype html><html lang="ar" dir="rtl"><head><title>تسجيل مدير المدرسة</title><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="private-supabase-bridge.js"></script><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"><style>*{box-sizing:border-box}body{margin:0;font-family:Tajawal,Arial;background:linear-gradient(135deg,#0f172a,#164e63);color:#0f172a;min-height:100vh;direction:rtl}.wrap{width:min(1120px,94vw);margin:auto;padding:36px 0}.card{background:#fff;border:1px solid #e2e8f0;border-radius:26px;box-shadow:0 24px 70px #02061755;padding:24px}.brand{color:#fff;text-align:center;margin-bottom:20px}.brand h1{font-size:32px;margin:0}.brand p{color:#cbd5e1}.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.field{width:100%;padding:12px 14px;border:1px solid #cbd5e1;border-radius:14px;font:inherit;background:#fff}.btn{border:0;border-radius:14px;padding:12px 18px;font:inherit;font-weight:800;cursor:pointer;background:#0f766e;color:#fff}.btn.secondary{background:#334155}.btn.danger{background:#b91c1c}.btn.light{background:#e2e8f0;color:#0f172a}.actions{display:flex;gap:9px;flex-wrap:wrap}.msg{margin-top:12px;padding:10px 12px;border-radius:12px;background:#f1f5f9;display:none}.msg.show{display:block}.muted{color:#64748b;font-size:13px}.title{font-size:24px;font-weight:800;margin:0 0 6px}.section{margin-top:18px;padding-top:18px;border-top:1px solid #e2e8f0}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:right}.table th{background:#f8fafc}.pill{display:inline-block;border-radius:999px;padding:4px 9px;background:#ecfdf5;color:#047857;font-size:11px;font-weight:800}.module{border:1px solid #e2e8f0;border-radius:18px;padding:18px;background:#f8fafc}.module h3{margin:0 0 8px}.topbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:16px}@media(max-width:760px){.g2,.g3{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}</style></head><body><div class="wrap"><div class="brand"><h1>نظام إدارة المدارس الذكي</h1><p>تسجيل مدير/ة المدرسة</p></div><div class="card" style="max-width:620px;margin:auto"><h2 class="title">استكمال دعوة المدير</h2><div id="info" class="module">جاري فحص رابط الدعوة...</div><div id="form" class="grid section" style="display:none"><input id="fullName" class="field" placeholder="الاسم الكامل"><input id="password" type="password" class="field" placeholder="إنشاء كلمة مرور - 8 أحرف فأكثر"><button class="btn" onclick="acceptInvite()">تسجيل الحساب وإرساله للمالك للتفعيل</button></div><div id="msg" class="msg"></div></div></div><script>const token=PrivateSchool.params().get('token')||'';function show(t,b=false){msg.textContent=t;msg.className='msg show';msg.style.color=b?'#b91c1c':'#047857'}async function inspect(){try{const d=await PrivateSchool.invite('inspect',{token});info.innerHTML=`<b>${d.school?.school_name||''}</b><div class="muted">الدعوة: ${d.invitation?.invitee_email||''}</div>`;fullName.value=d.invitation?.invitee_name||'';form.style.display='grid'}catch(e){info.textContent=e.message;info.style.color='#b91c1c'}}async function acceptInvite(){try{show('جاري إنشاء الحساب...');await PrivateSchool.invite('accept',{token,password:password.value,fullName:fullName.value});form.style.display='none';show('تم تسجيل الحساب. ينتظر الآن اعتماد المالك قبل إمكانية الدخول.')}catch(e){show(e.message,true)}}inspect();</script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<script src="private-storage-namespace.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تسجيل مدير المدرسة</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script>
+<script src="standalone-private-config.js"></script><script src="private-school-config.js"></script><script src="private-school-bridge.js"></script>
+<style>
+:root{--green:#07a869;--turq:#0da9a6;--navy:#15445a;--ink:#17324a}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#edf7f4,#e8f4f7);font-family:Tajawal,"Segoe UI",Arial,sans-serif;color:var(--ink)}
+.card{width:min(94vw,520px);background:#fff;border:1px solid #d9e6e8;border-radius:26px;padding:28px;box-shadow:0 24px 70px #15445a20}.mark{width:62px;height:62px;margin:auto;border-radius:20px;display:grid;place-items:center;background:#e8f7f3;font-size:31px}h1{text-align:center;margin:14px 0 6px;color:var(--navy)}.sub{text-align:center;color:#667985;line-height:1.7}.info{background:#f3f9f8;border-radius:14px;padding:12px 14px;margin:16px 0}.info b{display:block}.field{margin:12px 0}.field label{display:block;font-weight:900;font-size:13px;margin-bottom:6px}.field input{width:100%;border:1px solid #c9d9df;border-radius:12px;padding:12px;font:inherit}.readonly{background:#f5f7f8}.btn{width:100%;border:0;border-radius:13px;padding:13px;background:var(--green);color:#fff;font:inherit;font-weight:900;cursor:pointer}.msg{margin-top:12px;min-height:22px;font-size:13px;color:#b42318}.success{display:none;text-align:center;background:#edf9f3;border:1px solid #c9ead8;border-radius:16px;padding:16px;color:#087548;line-height:1.8}
+</style></head>
+<body><main class="card">
+<div class="mark">🏫</div><h1>تسجيل مدير/مديرة المدرسة</h1><p class="sub">هذه الصفحة مخصصة لرابط المدير الصادر من مالك المدرسة فقط.</p>
+<div id="loading" class="info">جارٍ التحقق من رابط التسجيل...</div>
+<form id="form" hidden>
+<div class="info"><b id="schoolName"></b><span id="schoolCode"></span></div>
+<div class="field"><label>البريد الإلكتروني</label><input id="email" class="readonly" readonly></div>
+<div class="field"><label>الاسم الكامل</label><input id="fullName" required></div>
+<div class="field"><label>كلمة المرور</label><input id="password" type="password" minlength="8" autocomplete="new-password" required></div>
+<div class="field"><label>تأكيد كلمة المرور</label><input id="confirmPassword" type="password" minlength="8" autocomplete="new-password" required></div>
+<button class="btn" type="submit">إكمال تسجيل المدير</button><div id="msg" class="msg"></div>
+</form>
+<div id="success" class="success"><b>تم تسجيل حساب المدير بنجاح.</b><br>الحساب الآن <strong>بانتظار تفعيل مالك المدرسة</strong>.<br>بعد التفعيل سيرسل لك المالك رابط الدخول الخاص بالمدرسة.</div>
+</main>
+<script>
+const token=new URLSearchParams(location.search).get('token')||'';let invitation=null;
+const $=id=>document.getElementById(id);
+(async()=>{try{
+ if(!token)throw new Error('رابط التسجيل غير مكتمل');
+ const r=await PrivateSchoolBridge.inspectInvite(token);invitation=r.invitation;
+ if(invitation.invite_role!=='manager')throw new Error('هذا الرابط غير مخصص لتسجيل مدير المدرسة');
+ if(invitation.status!=='pending')throw new Error('رابط التسجيل مستخدم أو غير صالح');
+ $('schoolName').textContent=invitation.schoolName||r.school?.school_name||'المدرسة';
+ $('schoolCode').textContent=invitation.schoolCode||r.school?.school_code||'';
+ $('email').value=invitation.invitee_email||invitation.email||'';
+ $('fullName').value=invitation.invitee_name||'';
+ $('loading').hidden=true;$('form').hidden=false;
+}catch(e){$('loading').textContent=e.message||'تعذر التحقق من الرابط';$('loading').style.color='#b42318'}})();
+$('form').onsubmit=async e=>{e.preventDefault();const msg=$('msg');msg.textContent='';
+ try{
+  if($('password').value!==$('confirmPassword').value)throw new Error('كلمتا المرور غير متطابقتين');
+  const r=await PrivateSchoolBridge.acceptInvite({token,fullName:$('fullName').value.trim(),password:$('password').value});
+  if(r.role!=='manager'||r.status!=='pending')throw new Error('تعذر إكمال تسجيل المدير بالحالة الصحيحة');
+  $('form').hidden=true;$('success').style.display='block';
+ }catch(err){msg.textContent=err.message||'تعذر إكمال التسجيل'}
+};
+</script></body></html>
