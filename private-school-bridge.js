@@ -64,8 +64,19 @@
     }
     writeLegacy('smart_school_current_session',{id:ctx.userId,name:ctx.userName,email:ctx.userEmail,role:appRole,dbRole:ctx.role,schoolId:ctx.schoolId,schoolName:ctx.schoolName,schoolCode:ctx.schoolCode,schoolEdition:'private',privateSchool:true,loginMode:'private-auth',accessGrants:Array.isArray(ctx.accessGrants)?ctx.accessGrants:[],availableRoles:Array.isArray(ctx.availableRoles)?ctx.availableRoles:[],supervisorUserId:ctx.supervisorUserId||'',supervisorRole:ctx.supervisorRole||'',authenticatedAt:ctx.authenticatedAt});
   }
+  async function ensureSession(){
+    const sb=getClient();
+    let {data:{session},error}=await sb.auth.getSession();
+    if(error) console.warn('تعذر قراءة جلسة المدارس الخاصة',error);
+    const expiresAt=Number(session?.expires_at||0)*1000;
+    if(!session || !expiresAt || expiresAt-Date.now()<120000){
+      const refreshed=await sb.auth.refreshSession();
+      if(!refreshed.error && refreshed.data?.session) session=refreshed.data.session;
+    }
+    return session||null;
+  }
   async function invoke(fn,body,opts={}){
-    const sb=getClient(); const {data:{session}}=await sb.auth.getSession();
+    const sb=getClient(); const session=await ensureSession();
     const token=session?.access_token;
     if(!token && !opts.allowAnonymous) throw new Error('يلزم تسجيل الدخول');
     const res=await fetch(`${C.supabaseUrl}/functions/v1/${fn}`,{method:'POST',headers:{'Content-Type':'application/json','apikey':C.publishableKey,...(token?{'Authorization':'Bearer '+token}:{})},body:JSON.stringify(body||{})});
@@ -98,7 +109,7 @@
   async function logout(){try{await getClient().auth.signOut()}finally{clearPrivateCompat();clearSystemAdminMarkers()}}
   async function requireContext(allowedRoles){
     let ctx=privateContext();
-    const {data:{session}}=await getClient().auth.getSession();
+    const session=await ensureSession();
     if(!session){clearPrivateCompat();throw new Error('انتهت جلسة الدخول')}
     if(!ctx || ctx.edition!=='private' || ctx.userId!==session.user.id){ctx=(await establishContext(ctx?.schoolId||'',ctx?.role||'')).context}
     if(Array.isArray(allowedRoles)&&allowedRoles.length&&!allowedRoles.includes(ctx.role)) throw new Error('لا تملك صلاحية فتح هذه الصفحة');
@@ -128,7 +139,11 @@
   async function template(payload={}){const ctx=await requireContext();return invoke('private-school-template',{schoolId:ctx.schoolId,...payload})}
   async function outputs(action,payload={}){const ctx=await requireContext();return invoke('private-school-outputs',{action,schoolId:ctx.schoolId,...payload})}
   async function selfEvaluationOutput(action='snapshot',payload={}){const ctx=await requireContext(['owner','manager']);return invoke('private-school-self-evaluation-output',{action,schoolId:ctx.schoolId,...payload})}
+  async function userProfile(action='get',payload={}){const ctx=await requireContext();return invoke('private-user-report-profile',{action,schoolId:ctx.schoolId,actorRole:ctx.role,...payload})}
+  async function registrationLink(){const ctx=await requireContext(['manager']);return invoke('private-school-registration-link',{schoolId:ctx.schoolId})}
+  async function inspectSchoolRegistration(token){return invoke('private-school-registration',{action:'inspect',token:clean(token)},{allowAnonymous:true})}
+  async function registerSchoolUser(payload){return invoke('private-school-registration',{action:'register',token:clean(payload.token),email:clean(payload.email),fullName:clean(payload.fullName),password:String(payload.password||''),role:clean(payload.role),roleVariant:clean(payload.roleVariant)},{allowAnonymous:true})}
   async function provisionPrivateSchool(payload={}){return invoke('private-school-provisioning',{action:'create',...payload})}
   async function privateSchoolOverview(schoolId){const d=await invoke('private-school-provisioning',{action:'overview',schoolId:clean(schoolId)});if(d&&!d.ownerLoginPath&&d.ownerLoginUrl)d.ownerLoginPath=d.ownerLoginUrl;if(d&&!d.ownerLoginUrl&&d.ownerLoginPath)d.ownerLoginUrl=d.ownerLoginPath;return d}
-  g.PrivateSchoolBridge=Object.freeze({getClient,login,logout,establishContext,requireContext,privateContext,roleLanding,inspectInvite,acceptInvite,owner,manager,staff,workflows,compliance,performance,messages,tasks,directory,files,uploadModuleFile,template,outputs,selfEvaluationOutput,provisionPrivateSchool,privateSchoolOverview,applyCompatibility,clearPrivateCompat,ROLE_MAP});
+  g.PrivateSchoolBridge=Object.freeze({getClient,login,logout,establishContext,requireContext,privateContext,roleLanding,inspectInvite,acceptInvite,owner,manager,staff,workflows,compliance,performance,messages,tasks,directory,files,uploadModuleFile,template,outputs,selfEvaluationOutput,userProfile,registrationLink,inspectSchoolRegistration,registerSchoolUser,provisionPrivateSchool,privateSchoolOverview,applyCompatibility,clearPrivateCompat,ROLE_MAP});
 })(window);

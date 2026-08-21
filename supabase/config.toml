@@ -26,3 +26,9 @@ verify_jwt = true
 verify_jwt = true
 [functions.private-user-report-profile]
 verify_jwt = true
+
+[functions.private-school-registration]
+verify_jwt = false
+
+[functions.private-school-registration-link]
+verify_jwt = true

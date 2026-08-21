@@ -1,175 +1,36 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const cors={
-  'Access-Control-Allow-Origin':'*',
-  'Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type'
-};
-const json=(body:any,status=200)=>new Response(JSON.stringify(body),{
-  status,headers:{...cors,'content-type':'application/json; charset=utf-8'}
-});
-const clean=(v:any)=>String(v??'').trim();
-
-async function authUser(req:Request){
-  const url=Deno.env.get('SUPABASE_URL')!;
-  const anon=Deno.env.get('SUPABASE_ANON_KEY')!;
-  const h=req.headers.get('authorization')||'';
-  const uc=createClient(url,anon,{global:{headers:{Authorization:h}}});
-  return await uc.auth.getUser();
-}
-async function userMeta(db:any,userId:string){
-  try{
-    const r=await db.auth.admin.getUserById(userId);
-    const u=r.data?.user;
-    return {
-      email:u?.email||'',
-      name:u?.user_metadata?.full_name||u?.user_metadata?.name||u?.email||''
-    };
-  }catch(_){return {email:'',name:''}}
-}
-
-Deno.serve(async(req)=>{
-  if(req.method==='OPTIONS')return new Response('ok',{headers:cors});
-  try{
-    const url=Deno.env.get('SUPABASE_URL')!;
-    const service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const au=await authUser(req);
-    const user=au.data.user;
-    if(!user)return json({error:'unauthorized'},401);
-
-    const db=createClient(url,service,{auth:{persistSession:false}});
-    const b=await req.json().catch(()=>({}));
-    const schoolId=clean(b.schoolId);
-    const actorRole=clean(b.actorRole);
-    const action=clean(b.action);
-
-    if(!schoolId)return json({error:'school_required'},400);
-    const membership=await db.from('school_members')
-      .select('id,role,status')
-      .eq('school_id',schoolId)
-      .eq('user_id',user.id)
-      .eq('status','active');
-    if(membership.error)throw membership.error;
-    const roles=(membership.data||[]).map((x:any)=>String(x.role));
-    if(!roles.length)return json({error:'forbidden'},403);
-    const role=actorRole&&roles.includes(actorRole)?actorRole:roles[0];
-
-    async function managerContacts(){
-      const q=await db.from('school_members')
-        .select('user_id,role,status')
-        .eq('school_id',schoolId)
-        .eq('role','manager')
-        .eq('status','active');
-      if(q.error)throw q.error;
-      const contacts=[];
-      for(const row of q.data||[]){
-        const meta=await userMeta(db,row.user_id);
-        contacts.push({
-          user_id:row.user_id,
-          role:'manager',
-          email:meta.email,
-          label:meta.name?`${meta.name} — مدير/مديرة المدرسة`:'مدير/مديرة المدرسة'
-        });
-      }
-      return contacts;
-    }
-
-    if(action==='contacts'){
-      if(role==='owner'){
-        return json({
-          ok:true,
-          policy:'مراسلات مالك المدرسة مخصصة للتواصل المباشر مع مدير/مديرة المدرسة فقط.',
-          contacts:await managerContacts()
-        });
-      }
-      const q=await db.from('school_members')
-        .select('user_id,role,status')
-        .eq('school_id',schoolId)
-        .eq('status','active')
-        .neq('user_id',user.id);
-      if(q.error)throw q.error;
-      const contacts=[];
-      for(const row of q.data||[]){
-        const meta=await userMeta(db,row.user_id);
-        contacts.push({
-          user_id:row.user_id,role:row.role,email:meta.email,
-          label:meta.name||meta.email||row.role
-        });
-      }
-      return json({ok:true,policy:'المراسلات الداخلية ضمن المدرسة فقط.',contacts});
-    }
-
-    if(action==='send'){
-      const recipientId=clean(b.recipientUserId);
-      const subject=clean(b.subject);
-      const body=clean(b.body);
-      if(!recipientId||!body)return json({error:'recipient_and_body_required'},400);
-
-      const target=await db.from('school_members')
-        .select('user_id,role,status')
-        .eq('school_id',schoolId)
-        .eq('user_id',recipientId)
-        .eq('status','active');
-      if(target.error)throw target.error;
-      const targetRoles=(target.data||[]).map((x:any)=>String(x.role));
-      if(!targetRoles.length)return json({error:'recipient_not_in_school'},403);
-
-      // قاعدة حاسمة: المالك لا يراسل إلا مدير/مديرة المدرسة.
-      if(role==='owner'&&!targetRoles.includes('manager')){
-        return json({error:'owner_can_message_manager_only'},403);
-      }
-
-      const ins=await db.from('internal_messages')
-        .insert({school_id:schoolId,sender_id:user.id,subject:subject||null,body})
-        .select('id,school_id,sender_id,subject,body,created_at')
-        .single();
-      if(ins.error)throw ins.error;
-      const rec=await db.from('internal_message_recipients')
-        .insert({message_id:ins.data.id,recipient_id:recipientId});
-      if(rec.error){
-        await db.from('internal_messages').delete().eq('id',ins.data.id);
-        throw rec.error;
-      }
-      return json({ok:true,message:ins.data});
-    }
-
-    if(action==='inbox'){
-      const q=await db.from('internal_message_recipients')
-        .select('id,read_at,message:internal_messages(id,school_id,sender_id,subject,body,created_at)')
-        .eq('recipient_id',user.id)
-        .order('id',{ascending:false})
-        .limit(100);
-      if(q.error)throw q.error;
-      const messages=[];
-      for(const row of q.data||[]){
-        const m=(row as any).message;
-        if(!m||m.school_id!==schoolId)continue;
-        const sender=await userMeta(db,m.sender_id);
-        messages.push({...m,read_at:(row as any).read_at,sender_name:sender.name||sender.email});
-      }
-      messages.sort((a:any,b:any)=>String(b.created_at).localeCompare(String(a.created_at)));
-      return json({ok:true,messages});
-    }
-
-    if(action==='read'){
-      const messageId=clean(b.messageId);
-      if(!messageId)return json({error:'message_required'},400);
-      const rec=await db.from('internal_message_recipients')
-        .select('id,message:internal_messages(id,school_id,sender_id,subject,body,created_at)')
-        .eq('message_id',messageId)
-        .eq('recipient_id',user.id)
-        .maybeSingle();
-      if(rec.error)throw rec.error;
-      const m=(rec.data as any)?.message;
-      if(!rec.data||!m||m.school_id!==schoolId)return json({error:'not_found'},404);
-      await db.from('internal_message_recipients')
-        .update({read_at:new Date().toISOString()})
-        .eq('id',(rec.data as any).id);
-      const sender=await userMeta(db,m.sender_id);
-      return json({ok:true,message:{...m,read_at:new Date().toISOString(),sender_name:sender.name||sender.email}});
-    }
-
-    return json({error:'unknown_action'},400);
-  }catch(e){
-    return json({error:e instanceof Error?e.message:String(e)},500);
-  }
-});
+const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type'};const json=(b:any,s=200)=>new Response(JSON.stringify(b),{status:s,headers:{...cors,'content-type':'application/json; charset=utf-8'}});const clean=(v:any)=>String(v??'').trim();
+const roleLabels:any={manager:'مدير/مديرة المدرسة',agent:'وكيل/وكيلة',teacher:'معلم/معلمة',student_advisor:'موجه/موجهة طلابية',health_advisor:'موجه/موجهة صحي',activity_leader:'رائد/رائدة نشاط',kindergarten_teacher:'معلمة رياض أطفال',administrative_employee:'موظف/موظفة إدارية',owner:'مالك المدرسة'};
+async function meta(db:any,id:string){try{const r=await db.auth.admin.getUserById(id);const u=r.data?.user;return {email:u?.email||'',name:u?.user_metadata?.full_name||u?.user_metadata?.name||u?.email||''}}catch(_){return {email:'',name:''}}}
+function allowedRecipient(sender:string,target:string){if(sender==='owner')return target==='manager';if(sender==='manager')return target!=='owner'&&target!=='manager';if(sender==='agent')return target!=='owner';return target==='agent'}
+function groupMatch(group:string,role:string){if(group==='all_users')return !['owner','manager'].includes(role);if(group==='teachers')return ['teacher','kindergarten_teacher'].includes(role);if(group==='agents')return role==='agent';if(group==='advisors')return ['student_advisor','health_advisor'].includes(role);if(group==='activity_leaders')return role==='activity_leader';if(group==='administrative_employees')return role==='administrative_employee';if(group==='kindergarten_teachers')return role==='kindergarten_teacher';if(group==='manager')return role==='manager';return false}
+Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{headers:cors});try{
+ const url=Deno.env.get('SUPABASE_URL')!,anon=Deno.env.get('SUPABASE_ANON_KEY')!,service=Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;const uc=createClient(url,anon,{global:{headers:{Authorization:req.headers.get('authorization')||''}}});const {data:{user}}=await uc.auth.getUser();if(!user)return json({error:'unauthorized'},401);const db=createClient(url,service,{auth:{persistSession:false}});const b=await req.json().catch(()=>({}));const sid=clean(b.schoolId),action=clean(b.action),actor=clean(b.actorRole);if(!sid)return json({error:'school_required'},400);
+ const mq=await db.from('school_members').select('role').eq('school_id',sid).eq('user_id',user.id).eq('status','active');if(mq.error)throw mq.error;const roles=(mq.data||[]).map((x:any)=>String(x.role));if(!roles.length)return json({error:'forbidden'},403);const role=actor&&roles.includes(actor)?actor:roles[0];
+ const membersQ=async()=>{const r=await db.from('school_members').select('user_id,role,status,display_name,role_variant').eq('school_id',sid).eq('status','active').neq('user_id',user.id);if(r.error)throw r.error;return r.data||[]};
+ if(action==='contacts'){
+   const rows=await membersQ();const contacts=[];for(const row of rows){if(!allowedRecipient(role,String(row.role)))continue;const m=await meta(db,row.user_id);contacts.push({user_id:row.user_id,role:row.role,role_variant:row.role_variant||'',email:m.email,label:row.display_name||m.name||m.email||roleLabels[row.role]||row.role,role_label:roleLabels[row.role]||row.role})}
+   const groups:any[]=[];const push=(key:string,label:string,rolesIn:string[])=>{const count=contacts.filter((c:any)=>rolesIn.includes(c.role)).length;if(count)groups.push({key,label,count})};
+   if(role==='owner'){push('manager','مدير/مديرة المدرسة',['manager'])}
+   else if(role==='manager'||role==='agent'){
+     if(role==='agent')push('manager','مدير/مديرة المدرسة',['manager']);
+     push('teachers','جميع المعلمين والمعلمات',['teacher','kindergarten_teacher']);push('agents','جميع الوكلاء والوكيلات',['agent']);push('advisors','جميع الموجهين والموجهات',['student_advisor','health_advisor']);push('activity_leaders','جميع رواد ورائدات النشاط',['activity_leader']);push('administrative_employees','جميع الموظفين والموظفات الإداريين',['administrative_employee']);
+     const allCount=contacts.filter((c:any)=>!['owner','manager'].includes(c.role)).length;if(allCount)groups.unshift({key:'all_users',label:'جميع المستخدمين',count:allCount});
+   } else push('agents','الوكلاء والوكيلات',['agent']);
+   const policy=role==='owner'?'المالك يراسل مدير/مديرة المدرسة فقط.':role==='manager'?'المدير يراسل الوكلاء وجميع المستخدمين داخل المدرسة، جماعيًا أو فرديًا.':role==='agent'?'الوكيل يراسل المدير وجميع المستخدمين داخل المدرسة، جماعيًا أو فرديًا.':'المستخدم يراسل الوكلاء والوكيلات فقط.';
+   return json({ok:true,policy,contacts,groups,senderRole:role})
+ }
+ if(action==='send'){
+   const body=clean(b.body),subject=clean(b.subject);if(!body)return json({error:'body_required'},400);const rows=await membersQ();let targetIds:string[]=[];
+   const group=clean(b.groupKey);const explicit=[...(Array.isArray(b.recipientUserIds)?b.recipientUserIds:[]),clean(b.recipientUserId)].map(clean).filter(Boolean);
+   if(group){targetIds=rows.filter((r:any)=>allowedRecipient(role,String(r.role))&&groupMatch(group,String(r.role))).map((r:any)=>String(r.user_id))}else targetIds=[...new Set(explicit)];
+   if(!targetIds.length)return json({error:'recipient_required'},400);
+   const validRows=rows.filter((r:any)=>targetIds.includes(String(r.user_id)));if(validRows.length!==targetIds.length)return json({error:'recipient_not_in_school'},403);if(validRows.some((r:any)=>!allowedRecipient(role,String(r.role))))return json({error:'recipient_not_allowed'},403);
+   const ins=await db.from('internal_messages').insert({school_id:sid,sender_id:user.id,subject:subject||null,body,priority:clean(b.priority)||'normal'}).select('*').single();if(ins.error)throw ins.error;
+   const recRows=targetIds.map(id=>({message_id:ins.data.id,recipient_id:id}));const rec=await db.from('internal_message_recipients').insert(recRows);if(rec.error){await db.from('internal_messages').delete().eq('id',ins.data.id);throw rec.error}
+   return json({ok:true,message:ins.data,recipientCount:targetIds.length})
+ }
+ if(action==='inbox'){const r=await db.from('internal_message_recipients').select('id,read_at,message:internal_messages(*)').eq('recipient_id',user.id).order('id',{ascending:false}).limit(100);if(r.error)throw r.error;const messages=[];for(const row of r.data||[]){const m=(row as any).message;if(!m||m.school_id!==sid)continue;const s=await meta(db,m.sender_id);messages.push({...m,read_at:(row as any).read_at,sender_name:s.name||s.email})}messages.sort((a:any,b:any)=>String(b.created_at).localeCompare(String(a.created_at)));return json({ok:true,messages,unread:messages.filter((x:any)=>!x.read_at).length})}
+ if(action==='read'){const id=clean(b.messageId);const r=await db.from('internal_message_recipients').select('id,read_at,message:internal_messages(*)').eq('message_id',id).eq('recipient_id',user.id).maybeSingle();if(r.error)throw r.error;const m=(r.data as any)?.message;if(!r.data||!m||m.school_id!==sid)return json({error:'not_found'},404);const at=new Date().toISOString();await db.from('internal_message_recipients').update({read_at:at}).eq('id',(r.data as any).id);const s=await meta(db,m.sender_id);return json({ok:true,message:{...m,read_at:at,sender_name:s.name||s.email}})}
+ return json({error:'unknown_action'},400)
+}catch(e){return json({error:e instanceof Error?e.message:String(e)},500)}});
