@@ -17,9 +17,8 @@ function boot(){
       <a class="pm-card" href="private-outputs.html?privateEdition=1"><span>📚</span><b>المخرجات المؤسسية</b><small>أرشيف التقارير والمخرجات النهائية المعتمدة</small></a>
     </div>
     <div class="pm-actions">
-      <a href="private-manager-users.html?privateEdition=1">👥 إدارة المستخدمين</a>
-      <a href="private-workflows.html?privateEdition=1">🧭 سير الاعتمادات</a>
-      <a href="private-messages.html?privateEdition=1">✉️ المراسلات</a>
+      <a id="private-users-login-link" href="school-login.html?edition=private">👥 دخول المستخدمين</a>
+      <a id="private-workflows-link" href="private-workflows.html?privateEdition=1">🧭 سير الاعتمادات <span id="private-workflow-badge" class="pm-badge" style="display:none">0</span></a>
     </div>`;
   el.style.cssText='position:relative;z-index:50;width:min(calc(100% - 28px),1180px);margin:14px auto 18px;background:linear-gradient(145deg,#ffffff,#f3fbf8);border:1px solid #d7e9e4;border-radius:22px;padding:16px;box-shadow:0 12px 32px rgba(20,67,78,.10);font-family:Tajawal,Arial;color:#18364a';
   const style=document.createElement('style');
@@ -31,12 +30,13 @@ function boot(){
     #private-manager-feature-strip .pm-card{text-decoration:none;color:#18364a;border:1px solid #dce8ef;background:#fff;border-radius:17px;padding:14px;text-align:center;display:flex;min-height:128px;flex-direction:column;align-items:center;justify-content:center;gap:6px}
     #private-manager-feature-strip .pm-card span{font-size:28px} #private-manager-feature-strip .pm-card b{font-size:14px} #private-manager-feature-strip .pm-card small{font-size:11px;color:#64748b;line-height:1.45}
     #private-manager-feature-strip .pm-actions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
-    #private-manager-feature-strip .pm-actions a{text-decoration:none;color:#0b3d2f;background:#eaf7f2;padding:8px 12px;border-radius:999px;font-weight:900;font-size:12px}
+    #private-manager-feature-strip .pm-actions a{text-decoration:none;color:#0b3d2f;background:#eaf7f2;padding:8px 12px;border-radius:999px;font-weight:900;font-size:12px;position:relative}.pm-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;margin-right:4px;border-radius:999px;background:#dc2626;color:#fff;font-size:11px;font-weight:900}
     @media(max-width:760px){#private-manager-feature-strip .pm-grid{grid-template-columns:1fr}}
   `;
   document.head.appendChild(style);
   const anchor=document.querySelector('header')||document.querySelector('main')||document.body.firstElementChild;
   if(anchor&&anchor.parentNode) anchor.insertAdjacentElement('afterend',el); else document.body.prepend(el);
+  (async()=>{try{for(let i=0;i<80&&!window.PrivateSchoolBridge;i++)await new Promise(r=>setTimeout(r,50));if(!window.PrivateSchoolBridge)return;const ctx=await window.PrivateSchoolBridge.requireContext(['manager']);const login=document.getElementById('private-users-login-link');if(login)login.href='school-login.html?edition=private&schoolId='+encodeURIComponent(ctx.schoolId);const refresh=async()=>{try{const [wf,pf]=await Promise.all([window.PrivateSchoolBridge.workflows('context'),window.PrivateSchoolBridge.performance('queue').catch(()=>({queue:[]}))]);const count=Number(wf?.counts?.managerPending??0)+Number((pf?.queue||[]).length||0);const b=document.getElementById('private-workflow-badge');if(b){b.textContent=String(count);b.style.display=count>0?'inline-flex':'none'}}catch(_){}};await refresh();setInterval(refresh,60000)}catch(e){console.warn('[private-manager-enhancements]',e)}})();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
