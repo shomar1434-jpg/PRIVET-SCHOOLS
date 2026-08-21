@@ -1,6 +1,6 @@
 (function(){
-  if(window.__SMART_PRIVATE_SCHOOL_EXIT_SCOPE_V4__) return;
-  window.__SMART_PRIVATE_SCHOOL_EXIT_SCOPE_V4__ = true;
+  if(window.__SMART_INDEPENDENT_SCHOOL_EXIT_SCOPE_V4__) return;
+  window.__SMART_INDEPENDENT_SCHOOL_EXIT_SCOPE_V4__ = true;
 
   function getParams(){
     try{return new URLSearchParams(location.search || '');}catch(e){return new URLSearchParams('');}
@@ -25,7 +25,6 @@
     if(role==='manager' || role==='leadership') return 'manager.html';
     if(role==='agent' || role==='agency') return 'agent.html';
     if(role==='student_advisor' || role==='advisor') return 'student_advisor.html';
-    if(role==='activity_leader' || role==='activity' || role==='activity-leader' || role==='leader') return 'activity_leader.html';
     return 'teacher.html';
   }
 
@@ -49,19 +48,19 @@
     return schoolLoginUrl();
   }
 
-  function isPrivateSchoolPage(){
+  function isIndependentSchoolPage(){
     var q = getParams();
-    var independentFlag = String(q.get('privateSchool') || '').toLowerCase() === 'true';
+    var independentFlag = String(q.get('independent') || '').toLowerCase() === 'true';
     var schoolMode = String(q.get('schoolMode') || '').toLowerCase() === 'independent';
     var loginMode = String(q.get('loginMode') || '').toLowerCase() === 'direct';
     var direct = String(q.get('direct') || '').toLowerCase() === '1';
     var schoolId = String(q.get('schoolId') || q.get('school') || q.get('schoolCode') || '').trim();
     var s = readSession();
-    var sessionIndependent = !!(s && (s.privateSchool === true || s.loginMode === 'direct') && (s.schoolId || schoolId));
+    var sessionIndependent = !!(s && (s.independentSchool === true || s.loginMode === 'direct') && (s.schoolId || schoolId));
     var sessionFlag = false;
-    try{ sessionFlag = sessionStorage.getItem('private_school_mode') === '1'; }catch(e){}
+    try{ sessionFlag = sessionStorage.getItem('independent_school_mode') === '1'; }catch(e){}
 
-    /* نطاق آمن: لا يعمل على واجهة مدير/ة النظام إلا إذا كانت الصفحة داخلة صراحة من رابط المدرسة الأهلية والخاصة */
+    /* نطاق آمن: لا يعمل على واجهة مدير/ة النظام إلا إذا كانت الصفحة داخلة صراحة من رابط المدرسة المستقلة */
     return !!schoolId && independentFlag && schoolMode && (loginMode || direct || sessionIndependent || sessionFlag);
   }
 
@@ -78,13 +77,13 @@
     try{
       [
         'currentRole','currentUserName','currentUserEmail','smart_school_active_role',
-        'smart_school_current_session','private_school_mode'
+        'smart_school_current_session','independent_school_mode'
       ].forEach(function(k){ localStorage.removeItem(k); sessionStorage.removeItem(k); });
     }catch(e){}
   }
 
   function goBackToSchoolUsersLogin(){
-    if(!isPrivateSchoolPage()) return false;
+    if(!isIndependentSchoolPage()) return false;
     try{
       if(window.parent && window.parent !== window && typeof window.parent.backToPortal === 'function'){
         window.parent.backToPortal();
@@ -98,7 +97,7 @@
   }
 
   function finalClosePage(){
-    if(!isPrivateSchoolPage()) return false;
+    if(!isIndependentSchoolPage()) return false;
     clearIndependentSession();
     try{ window.open('', '_self'); }catch(e){}
     try{ window.close(); }catch(e){}
@@ -115,7 +114,7 @@
   }
 
   document.addEventListener('click', function(e){
-    if(!isPrivateSchoolPage()) return;
+    if(!isIndependentSchoolPage()) return;
     var id = getActionId(e.target);
     if(!id) return;
     e.preventDefault();
@@ -128,17 +127,17 @@
 
 
   function installFloatingReturnButton(){
-    if(!isPrivateSchoolPage()) return;
-    if(document.getElementById('privateSchoolReturnBtn')) return;
-    var st = document.getElementById('privateSchoolReturnBtnStyle');
+    if(!isIndependentSchoolPage()) return;
+    if(document.getElementById('independentSchoolReturnBtn')) return;
+    var st = document.getElementById('independentSchoolReturnBtnStyle');
     if(!st){
       st = document.createElement('style');
-      st.id = 'privateSchoolReturnBtnStyle';
-      st.textContent = '#privateSchoolReturnBtn{position:fixed!important;right:18px!important;bottom:18px!important;width:48px!important;height:48px!important;border:0!important;border-radius:50%!important;background:#0f766e!important;color:#fff!important;font-size:24px!important;font-weight:900!important;z-index:2147483000!important;box-shadow:0 8px 22px rgba(0,0,0,.25)!important;cursor:pointer!important;display:flex!important;align-items:center!important;justify-content:center!important}#privateSchoolReturnBtn:hover{filter:brightness(.95)!important;transform:translateY(-1px)!important}@media print{#privateSchoolReturnBtn{display:none!important}}';
+      st.id = 'independentSchoolReturnBtnStyle';
+      st.textContent = '#independentSchoolReturnBtn{position:fixed!important;right:18px!important;bottom:18px!important;width:48px!important;height:48px!important;border:0!important;border-radius:50%!important;background:#0f766e!important;color:#fff!important;font-size:24px!important;font-weight:900!important;z-index:2147483000!important;box-shadow:0 8px 22px rgba(0,0,0,.25)!important;cursor:pointer!important;display:flex!important;align-items:center!important;justify-content:center!important}#independentSchoolReturnBtn:hover{filter:brightness(.95)!important;transform:translateY(-1px)!important}@media print{#independentSchoolReturnBtn{display:none!important}}';
       document.head.appendChild(st);
     }
     var btn = document.createElement('button');
-    btn.id = 'privateSchoolReturnBtn';
+    btn.id = 'independentSchoolReturnBtn';
     btn.type = 'button';
     btn.title = isFollowPage() ? 'الرجوع للقسم السابق' : 'العودة لشاشة دخول المدرسة';
     btn.setAttribute('aria-label', btn.title);
@@ -157,11 +156,11 @@
     installFloatingReturnButton();
   }
 
-  window.smartPrivateSchoolBackToUsersLogin = goBackToSchoolUsersLogin;
-  window.smartPrivateSchoolFinalClose = finalClosePage;
+  window.smartIndependentSchoolBackToUsersLogin = goBackToSchoolUsersLogin;
+  window.smartIndependentSchoolFinalClose = finalClosePage;
 })();
 
-/* Light follow-up policy for private schools only
+/* Light follow-up policy for independent schools only
    Reverts heavy view-only behavior. Keeps only:
    1) Hide "تقرير جديد" in follow/visit context.
    2) Block edit/delete-style actions only inside الأرشيف الرقمي / الأرشيف الذكي. */
@@ -176,14 +175,14 @@
       return raw?JSON.parse(raw):null;
     }catch(e){return null;}
   }
-  function isPrivateSchool(){
+  function isIndependentSchool(){
     var q=params();
     var schoolId=String(q.get('schoolId')||q.get('school')||q.get('schoolCode')||'').trim();
-    var independent=String(q.get('privateSchool')||'').toLowerCase()==='true';
+    var independent=String(q.get('independent')||'').toLowerCase()==='true';
     var schoolMode=String(q.get('schoolMode')||'').toLowerCase()==='independent';
     var direct=String(q.get('direct')||'').toLowerCase()==='1' || String(q.get('loginMode')||'').toLowerCase()==='direct';
     var s=readSession();
-    var sessionIndependent=!!(s && (s.privateSchool===true || s.loginMode==='direct') && (s.schoolId||schoolId));
+    var sessionIndependent=!!(s && (s.independentSchool===true || s.loginMode==='direct') && (s.schoolId||schoolId));
     return !!schoolId && independent && schoolMode && (direct || sessionIndependent);
   }
   function isFollowContext(){
@@ -191,7 +190,7 @@
     var mode=String(q.get('mode')||'').toLowerCase();
     return q.get('follow')==='1' || q.get('readonly')==='1' || mode.indexOf('supervisor')>-1 || !!q.get('viewerRole') || !!q.get('returnRole');
   }
-  function shouldRun(){ return isPrivateSchool() && isFollowContext(); }
+  function shouldRun(){ return isIndependentSchool() && isFollowContext(); }
   function textOf(el){ return String((el&&(el.innerText||el.textContent||el.value||el.getAttribute('aria-label')||el.title||el.id||el.className||''))||'').trim(); }
   function metaText(el){
     return [textOf(el), el && el.id, el && el.className, el && el.getAttribute && el.getAttribute('onclick'), el && el.getAttribute && el.getAttribute('href')].join(' ');
