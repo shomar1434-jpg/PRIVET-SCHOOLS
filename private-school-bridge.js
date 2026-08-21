@@ -101,7 +101,7 @@
   }
   async function establishContext(schoolId='',actorRole=''){
     const requestedRole=clean(actorRole)||clean(privateContext()?.role);
-    const data=await invoke('private-school-session',{schoolId:clean(schoolId),actorRole:requestedRole},{authRole:requestedRole});
+    const data=await invoke('private-school-session',{schoolId:clean(schoolId),activeRole:requestedRole,role:requestedRole},{authRole:requestedRole});
     const ctx=data.context;
     if(!ctx || ctx.edition!=='private') throw new Error('تعذر إنشاء سياق المدرسة الخاصة');
     sessionStorage.setItem(C.sessionStorageKey,JSON.stringify(ctx));
