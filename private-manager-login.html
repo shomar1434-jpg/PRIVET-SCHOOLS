@@ -1,31 +1,20 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<script src="private-storage-namespace.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>دخول مدير المدرسة</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0"></script>
-<script src="standalone-private-config.js"></script><script src="private-school-config.js"></script><script src="private-school-bridge.js"></script>
-<style>
-:root{--blue:#3d7eb9;--turq:#0da9a6;--navy:#15445a;--ink:#17324a}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#edf5fa,#edf8f5);font-family:Tajawal,"Segoe UI",Arial,sans-serif;color:var(--ink)}
-.card{width:min(94vw,470px);background:#fff;border:1px solid #d9e5eb;border-radius:26px;padding:30px;box-shadow:0 24px 70px #15445a20}.mark{width:64px;height:64px;margin:auto;border-radius:20px;background:#edf5fc;display:grid;place-items:center;font-size:32px}h1{text-align:center;color:var(--navy);margin:14px 0 5px}.sub{text-align:center;color:#687b88;line-height:1.7}.field{margin:13px 0}.field label{display:block;font-weight:900;font-size:13px;margin-bottom:6px}.field input{width:100%;border:1px solid #cad9e1;border-radius:12px;padding:13px;font:inherit}.btn{width:100%;border:0;border-radius:13px;padding:13px;background:linear-gradient(90deg,var(--navy),var(--blue));color:#fff;font:inherit;font-weight:900;cursor:pointer}.msg{min-height:22px;margin-top:12px;color:#b42318;font-size:13px;text-align:center}
-</style></head>
-<body><main class="card"><div class="mark">🏛️</div><h1>دخول مدير/مديرة المدرسة</h1><p class="sub">يعمل هذا الرابط بعد تفعيل الحساب من مالك المدرسة فقط.</p>
-<form id="loginForm"><div class="field"><label>البريد الإلكتروني</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label>كلمة المرور</label><input id="password" type="password" autocomplete="current-password" required></div><button class="btn" type="submit">دخول قسم مدير المدرسة</button><div id="msg" class="msg"></div></form>
-</main>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تحويل إلى بوابة دخول المدرسة</title>
 <script>
-const schoolId=new URLSearchParams(location.search).get('schoolId')||new URLSearchParams(location.search).get('school_id')||'';
-document.getElementById('loginForm').onsubmit=async e=>{e.preventDefault();const m=document.getElementById('msg');m.textContent='جارٍ التحقق...';
- try{
-  if(!schoolId)throw new Error('رابط دخول المدرسة غير مكتمل');
-  const r=await PrivateSchoolBridge.login(document.getElementById('email').value.trim(),document.getElementById('password').value,schoolId,'manager');
-  if(r.context?.role!=='manager'){await PrivateSchoolBridge.logout();throw new Error('هذا الحساب غير مفعل كمدير للمدرسة');}
-  location.replace('manager.html?privateEdition=1&schoolId='+encodeURIComponent(schoolId));
- }catch(err){
-  try{await PrivateSchoolBridge.logout()}catch(_){}
-  const raw=String(err.message||'');
-  m.textContent=raw.includes('no_active_membership')?'الحساب مسجل لكنه لم يُفعّل بعد من مالك المدرسة.':(raw||'تعذر تسجيل الدخول');
- }
-};
-</script></body></html>
+(function(){
+  const q=new URLSearchParams(location.search||'');
+  const sid=q.get('schoolId')||q.get('school_id')||'';
+  const next=new URL('school-login.html',location.href);
+  next.searchParams.set('edition','private');
+  if(sid)next.searchParams.set('schoolId',sid);
+  next.searchParams.set('role','manager');
+  location.replace(next.href);
+})();
+</script>
+</head>
+<body></body>
+</html>
