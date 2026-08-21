@@ -10,7 +10,8 @@
   if(!g.PrivateSchoolBridge)return;
   let ctx;try{ctx=await g.PrivateSchoolBridge.requireContext();}catch(_){return}
   if(document.getElementById('private-school-nav'))return;
-  const links=[['الرئيسية',withPrivate(g.PrivateSchoolBridge.roleLanding(ctx))],['سير العمل','private-workflows.html?privateEdition=1'],['المراسلات','internal_messages.html?privateEdition=1']];
+  const workflowLabel=['agent','manager'].includes(ctx.role)?'سير الاعتمادات':'طلبات حالات الانضباط';
+  const links=[['الرئيسية',withPrivate(g.PrivateSchoolBridge.roleLanding(ctx))],[workflowLabel,'private-workflows.html?privateEdition=1'],['المراسلات','internal_messages.html?privateEdition=1']];
   if(['owner','manager'].includes(ctx.role))links.push(['فحص الالتزام','private-compliance.html?privateEdition=1']);
   if(['owner','manager'].includes(ctx.role))links.push(['المخرجات','private-outputs.html?privateEdition=1']);
   if(['owner','manager'].includes(ctx.role))links.push(['الهوية والقالب','private-template-settings.html?privateEdition=1']);

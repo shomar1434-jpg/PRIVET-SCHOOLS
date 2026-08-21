@@ -72,7 +72,7 @@
      document.addEventListener('private-school-context-ready',ready,{once:true});
      await load('private-school-isolation.js');
      await load('private-school-page-guard.js');
-     const navPages=new Set(['manager.html','agent.html','teacher.html','administrative_employee_portal.html','student_advisor.html','activity_leader.html','health_advisor.html','kindergarten_teacher.html','school_health_unified_registry.html']);
+     const navPages=new Set(['manager.html','agent.html','teacher.html','administrative_employee_portal.html','student_advisor.html','activity_leader.html','health_advisor.html','kindergarten_teacher.html','school_health_unified_registry.html','staff_discipline.html','wakil_staff_discipline.html']);
      if(navPages.has(page)){
        await load('private-school-nav.js');
        await load('private-multi-school-switcher.js');
