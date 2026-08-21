@@ -1,31 +1,9 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-
-<script src="private-storage-namespace.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script>
-<!-- PRIVATE_EDITION_BUILD_HEAD -->
-<script src="private-edition-bootstrap.js"></script>
-<style id="private-school-auth-pending-style">html.private-auth-pending body{visibility:hidden!important}
-        /* ===== بوابة مدير النظام: اختيار نطاق الإدارة ===== */
-        .admin-edition-hint{margin:.25rem 0 .7rem;color:#475569;font-size:.72rem;font-weight:700}
-        .admin-edition-actions{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;max-width:24rem;margin:0 auto}
-        .admin-edition-card{appearance:none;border:1px solid rgba(15,118,110,.18);border-radius:1rem;padding:.85rem .7rem;min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;cursor:pointer;font-family:inherit;font-weight:800;transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;background:#fff}
-        .admin-edition-card:hover{transform:translateY(-2px);box-shadow:0 12px 24px rgba(15,23,42,.14);filter:brightness(1.02)}
-        .admin-edition-card:focus-visible{outline:3px solid rgba(13,148,136,.35);outline-offset:2px}
-        .admin-edition-card[disabled]{opacity:.62;cursor:wait;transform:none}
-        .admin-edition-public{background:linear-gradient(135deg,#f0fdfa,#ccfbf1);color:#115e59}
-        .admin-edition-private{background:linear-gradient(135deg,#fff8e1,#f7dfa0);color:#6b4f0b;border-color:rgba(180,132,32,.25)}
-        .admin-edition-icon{font-size:1.4rem;line-height:1}
-        .admin-edition-title{font-size:.82rem;line-height:1.45}
-        .admin-edition-subtitle{font-size:.58rem;font-weight:700;opacity:.72;line-height:1.4}
-        .admin-edition-status{min-height:18px;margin-top:.55rem;font-size:.68rem;font-weight:700;color:#475569}
-        @media(max-width:430px){.admin-edition-actions{grid-template-columns:1fr}.admin-edition-card{min-height:76px}}
-</style>
-<script src="private-school-preflight.js"></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>نظام إدارة المدارس الذكي — المدارس الأهلية والخاصة</title>
+    <title>منصة المدرسة الرقمية الذكية - نظام التحكم المركزي</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -195,9 +173,7 @@
         }
 
         /* إصلاح الخصوصية وواجهة التنشيط: لا تظهر بيانات محفوظة داخل حقول الإدخال */
-        #user-display-name { direction: rtl; }
-        #user-madrasati-email { direction: ltr !important; text-align: center !important; unicode-bidi: plaintext; }
-        input[type="email"], input[data-email-field="true"] { direction: ltr !important; text-align: center !important; unicode-bidi: plaintext; }
+        #user-display-name, #user-madrasati-email { direction: rtl; }
         #role-selector-screen.login-hidden { display: none !important; }
 
     
@@ -359,644 +335,86 @@
 @media print{.teams-ai-hall-btn{display:none!important}}
 </style>
 
-
-<style id="safe-remove-close-center-support-real">
-/* إخفاء زر إغلاق التطبيق فقط دون المساس بأزرار إغلاق النوافذ */
-button[onclick="openExitModal()"],button[onclick="exitApp()"],button[onclick="closeApp()"]{display:none!important}
-/* توسيط بطاقات الدعم الفني السفلية */
-.ss-support-center-row{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;align-items:center!important;gap:1rem!important}
-.ss-support-center-card{width:100%!important;max-width:28rem!important;justify-content:center!important}
-</style>
-
-<style id="owner-portal-final-layout-2026">
-/* واجهة مدير النظام: شبكة أقسام متكاملة ومتجاوبة دون الحاجة لتغيير Zoom */
-html,body{width:100%;height:100%;margin:0}
-body{background:radial-gradient(circle at 88% 16%,rgba(25,166,158,.20),transparent 18rem),radial-gradient(circle at 8% 76%,rgba(0,133,125,.28),transparent 22rem),linear-gradient(135deg,#f8fcff 0%,#eef8f7 48%,#dff5f8 100%)!important;color:#102033!important}
-body::before{content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(120deg,rgba(0,126,118,.68) 0 12%,transparent 12.2% 100%),linear-gradient(0deg,rgba(0,133,130,.68) 0 14%,transparent 14.2% 100%)}
-body::after{content:""!important;position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 92% 26%,rgba(30,123,120,.14),transparent 7rem),linear-gradient(90deg,rgba(255,255,255,.94),rgba(255,255,255,.62) 56%,rgba(220,245,248,.30))!important}
-#main-ui{box-sizing:border-box!important;min-height:100dvh!important;height:100dvh!important;padding:clamp(.45rem,1vh,.8rem) clamp(.8rem,2.2vw,1.8rem)!important;display:grid!important;grid-template-rows:auto minmax(0,1fr) auto!important;gap:clamp(.4rem,.9vh,.7rem)!important;overflow:hidden!important}
-#main-ui header{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;max-width:100%!important;margin:0 auto!important;padding:.15rem 0 0!important;text-align:center!important}
-#main-ui header img{display:none!important}
-#main-ui header h1{color:#087266!important;text-shadow:0 8px 18px rgba(8,114,102,.12)!important;font-size:clamp(1.65rem,4.6vh,3.15rem)!important;line-height:1!important;font-weight:900!important;letter-spacing:-.05rem!important;margin:0!important}
-#main-ui header p{color:#667085!important;font-size:clamp(.67rem,1.35vh,.92rem)!important;margin-top:.25rem!important;font-weight:800!important}
-#main-ui header::after{content:"";display:block;width:150px;max-width:24vw;height:2px;margin:.35rem auto 0;background:linear-gradient(90deg,transparent,#2bb9b0,transparent);border-radius:999px}
-#bell-container{display:none!important}
-#active-role-badge.global-admin-badge{top:.8rem!important;right:1rem!important;background:#d6ad47!important;color:#142033!important;border-radius:999px!important;padding:.38rem 1rem!important;box-shadow:0 10px 24px rgba(160,120,36,.20)!important;font-size:.72rem!important}
-.exit-app-btn{top:.8rem!important;left:1rem!important;border-radius:999px!important;background:#ef4444!important;padding:.36rem 1.1rem!important;font-size:.72rem!important}
-#apps-grid{direction:rtl!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:clamp(.45rem,1.15vh,.85rem)!important;width:min(100%,1040px)!important;height:100%!important;min-height:0!important;max-height:100%!important;margin:0 auto!important;padding:0!important;align-self:stretch!important;align-content:stretch!important}
-#apps-grid .app-card{min-width:0!important;min-height:0!important;height:100%!important;padding:clamp(.48rem,1.05vh,.78rem)!important;border-radius:clamp(.85rem,1.8vh,1.35rem)!important;background:rgba(255,255,255,.88)!important;border:1px solid rgba(15,118,110,.14)!important;border-bottom:4px solid #087b6f!important;box-shadow:0 10px 24px rgba(30,64,80,.10)!important;backdrop-filter:blur(9px)!important;display:flex!important;align-items:center!important;justify-content:center!important;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease!important}
-#apps-grid .app-card:hover{transform:translateY(-2px)!important;box-shadow:0 16px 30px rgba(30,64,80,.15)!important;border-color:rgba(13,148,136,.38)!important}
-#apps-grid .app-card>div{width:100%!important}
-#apps-grid .app-card .role-icon{width:clamp(34px,5.1vh,52px)!important;height:clamp(34px,5.1vh,52px)!important;border-radius:50%!important;margin:0 auto clamp(.22rem,.45vh,.4rem)!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:clamp(1rem,2.15vh,1.5rem)!important}
-#apps-grid .app-card h2{font-size:clamp(.78rem,1.55vh,1.05rem)!important;line-height:1.25!important;color:#182133!important;font-weight:900!important;margin:0!important}
-#apps-grid .app-card p{font-size:clamp(.55rem,1.02vh,.69rem)!important;margin-top:.18rem!important;color:#07836f!important;line-height:1.25!important}
-#apps-grid .app-card button{margin-top:clamp(.28rem,.65vh,.48rem)!important;padding:clamp(.28rem,.65vh,.42rem) .8rem!important;border-radius:.72rem!important;font-size:clamp(.62rem,1.18vh,.78rem)!important;background:#087b6f!important;box-shadow:0 6px 14px rgba(8,123,111,.18)!important}
-#apps-grid .school-management-card{background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(236,253,245,.94))!important;border-color:rgba(5,150,105,.26)!important}
-#apps-grid .school-management-card .role-icon{background:linear-gradient(135deg,#047857,#0f766e)!important;color:#fff!important}
-.owner-footer-strip{direction:rtl;width:min(100%,900px);margin:0 auto;background:rgba(255,255,255,.90);border:1px solid rgba(15,118,110,.14);box-shadow:0 10px 26px rgba(30,64,80,.10);border-radius:1.45rem;padding:clamp(.32rem,.7vh,.48rem) clamp(.6rem,1.1vw,.9rem);display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;align-items:center;gap:clamp(.25rem,.6vw,.55rem)}
-.owner-footer-item{border:0;background:transparent;color:#087266;display:flex;align-items:center;justify-content:center;gap:.45rem;text-align:right;font-family:inherit;min-width:0}
-.owner-footer-item strong{display:block;font-size:clamp(.68rem,1.18vh,.82rem);font-weight:900;white-space:nowrap}.owner-footer-item small{display:block;font-size:clamp(.54rem,.92vh,.66rem);font-weight:700;color:#677386;white-space:nowrap}.owner-footer-icon{font-size:clamp(1rem,1.8vh,1.3rem);line-height:1;color:#087b6f}.owner-footer-sep{height:28px;width:1px;background:rgba(15,118,110,.20)}
-#role-selector-screen{background:rgba(15,23,42,.68)!important}
-@media(min-width:901px) and (max-height:680px){#main-ui{padding-top:.28rem!important;padding-bottom:.3rem!important;gap:.28rem!important}#main-ui header h1{font-size:clamp(1.45rem,4.15vh,2.35rem)!important}#main-ui header p{font-size:.62rem!important;margin-top:.12rem!important}#main-ui header::after{margin-top:.2rem!important}#apps-grid{gap:.38rem!important;width:min(100%,1000px)!important}#apps-grid .app-card{padding:.36rem!important;border-bottom-width:3px!important}#apps-grid .app-card .role-icon{width:30px!important;height:30px!important;font-size:.92rem!important;margin-bottom:.15rem!important}#apps-grid .app-card h2{font-size:.72rem!important}#apps-grid .app-card p{font-size:.52rem!important;margin-top:.1rem!important}#apps-grid .app-card button{font-size:.58rem!important;padding:.22rem .6rem!important;margin-top:.2rem!important}.owner-footer-strip{padding:.25rem .6rem!important;border-radius:1.1rem!important}.owner-footer-item strong{font-size:.64rem!important}.owner-footer-item small{font-size:.5rem!important}.owner-footer-sep{height:22px!important}}
-@media(max-width:900px){html,body{height:auto!important;min-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important}#main-ui{height:auto!important;min-height:100dvh!important;display:flex!important;overflow:visible!important;padding:4.2rem .85rem 1rem!important}#apps-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:none!important;height:auto!important;width:min(100%,720px)!important}#apps-grid .app-card{height:auto!important;min-height:122px!important;padding:.7rem!important}.owner-footer-strip{width:min(100%,720px);grid-template-columns:1fr 1fr!important;gap:.4rem!important;margin-top:.6rem!important}.owner-footer-sep{display:none!important}.owner-footer-item{padding:.35rem!important}}
-@media(max-width:560px){#main-ui{padding-left:.65rem!important;padding-right:.65rem!important}#apps-grid{grid-template-columns:1fr!important;width:min(100%,430px)!important}#apps-grid .app-card{min-height:118px!important}.owner-footer-strip{grid-template-columns:1fr!important;width:min(100%,430px)}.owner-footer-item{justify-content:flex-start!important;padding:.35rem .65rem!important}}
-</style>
-
-<script id="gender-neutral-labels-safe">
-/* Hotfix: نظام تسميات خفيف بدون مراقبة مستمرة أو فحص شامل للصفحة.
-   التسميات المحايدة تم تثبيتها داخل النصوص، وهذا السكربت يوفّر قاموسًا فقط للاستخدامات المستقبلية. */
-(function(){
-  window.roleLabels = window.roleLabels || {
-    manager: 'المدير/المديرة',
-    deputy: 'الوكيل/الوكيلة',
-    teacher: 'المعلم/المعلمة',
-    supervisor: 'الموجه/الموجهة',
-    activityLeader: 'رائد/رائدة النشاط',
-    adminEmployee: 'الموظف/الموظفة الإدارية',
-    student: 'الطالب/الطالبة'
-  };
-})();
-</script>
-
-
-
-
-<style id="owner-mobile-desktop-mode-scroll-fix-2026">
-/* تصحيح آمن مخصص لواجهة مالك النظام فقط: يسمح بالتمرير في الجوالات الطولية حتى عند تفعيل وضع الكمبيوتر، ويمنع اختفاء الشريط السفلي. */
-@media (orientation: portrait), (max-width: 900px), (pointer: coarse) and (max-height: 1200px) {
-  html, body {
-    height: auto !important;
-    min-height: 100% !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    touch-action: pan-y !important;
-    -webkit-overflow-scrolling: touch !important;
-  }
-
-  #main-ui {
-    height: auto !important;
-    min-height: 100svh !important;
-    max-height: none !important;
-    overflow: visible !important;
-    padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important;
-  }
-
-  #apps-grid {
-    flex: 0 0 auto !important;
-    align-content: start !important;
-  }
-
-  #owner-footer-strip.owner-footer-strip,
-  .owner-footer-strip {
-    position: sticky !important;
-    bottom: max(10px, env(safe-area-inset-bottom, 0px)) !important;
-    z-index: 1002 !important;
-    margin-top: 1rem !important;
-    margin-bottom: 0 !important;
-  }
-}
-
-@media (orientation: portrait) and (min-width: 901px) {
-  #apps-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    width: min(100%, 860px) !important;
-  }
-
-  .owner-footer-strip {
-    grid-template-columns: 1fr 1fr !important;
-    gap: .65rem !important;
-  }
-
-  .owner-footer-sep {
-    display: none !important;
-  }
-}
-</style>
-
-<script src="school_isolation_guard.js?v=nonblock20260614"></script>
-
-<!-- PREMIUM_UI_2026 -->
-<link rel="stylesheet" href="premium-ui.css">
-<script defer src="premium-ui.js"></script>
-
-<style id="owner-dashboard-readable-cards-v2">
-/* تحسين قراءة بطاقات واجهة مالك النظام فقط */
-#main-ui #apps-grid{
-  width:min(94vw,1280px)!important;
-  max-width:1280px!important;
-  gap:clamp(.7rem,1.35vw,1.15rem)!important;
-}
-#main-ui #apps-grid .app-card{
-  padding:clamp(.72rem,1.25vh,1rem) clamp(.85rem,1.3vw,1.15rem)!important;
-}
-#main-ui #apps-grid .app-card h2{
-  font-size:clamp(.86rem,1.28vw,1.08rem)!important;
-  line-height:1.35!important;
-  white-space:normal!important;
-  overflow-wrap:anywhere!important;
-}
-#main-ui #apps-grid .app-card p{
-  font-size:clamp(.61rem,.78vw,.75rem)!important;
-  line-height:1.45!important;
-}
-#main-ui #apps-grid .app-card button{
-  font-size:clamp(.68rem,.82vw,.8rem)!important;
-  min-height:30px!important;
-}
-#main-ui .owner-footer-strip{
-  width:min(94vw,1100px)!important;
-  grid-template-columns:1fr auto 1fr auto 1fr auto 1fr auto 1fr!important;
-}
-#main-ui .owner-footer-item.owner-knowledge-entry{
-  cursor:pointer!important;
-  border:0!important;
-  background:linear-gradient(135deg,rgba(15,118,110,.10),rgba(6,182,212,.08))!important;
-  border-radius:14px!important;
-  padding:.36rem .55rem!important;
-  transition:.18s ease!important;
-}
-#main-ui .owner-footer-item.owner-knowledge-entry:hover{
-  transform:translateY(-2px)!important;
-  background:linear-gradient(135deg,rgba(15,118,110,.17),rgba(6,182,212,.13))!important;
-}
-@media (max-width:900px){
-  #main-ui #apps-grid{width:min(100%,760px)!important}
-  #main-ui .owner-footer-strip{grid-template-columns:1fr 1fr!important;width:min(100%,760px)!important}
-  #main-ui .owner-footer-sep{display:none!important}
-}
-@media (max-width:560px){
-  #main-ui #apps-grid{width:min(100%,440px)!important}
-  #main-ui .owner-footer-strip{grid-template-columns:1fr!important;width:min(100%,440px)!important}
-}
-</style>
-<link rel="stylesheet" href="responsive-layout.css?v=20260818-responsive-1">
-
-<style id="private-entry-actions-layout-fix">
-.private-entry-actions{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:.7rem;width:100%;}
-.private-entry-link{display:flex;align-items:center;justify-content:center;min-height:44px;padding:.65rem .8rem;border-radius:14px;text-decoration:none;font-family:'Cairo','Tajawal',Arial,sans-serif;font-weight:800;font-size:.86rem;line-height:1.35;transition:transform .18s ease,box-shadow .18s ease,background .18s ease;box-shadow:0 8px 20px rgba(15,23,42,.10);}
-.private-entry-link:hover{transform:translateY(-1px);}
-.private-entry-owner{background:#cfae5d;color:#17263a;border:1px solid rgba(23,38,58,.12);}
-.private-entry-admin{background:#0b5a49;color:#fff;border:1px solid rgba(255,255,255,.2);}
-@media (max-width:520px){.private-entry-actions{grid-template-columns:1fr}.private-entry-link{font-size:.82rem}}
-@media (max-height:650px){
-  body{overflow:auto!important;height:auto!important;min-height:100dvh!important;}
-  #role-selector-screen{position:relative!important;min-height:100dvh!important;display:flex!important;align-items:center!important;justify-content:flex-end!important;padding:1rem!important;}
-  .login-container{position:relative!important;right:auto!important;left:auto!important;bottom:auto!important;margin:0!important;max-height:none!important;}
-}
-</style>
-
-<style id="central-admin-edition-layout-v2">
-#role-selector-screen .login-container{width:min(30rem,calc(100vw - 2rem))!important;max-width:30rem!important;padding:1.35rem!important;}
-#system-admin-login-form{max-width:none!important;}
-#system-admin-login-form input{min-height:48px!important;}
-.admin-edition-actions{max-width:none!important;}
-@media(max-width:520px){#role-selector-screen .login-container{width:calc(100vw - 2rem)!important;right:1rem!important;bottom:1rem!important}.admin-edition-actions{grid-template-columns:1fr 1fr!important}.admin-edition-title{font-size:.74rem}.admin-edition-subtitle{display:none}}
-@media(max-width:360px){.admin-edition-actions{grid-template-columns:1fr!important}.admin-edition-subtitle{display:block}}
-</style>
-
-<style id="standalone-private-login-style">
-.standalone-private-entry{grid-template-columns:1fr!important}
-.standalone-private-login{min-height:92px!important;width:100%!important}
-.standalone-private-login .admin-edition-title{font-size:1rem!important}
-</style>
-<script src="standalone-private-config.js"></script>
-
-<style id="standalone-balanced-dashboard-v4">
-/* التوازن البصري النهائي للمشروع المستقل */
-#main-ui{justify-content:flex-start!important;gap:clamp(.65rem,1.4vh,1rem)!important;padding:clamp(1.1rem,2.2vh,1.8rem) clamp(.8rem,2vw,1.8rem) 1.2rem!important;overflow-y:auto!important}
-#main-ui header{margin:0 auto .45rem!important;flex:0 0 auto!important}
-#main-ui header img{width:clamp(76px,8.2vh,108px)!important;margin-bottom:.55rem!important}
-#main-ui header h1{font-size:clamp(1.6rem,3.2vh,2.35rem)!important;line-height:1.15!important}
-#main-ui header p{font-size:clamp(.68rem,1.25vh,.82rem)!important;margin-top:.35rem!important}
-#main-ui #bell-container{margin:0 auto .35rem!important;max-width:1040px!important}
-#main-ui #apps-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-rows:minmax(142px,1fr)!important;gap:clamp(.7rem,1.45vw,1.05rem)!important;width:min(100%,1180px)!important;height:auto!important;max-height:none!important;align-items:stretch!important;padding:0!important;margin:0 auto!important}
-#main-ui #apps-grid .app-card{height:100%!important;min-height:142px!important;padding:1rem .85rem!important;border-radius:1.35rem!important;display:flex!important;align-items:stretch!important;justify-content:center!important}
-#main-ui #apps-grid .app-card>div{display:grid!important;grid-template-rows:50px auto minmax(30px,auto) 36px!important;align-items:center!important;width:100%!important;height:100%!important;gap:.3rem!important}
-#main-ui #apps-grid .app-card .role-icon{width:48px!important;height:48px!important;margin:0 auto!important;font-size:1.35rem!important}
-#main-ui #apps-grid .app-card h2{font-size:.96rem!important;line-height:1.35!important;min-height:2.55em!important;display:flex!important;align-items:center!important;justify-content:center!important;margin:0!important}
-#main-ui #apps-grid .app-card p{font-size:.68rem!important;line-height:1.45!important;min-height:2.9em!important;display:flex!important;align-items:flex-start!important;justify-content:center!important;margin:0!important}
-#main-ui #apps-grid .app-card button{height:36px!important;min-height:36px!important;margin:0!important;padding:.4rem .7rem!important;font-size:.72rem!important;border-radius:.75rem!important;align-self:end!important}
-#main-ui .owner-footer-strip{width:min(100%,1180px)!important;margin:.2rem auto 0!important;min-height:58px!important}
-
-@media(max-width:1120px){#main-ui #apps-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;width:min(100%,900px)!important}.owner-footer-strip{width:min(100%,900px)!important}}
-@media(max-width:760px){#main-ui #apps-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;width:min(100%,620px)!important;grid-auto-rows:minmax(136px,auto)!important}#main-ui #apps-grid .app-card{min-height:136px!important}.owner-footer-strip{width:min(100%,620px)!important}}
-@media(max-width:470px){#main-ui #apps-grid{grid-template-columns:1fr!important;width:min(100%,390px)!important}#main-ui #apps-grid .app-card{min-height:128px!important}#main-ui #apps-grid .app-card>div{grid-template-rows:44px auto auto 36px!important}.owner-footer-strip{width:min(100%,390px)!important}}
-</style>
-
-<style id="private-dashboard-uiux-balance-v5">
-#main-ui #apps-grid{justify-content:center!important;align-content:start!important}
-@media(min-width:1240px){
- #main-ui #apps-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;width:min(96vw,1260px)!important;gap:14px!important}
- #main-ui #apps-grid .app-card{min-height:150px!important}
-}
-@media(min-width:901px) and (max-width:1239px){
- #main-ui #apps-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;width:min(96vw,1120px)!important}
-}
-
-#main-ui{max-width:100vw!important;overflow-x:hidden!important}
-</style>
-
-<style id="private-final-center-layout-v6">
-html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
-#main-ui{
-  width:100%!important;max-width:1440px!important;margin:0 auto!important;
-  align-items:center!important;justify-content:flex-start!important;
-  padding-inline:clamp(16px,3vw,42px)!important;
-}
-#main-ui>header,#main-ui #bell-container,#main-ui #apps-grid,#main-ui .owner-footer-strip{
-  margin-left:auto!important;margin-right:auto!important;
-}
-#main-ui header{text-align:center!important;width:min(100%,1100px)!important}
-#main-ui #apps-grid{
-  justify-items:stretch!important;justify-content:center!important;align-content:start!important;
-}
-#main-ui .owner-footer-strip{
-  justify-self:center!important;align-self:center!important;
-  width:min(96vw,1120px)!important;
-  text-align:center!important;
-}
-#main-ui .owner-footer-item{justify-content:center!important;text-align:center!important}
-#active-role-badge.global-admin-badge{
-  position:fixed!important;top:16px!important;right:16px!important;left:auto!important;
-  width:auto!important;min-width:0!important;max-width:140px!important;
-  padding:7px 13px!important;border-radius:999px!important;
-  background:#0b5a49!important;color:#fff!important;border:1px solid rgba(255,255,255,.24)!important;
-  font-size:11px!important;line-height:1!important;white-space:nowrap!important;
-  box-shadow:0 8px 22px rgba(11,90,73,.18)!important;
-}
-#role-selector-screen{
-  inset:0!important;width:100%!important;min-height:100dvh!important;
-  align-items:center!important;justify-content:center!important;
-  padding:24px!important;text-align:center!important;
-}
-#role-selector-screen .login-container{
-  position:relative!important;inset:auto!important;transform:none!important;
-  margin:auto!important;width:min(92vw,520px)!important;max-width:520px!important;
-}
-#role-selector-screen:not(.login-hidden){display:flex!important;justify-content:center!important}
-#role-selector-screen.login-hidden{display:none!important}
-body:has(#role-selector-screen:not(.login-hidden)) #role-selector-screen{justify-content:center!important}
-@media(max-width:700px){
-  #active-role-badge.global-admin-badge{top:10px!important;right:10px!important;font-size:10px!important;padding:6px 10px!important}
-  #main-ui{padding-inline:12px!important}
-}
-</style>
-
-<style id="moe-saudi-identity-cards-v1">
-:root{
-  --moe-green:#07a869;
-  --moe-blue:#3d7eb9;
-  --moe-turquoise:#0da9a6;
-  --moe-navy:#15445a;
-  --moe-gold:#c1b489;
-  --moe-gray:#c2c1c1;
-}
-#main-ui{
-  font-family:"Tajawal","Cairo","Noto Kufi Arabic",Arial,sans-serif!important;
-}
-#main-ui header h1{
-  color:var(--moe-navy)!important;
-  font-weight:900!important;
-  letter-spacing:0!important;
-  font-size:clamp(1.9rem,3.5vh,2.7rem)!important;
-}
-#main-ui header p{
-  color:#326679!important;
-  font-size:clamp(.78rem,1.35vh,.95rem)!important;
-  font-weight:800!important;
-}
-#main-ui #apps-grid .app-card{
-  --card-accent:var(--moe-green);
-  --card-bg:#f3fcf8;
-  --card-ink:#123c34;
-  position:relative!important;
-  overflow:hidden!important;
-  background:linear-gradient(155deg,#ffffff 0%,var(--card-bg) 100%)!important;
-  border:1px solid color-mix(in srgb,var(--card-accent) 28%,#ffffff)!important;
-  border-bottom:5px solid var(--card-accent)!important;
-  box-shadow:0 12px 28px rgba(21,68,90,.09)!important;
-}
-#main-ui #apps-grid .app-card::before{
-  content:""!important;
-  position:absolute!important;
-  inset-inline-start:0!important;
-  top:0!important;
-  width:6px!important;
-  height:100%!important;
-  background:var(--card-accent)!important;
-  opacity:.92!important;
-}
-#main-ui #apps-grid .app-card:nth-child(6n+1){--card-accent:#07a869;--card-bg:#f0fbf6;--card-ink:#0a5138}
-#main-ui #apps-grid .app-card:nth-child(6n+2){--card-accent:#3d7eb9;--card-bg:#f1f7fc;--card-ink:#214f72}
-#main-ui #apps-grid .app-card:nth-child(6n+3){--card-accent:#0da9a6;--card-bg:#effbfa;--card-ink:#086b69}
-#main-ui #apps-grid .app-card:nth-child(6n+4){--card-accent:#15445a;--card-bg:#f0f5f7;--card-ink:#15445a}
-#main-ui #apps-grid .app-card:nth-child(6n+5){--card-accent:#c1b489;--card-bg:#fbf9f2;--card-ink:#5f573d}
-#main-ui #apps-grid .app-card:nth-child(6n+6){--card-accent:#c2c1c1;--card-bg:#f7f7f7;--card-ink:#4c5459}
-
-#main-ui #apps-grid .app-card .role-icon{
-  background:var(--card-accent)!important;
-  color:#fff!important;
-  box-shadow:0 8px 18px color-mix(in srgb,var(--card-accent) 25%,transparent)!important;
-  border:2px solid rgba(255,255,255,.88)!important;
-}
-#main-ui #apps-grid .app-card:nth-child(6n+5) .role-icon,
-#main-ui #apps-grid .app-card:nth-child(6n+6) .role-icon{
-  color:#15445a!important;
-}
-#main-ui #apps-grid .app-card h2{
-  color:var(--card-ink)!important;
-  font-family:"Tajawal","Cairo",Arial,sans-serif!important;
-  font-size:clamp(1rem,1.25vw,1.18rem)!important;
-  font-weight:900!important;
-  line-height:1.45!important;
-}
-#main-ui #apps-grid .app-card p{
-  color:#64747c!important;
-  font-size:clamp(.7rem,.84vw,.82rem)!important;
-  font-weight:700!important;
-  line-height:1.55!important;
-}
-#main-ui #apps-grid .app-card button{
-  background:var(--card-accent)!important;
-  color:#fff!important;
-  border:0!important;
-  font-family:"Tajawal","Cairo",Arial,sans-serif!important;
-  font-weight:900!important;
-  font-size:clamp(.76rem,.9vw,.88rem)!important;
-  box-shadow:0 7px 16px color-mix(in srgb,var(--card-accent) 22%,transparent)!important;
-}
-#main-ui #apps-grid .app-card:nth-child(6n+5) button,
-#main-ui #apps-grid .app-card:nth-child(6n+6) button{
-  color:#15445a!important;
-}
-#main-ui #apps-grid .app-card:hover{
-  transform:translateY(-4px)!important;
-  border-color:var(--card-accent)!important;
-  box-shadow:0 18px 36px rgba(21,68,90,.14)!important;
-}
-#main-ui #apps-grid .school-management-card{
-  --card-accent:#15445a!important;
-  --card-bg:#eef5f7!important;
-  --card-ink:#15445a!important;
-}
-#main-ui .owner-footer-strip{
-  background:rgba(255,255,255,.96)!important;
-  border:1px solid #d6e3e7!important;
-  box-shadow:0 10px 26px rgba(21,68,90,.09)!important;
-}
-#main-ui .owner-footer-item{
-  color:#15445a!important;
-  font-family:"Tajawal","Cairo",Arial,sans-serif!important;
-}
-#main-ui .owner-footer-item strong{
-  font-size:clamp(.74rem,1vw,.88rem)!important;
-  font-weight:900!important;
-}
-#main-ui .owner-footer-item small{
-  color:#66747b!important;
-  font-size:clamp(.59rem,.8vw,.72rem)!important;
-}
-@supports not (color:color-mix(in srgb,#000 20%,#fff)){
-  #main-ui #apps-grid .app-card{border-color:#d8e5e8!important}
-  #main-ui #apps-grid .app-card .role-icon,
-  #main-ui #apps-grid .app-card button{box-shadow:0 8px 18px rgba(21,68,90,.12)!important}
-}
-@media(max-width:760px){
-  #main-ui #apps-grid .app-card h2{font-size:1rem!important}
-  #main-ui #apps-grid .app-card p{font-size:.75rem!important}
-}
-</style>
-
-
-
-
-
-
-<style id="private-card-content-footer-fix-v10">
-:root{
-  --dashboard-card-w:220px;
-  --dashboard-card-h:196px;
-  --dashboard-col-gap:22px;
-  --dashboard-row-gap:18px;
-}
-html,body{
-  width:100%!important;
-  max-width:100%!important;
-  margin:0!important;
-  overflow-x:hidden!important;
-}
-#main-ui{
-  box-sizing:border-box!important;
-  display:flex!important;
-  flex-direction:column!important;
-  width:100%!important;
-  min-height:100vh!important;
-  height:auto!important;
-  margin:0 auto!important;
-  padding:32px 22px 0!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  gap:0!important;
-  overflow:visible!important;
-}
-#main-ui>header{
-  width:100%!important;
-  max-width:1180px!important;
-  margin:0 auto 18px!important;
-  padding:0 12px!important;
-  text-align:center!important;
-  box-sizing:border-box!important;
-}
-#main-ui>header h1,
-#main-ui>header p{
-  width:100%!important;
-  margin-left:auto!important;
-  margin-right:auto!important;
-  text-align:center!important;
-}
-
-#main-ui #apps-grid{
-  box-sizing:border-box!important;
-  display:grid!important;
-  grid-template-columns:repeat(auto-fit,var(--dashboard-card-w))!important;
-  grid-auto-rows:var(--dashboard-card-h)!important;
-  justify-content:center!important;
-  justify-items:center!important;
-  align-content:start!important;
-  align-items:start!important;
-  column-gap:var(--dashboard-col-gap)!important;
-  row-gap:var(--dashboard-row-gap)!important;
-  width:min(100%,1190px)!important;
-  max-width:1190px!important;
-  margin:0 auto!important;
-  padding:0!important;
-  transform:none!important;
-}
-
-#main-ui #apps-grid .app-card{
-  box-sizing:border-box!important;
-  width:var(--dashboard-card-w)!important;
-  min-width:var(--dashboard-card-w)!important;
-  max-width:var(--dashboard-card-w)!important;
-  height:var(--dashboard-card-h)!important;
-  min-height:var(--dashboard-card-h)!important;
-  max-height:var(--dashboard-card-h)!important;
-  margin:0!important;
-  padding:12px 12px 10px!important;
-  flex:0 0 var(--dashboard-card-w)!important;
-  overflow:hidden!important;
-}
-
-/* إبقاء الأيقونة في الأعلى وإنزال المحتوى النصي والأزرار قليلاً */
-#main-ui #apps-grid .app-card>div{
-  box-sizing:border-box!important;
-  width:100%!important;
-  height:100%!important;
-  display:grid!important;
-  grid-template-rows:42px auto minmax(34px,1fr) 24px 36px!important;
-  gap:4px!important;
-  align-content:stretch!important;
-  padding-top:0!important;
-}
-
-#main-ui #apps-grid .app-card .role-icon{
-  width:42px!important;
-  height:42px!important;
-  min-width:42px!important;
-  min-height:42px!important;
-  margin:0 auto!important;
-  align-self:start!important;
-}
-
-/* العنوان والنص التعريفي ينزلان عن الأيقونة */
-#main-ui #apps-grid .app-card h2{
-  margin:6px 0 0!important;
-  padding:0!important;
-  text-align:center!important;
-  font-size:1rem!important;
-  line-height:1.3!important;
-  overflow:visible!important;
-}
-#main-ui #apps-grid .app-card p{
-  margin:5px 0 0!important;
-  padding:0 2px!important;
-  text-align:center!important;
-  font-size:.72rem!important;
-  line-height:1.45!important;
-  max-height:none!important;
-  overflow:visible!important;
-  display:block!important;
-}
-
-/* الحالة وزر الدخول ينزلان إلى النصف السفلي للبطاقة */
-#main-ui #apps-grid .app-card .status,
-#main-ui #apps-grid .app-card [class*="status"]{
-  align-self:end!important;
-  margin-top:4px!important;
-}
-#main-ui #apps-grid .app-card button{
-  box-sizing:border-box!important;
-  width:100%!important;
-  height:36px!important;
-  min-height:36px!important;
-  margin:4px 0 0!important;
-  padding:0 10px!important;
-  align-self:end!important;
-  flex:none!important;
-}
-
-/* رفع الشريط السفلي ليبدأ مباشرة بعد الصف الثاني */
-#main-ui .owner-footer-strip{
-  box-sizing:border-box!important;
-  position:relative!important;
-  inset:auto!important;
-  width:100vw!important;
-  max-width:none!important;
-  min-height:54px!important;
-  margin:12px calc(50% - 50vw) 0!important;
-  padding:8px 18px!important;
-  transform:none!important;
-  align-self:stretch!important;
-  flex:none!important;
-  border-top:4px solid #0da9a6!important;
-}
-#main-ui .owner-footer-strip,
-#main-ui .owner-footer-strip *{
-  text-align:center!important;
-}
-#main-ui .owner-footer-item{
-  justify-content:center!important;
-  align-items:center!important;
-}
-
-@media(max-width:1180px){
-  #main-ui{padding-left:18px!important;padding-right:18px!important}
-  #main-ui #apps-grid{width:min(100%,950px)!important}
-}
-@media(max-width:820px){
-  :root{--dashboard-col-gap:18px;--dashboard-row-gap:18px}
-  #main-ui{padding:28px 14px 0!important}
-  #main-ui>header{margin-bottom:16px!important}
-  #main-ui .owner-footer-strip{margin-top:10px!important}
-}
-@media(max-width:520px){
-  #main-ui{padding-left:10px!important;padding-right:10px!important}
-  #main-ui #apps-grid{
-    grid-template-columns:var(--dashboard-card-w)!important;
-    justify-content:center!important;
-  }
-}
-</style>
 </head>
 <body>
-    <script src="./openai-engine.js" defer data-openai-engine="true"></script>
-    <script src="./top-ai-center.js" defer data-top-ai-center="true"></script>
-
 
     <div id="toast-container"></div>
-
 
     <div id="role-selector-screen">
         <div class="login-container">
             <img src="https://upload.wikimedia.org/wikipedia/ar/1/17/Saudi_Ministry_of_Education_Logo_2025.png" class="w-32 mx-auto mb-6">
-            <h2 class="text-3xl font-extrabold mb-2 text-white">بوابة إدارة المدارس الأهلية والخاصة</h2>
-            <p class="text-slate-400 text-xs mb-8">دخول مدير النظام إلى مشروع المدارس الأهلية والخاصة المستقل</p>
+            <h2 class="text-3xl font-extrabold mb-2 text-white">بوابة التحكم المركزي</h2>
+            <p class="text-slate-400 text-xs mb-8">تسجيل الدخول للمنظمة التعليمية</p>
             
-            <form id="system-admin-login-form" class="mb-3 space-y-3 max-w-sm mx-auto" onsubmit="event.preventDefault(); handlePrivateSystemAdminEntry();" autocomplete="off">
-                <input type="email" id="system-admin-email" name="private_system_admin_email" autocomplete="off" autocapitalize="off" spellcheck="false" value="" placeholder="البريد الإلكتروني لمدير النظام" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white text-center outline-none focus:border-teal-400" dir="ltr" data-email-field="true" data-lpignore="true" data-1p-ignore="true">
-                <input type="password" id="system-admin-password" name="private_system_admin_password" autocomplete="new-password" value="" placeholder="كلمة مرور مدير النظام" required class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white text-center outline-none focus:border-teal-400" data-lpignore="true" data-1p-ignore="true">
-            </form>
+            <div class="mb-8 space-y-3 max-w-sm mx-auto">
+                <input type="text" id="user-display-name" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" placeholder="اسم المستخدم" 
+                       class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white text-center outline-none focus:border-teal-400">
+                
+                <div class="flex items-center justify-between px-2">
+                    <button onclick="openSchoolRequestModal()" class="action-btn text-xs text-slate-300">مدرسة جديدة</button>
+                    <button id="mainLoginBtn" onclick="handleAdminDirectEntry()" class="action-btn bg-teal-600 text-white border-none shadow-lg">دخول</button>
+                </div>
 
-            
-<script id="system-admin-empty-login-fields">
-(function(){
-  'use strict';
-  function clearAdminLoginFields(){
-    const email=document.getElementById('system-admin-email');
-    const password=document.getElementById('system-admin-password');
-    if(email) email.value='';
-    if(password) password.value='';
-  }
-  document.addEventListener('DOMContentLoaded',()=>{
-    clearAdminLoginFields();
-    requestAnimationFrame(clearAdminLoginFields);
-    setTimeout(clearAdminLoginFields,80);
-    setTimeout(clearAdminLoginFields,350);
-  });
-  window.addEventListener('pageshow',clearAdminLoginFields);
-})();
-</script>
-<p class="admin-edition-hint">أدخل بيانات مدير النظام ثم ادخل إلى نظام المدارس الأهلية والخاصة</p>
-            <div class="admin-edition-actions standalone-private-entry" aria-label="دخول نظام المدارس الأهلية والخاصة">
-                <button type="button" class="admin-edition-card admin-edition-private standalone-private-login" onclick="handlePrivateSystemAdminEntry()">
-                    <span class="admin-edition-icon" aria-hidden="true">🏢</span>
-                    <span class="admin-edition-title">دخول نظام المدارس الأهلية والخاصة</span>
-                    <span class="admin-edition-subtitle">مشروع مستقل — إدارة المدارس والملاك والأقسام</span>
-                </button>
+                <input type="email" id="user-madrasati-email" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" placeholder="بريد منصة مدرستي" 
+                       class="w-full p-3 rounded-xl bg-white/10 border border-white/20 text-white text-center outline-none focus:border-teal-400">
             </div>
-            <p id="system-admin-login-msg" class="admin-edition-status" aria-live="polite"></p>
 
-            <!-- بوابة مدير النظام للمشروع الخاص المستقل. إنشاء المدارس وإدارة الملاك تتم من قسم إدارة المدارس بعد الدخول. -->
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="handleRoleSelection('leadership')" class="role-btn rounded-2xl flex flex-col items-center">🏛️<br><span class="text-[10px] font-bold text-white">قسم مدير النظام</span></button>
+                <button onclick="handleRoleSelection('agency')" class="role-btn rounded-2xl flex flex-col items-center">📑<br><span class="text-[10px] font-bold text-white">قسم الوكيل/ة</span></button>
+                <button onclick="handleRoleSelection('performance')" class="role-btn rounded-2xl flex flex-col items-center">👨‍🏫<br><span class="text-[10px] font-bold text-white">قسم المعلم/ة</span></button>
+            </div>
+            <div class="mt-4 max-w-sm mx-auto">
+                <a href="private-entry.html" class="block w-full text-center px-4 py-3 rounded-2xl bg-white/10 border border-teal-400/40 text-teal-200 font-bold text-xs hover:bg-white/15 transition">🏫 إصدار المدارس الأهلية والخاصة</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة طلب تسجيل جديد مرتبطة برابط المدرسة وبنفس خانات قالب Excel -->
+    <div id="registration-modal" class="modal">
+        <div class="modal-content max-w-xl text-right">
+            <h3 class="text-xl font-bold mb-2">طلب تسجيل حساب جديد</h3>
+            <p class="text-xs text-slate-500 mb-4">هذا النموذج مرتبط برابط المدرسة، وسيظهر الطلب في حسابات المستخدمين بحالة معلّق حتى تفعيل المدير/ة.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input type="text" id="reg-name" class="w-full p-3 border rounded-xl text-sm" placeholder="الاسم">
+                <input type="email" id="reg-email" class="w-full p-3 border rounded-xl text-sm" placeholder="بريد منصة مدرستي">
+                <input type="password" id="reg-password" class="w-full p-3 border rounded-xl text-sm" placeholder="الرقم السري">
+                <select id="reg-role" class="w-full p-3 border rounded-xl text-sm">
+                    <option value="performance">معلم/ة</option>
+                    <option value="agency">وكيل/ة مدرسة</option>
+                    <option value="leadership">مدير النظام</option>
+                </select>
+                <input type="tel" id="reg-phone" class="w-full p-3 border rounded-xl text-sm" placeholder="الجوال">
+                <input type="text" id="reg-national-id" class="w-full p-3 border rounded-xl text-sm" placeholder="الهوية">
+                <input type="text" id="reg-school-name" class="w-full p-3 border rounded-xl text-sm" placeholder="اسم المدرسة">
+                <input type="text" id="reg-school-id" class="w-full p-3 border rounded-xl text-sm" placeholder="معرف المدرسة">
+            </div>
+            <div class="space-y-3 mt-4">
+                <button onclick="submitRegistrationRequest()" class="w-full bg-teal-700 text-white py-3 rounded-xl font-bold shadow-lg">إرسال الطلب لتفعيل الحساب</button>
+                <button onclick="closeModal('registration-modal')" class="w-full text-slate-400 text-xs text-center mt-2">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- نافذة طلب مدرسة جديدة / مدير مدرسة مستقل -->
+    <div id="school-request-modal" class="modal">
+        <div class="modal-content max-w-xl text-right">
+            <h3 class="text-xl font-bold mb-2">طلب إنشاء مدرسة جديدة</h3>
+            <p class="text-xs text-slate-500 mb-4">هذا الطلب ينشئ مدير مدرسة مستقل بحالة معلّق حتى يعتمده مدير النظام. بعد التفعيل يرتبط المدير بمدرسته ويُستخدم رابط التسجيل الداخلي لإضافة مستخدمي المدرسة.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input type="text" id="school-req-school-name" class="w-full p-3 border rounded-xl text-sm" placeholder="اسم المدرسة">
+                <input type="text" id="school-req-manager-name" class="w-full p-3 border rounded-xl text-sm" placeholder="اسم المدير">
+                <input type="email" id="school-req-email" class="w-full p-3 border rounded-xl text-sm" placeholder="بريد منصة مدرستي للمدير">
+                <input type="password" id="school-req-password" class="w-full p-3 border rounded-xl text-sm" placeholder="الرقم السري الأولي">
+            </div>
+            <div class="mt-4 p-3 rounded-xl bg-amber-50 border border-amber-100 text-xs text-amber-800 leading-6">
+                عند اعتماد مدير النظام لهذا الطلب سيتم إنشاء معرف مدرسة مستقل وربط المدير بها، ثم يستخدم المدير رابط التسجيل الداخلي لإضافة الوكلاء والمعلمين.
+            </div>
+            <div class="space-y-3 mt-4">
+                <button onclick="submitSchoolRequest()" class="w-full bg-teal-700 text-white py-3 rounded-xl font-bold shadow-lg">إرسال طلب المدرسة للاعتماد</button>
+                <button onclick="closeModal('school-request-modal')" class="w-full text-slate-400 text-xs text-center mt-2">إلغاء</button>
+            </div>
         </div>
     </div>
 
@@ -1005,7 +423,7 @@ html,body{
         <div class="bg-white/5 p-12 rounded-[3rem] border border-white/10 backdrop-blur-xl">
             <span class="text-7xl mb-6 block animate-bounce">⏳</span>
             <h2 class="text-2xl font-bold text-white mb-2">بانتظار تفعيل الحساب</h2>
-            <p class="text-slate-400 text-sm">طلبك قيد المراجعة سحابياً من قبل مدير/ة النظام.</p>
+            <p class="text-slate-400 text-sm">طلبك قيد المراجعة سحابياً من قبل مدير النظام.</p>
             <button onclick="location.reload()" class="mt-8 bg-teal-600 px-6 py-2 rounded-full text-xs font-bold text-white shadow-lg">تحديث الحالة</button>
         </div>
     </div>
@@ -1013,12 +431,12 @@ html,body{
     <!-- الواجهة الرئيسية -->
     <div id="main-ui" class="flex-grow flex flex-col justify-center p-4 md:p-8 opacity-0 pointer-events-none transition-opacity duration-700 relative">
         <div class="exit-app-btn" onclick="logout()">🚪 خروج</div>
-        <div id="active-role-badge" class="global-admin-badge">مدير النظام</div>
+        <div id="active-role-badge" class="global-admin-badge">تحميل...</div>
         
         <header class="text-center mb-6">
             <img src="https://upload.wikimedia.org/wikipedia/ar/1/17/Saudi_Ministry_of_Education_Logo_2025.png" class="w-32 mx-auto mb-4 drop-shadow-2xl">
-            <h1 class="text-3xl md:text-4xl font-black text-white drop-shadow-md">نظام إدارة المدارس الذكي</h1>
-            <p class="text-teal-300 text-xs mt-2 font-bold">منصة متكاملة لإدارة المدارس بكفاءة وفعالية</p>
+            <h1 class="text-3xl md:text-4xl font-black text-white drop-shadow-md">منصة المدرسة الرقمية الذكية</h1>
+            <p class="text-teal-300 text-xs mt-2 font-bold">النظام السحابي نشط ✅</p>
         </header>
 
         <!-- جرس التنبيهات -->
@@ -1036,20 +454,6 @@ html,body{
         </div>
 
         <div id="apps-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto w-full px-4"></div>
-        <div id="owner-footer-strip" class="owner-footer-strip" aria-label="اختصارات منصة المالك">
-            <div class="owner-footer-item"><span class="owner-footer-icon">👤</span><span><strong>سهولة الاستخدام</strong><small>واجهة بسيطة وفعالة</small></span></div>
-            <div class="owner-footer-sep"></div>
-            <div class="owner-footer-item"><span class="owner-footer-icon">🧩</span><span><strong>تكامل شامل</strong><small>ربط جميع الأقسام</small></span></div>
-            <div class="owner-footer-sep"></div>
-            <div class="owner-footer-item"><span class="owner-footer-icon">📈</span><span><strong>تقارير ذكية</strong><small>تحليلات دقيقة</small></span></div>
-            <div class="owner-footer-sep"></div>
-            <div class="owner-footer-item"><span class="owner-footer-icon">🛡️</span><span><strong>أمان عالي</strong><small>حماية بيانات متقدمة</small></span></div>
-            <div class="owner-footer-sep"></div>
-            <button type="button" class="owner-footer-item owner-knowledge-entry" onclick="openKnowledgeBase()" title="فتح القاعدة المعرفية">
-              <span class="owner-footer-icon">📚</span>
-              <span><strong>القاعدة المعرفية</strong><small>الأدلة التنظيمية والإجرائية</small></span>
-            </button>
-        </div>
     </div>
 
     <!-- حاويات التطبيقات -->
@@ -1060,8 +464,6 @@ html,body{
                 <button onclick="showRoleList('leadership')" class="bg-teal-700 text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-teal-600 whitespace-nowrap">🏛️ المدير/ة</button>
                 <button onclick="showRoleList('agency')" class="bg-teal-700 text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-teal-600 whitespace-nowrap">📑 الوكلاء/الوكيلات</button>
                 <button onclick="showRoleList('performance')" class="bg-teal-700 text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-teal-600 whitespace-nowrap">👨‍🏫 المعلمين/المعلمات</button>
-                <button onclick="showRoleList('student_advisor')" class="bg-teal-700 text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-teal-600 whitespace-nowrap">🧭 الموجه/الموجهة الطلابية</button>
-                <button onclick="showRoleList('activity_leader')" class="bg-teal-700 text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-teal-600 whitespace-nowrap">🏃 رواد/رائدات النشاط</button>
                 <button onclick="showUserManagement()" class="bg-slate-700 text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-slate-600 whitespace-nowrap">👥 المستخدمين والصلاحيات</button>
                 <button onclick="copyRegLinkForUsers()" class="bg-blue-700 text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-blue-600 whitespace-nowrap">🔗 إرسال رابط التسجيل</button>
                 <button onclick="showSendNotifModal()" class="bg-yellow-600 text-white px-3 py-1 rounded-lg text-[10px] font-bold hover:bg-yellow-500 whitespace-nowrap">🔔 إرسال تنبيه</button>
@@ -1096,6 +498,7 @@ html,body{
     <div id="viewport-monitoring" class="app-iframe-container">
         <div class="bg-slate-900 p-2 flex items-center justify-between border-b border-teal-500">
             <span class="text-teal-400 font-bold text-xs">👁️ متابعة: <span id="monitored-user-name"></span></span>
+            <button onclick="closeApp()" class="bg-red-600 text-white px-4 py-1 rounded-lg text-[10px] font-bold">إغلاق المتابعة ✖️</button>
         </div>
         <iframe id="frame-monitoring"></iframe>
     </div>
@@ -1104,10 +507,54 @@ html,body{
 
     
 
+<!-- إدارة المدارس المستقلة - Supabase -->
+<div id="school-management-modal" class="modal">
+  <div class="modal-content max-w-6xl text-right">
+    <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-5">
+      <div>
+        <h3 class="text-xl font-extrabold text-slate-800">🏫 إدارة المدارس المستقلة</h3>
+        <p class="text-[11px] text-slate-500 font-bold mt-1">إنشاء المدارس، حفظها في Supabase، توليد روابط التسجيل والدخول، وتعطيل أو حذف المدرسة عند الحاجة.</p>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="renderSchoolManagement()" class="bg-slate-100 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold">تحديث القائمة</button>
+        <button onclick="closeModal('school-management-modal')" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold">إغلاق</button>
+      </div>
+    </div>
 
-<!-- تم حذف نظام النظام المدرسي القديم القديم من المشروع الخاص المستقل. -->
+    <div class="bg-slate-50 border border-slate-200 rounded-3xl p-4 mb-5">
+      <h4 class="font-extrabold text-slate-700 mb-3">إنشاء / حفظ مدرسة</h4>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <input id="sm-school-name" class="p-3 border rounded-xl text-sm" placeholder="اسم المدرسة">
+        <input id="sm-manager-name" class="p-3 border rounded-xl text-sm" placeholder="اسم مدير المدرسة">
+        <input id="sm-manager-email" type="email" class="p-3 border rounded-xl text-sm" placeholder="بريد منصة مدرستي للمدير">
+        <input id="sm-manager-password" type="password" class="p-3 border rounded-xl text-sm" placeholder="الرقم السري الأولي">
+      </div>
+      <div class="flex flex-wrap gap-2 mt-4">
+        <button onclick="createSupabaseSchoolFromPanel()" class="bg-teal-700 text-white px-5 py-2 rounded-xl text-xs font-extrabold shadow">+ إنشاء/حفظ مدرسة</button>
+        <button onclick="fillSchoolPanelFromRequest()" class="bg-white border border-slate-200 text-slate-700 px-5 py-2 rounded-xl text-xs font-bold">تعبئة من نموذج مدرسة جديدة</button>
+      </div>
+      <div id="sm-status" class="text-[11px] font-bold mt-3 text-slate-500"></div>
+    </div>
 
-<!-- قاعة الاجتماعات - المرحلة الأولى -->
+    <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-slate-100 text-slate-700">
+          <tr>
+            <th class="p-3 text-right">المدرسة</th>
+            <th class="p-3 text-right">مدير المدرسة</th>
+            <th class="p-3 text-center">الحالة</th>
+            <th class="p-3 text-center">الروابط والإجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="schools-table-body">
+          <tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs">اضغط تحديث القائمة لعرض المدارس.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+    <!-- قاعة الاجتماعات - المرحلة الأولى -->
     <div id="meetings-room-modal" class="modal">
         <div class="modal-content max-w-6xl text-right">
             <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 mb-5">
@@ -1297,21 +744,17 @@ html,body{
             <div class="space-y-4">
                 <input type="hidden" id="edit-uid">
                 <input type="text" id="edit-name" class="w-full p-2 border rounded-lg text-sm" placeholder="الاسم">
-                <input type="email" id="edit-email" class="w-full p-2 border rounded-lg text-sm" placeholder="البريد الرسمي لحساب Microsoft Teams" dir="ltr" data-email-field="true">
-                <input type="text" id="edit-microsoft-user-id" class="w-full p-2 border rounded-lg text-sm" placeholder="Microsoft Object ID (اختياري)" dir="ltr" autocomplete="off">
+                <input type="email" id="edit-email" class="w-full p-2 border rounded-lg text-sm" placeholder="البريد">
                 <select id="edit-role" class="w-full p-2 border rounded-lg text-sm">
-                    <option value="performance">قسم المعلم/المعلمة/ة</option>
-                    <option value="agency">قسم الوكيل/الوكيلة/ة</option>
-                    <option value="leadership">قسم مدير/ة النظام</option>
-                    <option value="student_advisor">قسم الموجه/الموجهة الطلابية</option>
-                    <option value="activity_leader">قسم رائد/ة النشاط</option>
-                    <option value="administrative_employee">قسم الموظف/ة الإداري/ة</option>
+                    <option value="performance">قسم المعلم/ة</option>
+                    <option value="agency">قسم الوكيل/ة</option>
+                    <option value="leadership">قسم مدير النظام</option>
                 </select>
                 <select id="edit-active" class="w-full p-2 border rounded-lg text-sm">
                     <option value="true">مفعل / نشط</option>
                     <option value="false">غير مفعل / معلق</option>
                 </select>
-                <p class="text-[10px] text-slate-500 leading-relaxed">البريد المدخل هو البريد الرسمي لحساب Microsoft Teams، ويُستخدم لمطابقة الحضور تلقائيًا. ويمكن إضافة Microsoft Object ID لرفع دقة المطابقة عند تفعيل Microsoft Graph. يجب ألا يتكرر أي منهما داخل المدرسة.</p>
+                <p class="text-[10px] text-slate-500 leading-relaxed">يمكن من هنا إضافة المستخدم، تحديد صلاحية الدخول، ثم تفعيل الحساب أو تعليقه.</p>
                 <button id="saveUserBtn" onclick="saveUserEdit()" class="w-full bg-teal-700 text-white py-2 rounded-lg font-bold shadow-lg">حفظ المستخدم والصلاحيات</button>
                 <button onclick="closeModal('edit-user-modal')" class="text-slate-400 text-xs text-center mt-2">إلغاء</button>
             </div>
@@ -1368,7 +811,7 @@ html,body{
                 <button onclick="closeModal('role-list-modal')" class="text-slate-400 font-bold">إغلاق</button>
             </div>
             <div class="mb-4 rounded-2xl bg-teal-50 border border-teal-100 p-3 text-[11px] text-teal-900 font-bold leading-relaxed">
-                زر المتابعة يسمح للمسؤول بتفقد سير الأعمال داخل حساب المستخدم. يتم حجب قسم تقارير الأداء الوظيفي، ويكون أرشيف مجالات الأداء الوظيفي للمعاينة فقط دون تعديل.
+                زر المتابعة يسمح للمسؤول بتفقد سير الأعمال داخل حساب المستخدم. يتم حجب قسم تقرير جديد، ويكون الأرشيف الذكي للمعاينة فقط دون تعديل.
             </div>
             <div id="role-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
         </div>
@@ -1444,7 +887,7 @@ html,body{
 
 
 <style id="ss-cloud-storage-style">
-  .ss-cloud-toolbar{display:none!important;position:fixed;top:12px;inset-inline-start:12px;z-index:2147483000;font-family:'Cairo',Arial,sans-serif;direction:rtl}
+  .ss-cloud-toolbar{position:fixed;top:12px;inset-inline-start:12px;z-index:2147483000;font-family:'Cairo',Arial,sans-serif;direction:rtl}
   .ss-cloud-wrap{position:relative;display:inline-block}
   .ss-cloud-btn{background:linear-gradient(135deg,#0f766e,#1e7b78);color:#fff;border:0;border-radius:999px;padding:10px 16px;font-weight:800;box-shadow:0 10px 28px rgba(15,118,110,.28);cursor:pointer;font-size:13px;line-height:1;white-space:nowrap}
   .ss-cloud-btn:hover{filter:brightness(1.05)}
@@ -1467,12 +910,16 @@ html,body{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-bridge.js"></script>
-<script src="index-app.js?v=20260819-system-admin-admin-employee1"></script>
+<script src="index-app.js"></script>
+
+<!-- SMART_SCHOOL_AI_WIDGET_V2_START -->
+<script src="smart-ai-widget.js"></script>
+<!-- SMART_SCHOOL_AI_WIDGET_V2_END -->
 <script>
 
 /* ===== V24: Teams Meeting AI مرتبط بزر تعبئة محضر الاجتماعات ===== */
-const MEETING_ASK_AI_URL = "https://okjwdzvnqsdetxdsvdgr.supabase.co/functions/v1/ASK-AI";
-const MEETING_SUPABASE_ANON_KEY = "sb_publishable_rpHL2MOBqlgOU9eNHPOWiw_RW_mhrMx";
+const MEETING_ASK_AI_URL = "https://mfzsgaqxvxusayoribfo.supabase.co/functions/v1/ASK-AI";
+const MEETING_SUPABASE_ANON_KEY = "sb_publishable_wrqnWejHyIhaYnMusFfDQQ_6NBvAK9N";
 
 function ensureMeetingAIModal(){
   if(document.getElementById("meetingTeamsAIModal")) return;
@@ -1571,7 +1018,7 @@ function meetingMinutesPrompt(){
   const date=(document.getElementById("meetingAIDate")||{}).value||"";
   const text=(document.getElementById("meetingAIText")||{}).value||"";
   const participants=parseMeetingParticipants(text);
-  return `أنت Teams Meeting AI داخل منصة الإدارة المدرسية الذكية.
+  return `أنت Teams Meeting AI داخل منصة القيادة المدرسية الذكية.
 المطلوب: تحليل اجتماع Teams وتوليد محضر اجتماع رسمي جاهز للتعبئة داخل نموذج محضر الاجتماعات.
 
 عنوان الاجتماع: ${title}
@@ -1748,7 +1195,7 @@ document.addEventListener("click", function(e){
 <script id="V39_GITHUB_PAGES_WAKIL_FIX">
 (function(){
   function fixWakilPaths(){
-    const correctPath = "./wakil-records.html";
+    const correctPath = "./records/wakil/wakil-records.html";
 
     document.querySelectorAll("iframe").forEach(frame=>{
       const src = frame.getAttribute("src") || "";
@@ -1776,52 +1223,6 @@ document.addEventListener("click", function(e){
   setTimeout(fixWakilPaths, 2500);
 })();
 </script>
-
-<script id="V_RETURN_TO_AGENCY_HOME_FIX">
-(function(){
-  function openAgencyHome(){
-    try{
-      var main=document.getElementById('main-ui');
-      if(main) main.style.display='none';
-      document.querySelectorAll('.app-iframe-container').forEach(function(v){ v.classList.remove('active'); });
-      var viewport=document.getElementById('viewport-agency');
-      if(viewport) viewport.classList.add('active');
-      var frame=document.getElementById('frame-agency');
-      if(frame){
-        var src=frame.getAttribute('src')||'';
-        if(!src.includes('agent.html')) frame.setAttribute('src','agent.html?role=agency&return=1');
-        else frame.setAttribute('src','agent.html?role=agency&return=1&_r=' + Date.now());
-      }
-      var back=document.getElementById('backBtn');
-      if(back) back.classList.add('visible');
-      try{ sessionStorage.setItem('smartSchool:activeSection','agency'); }catch(e){}
-      try{ localStorage.setItem('smart_school_active_role','agency'); }catch(e){}
-      return true;
-    }catch(e){ console.warn('تعذر فتح قسم الوكيل', e); return false; }
-  }
-  window.smartSchoolOpenAgencyHome=openAgencyHome;
-  window.addEventListener('message',function(ev){
-    var data=ev && ev.data;
-    if(!data || data.type!=='smartSchool:navigate') return;
-    if(data.role==='agency' || data.target==='agent.html'){ openAgencyHome(); }
-  });
-})();
-</script>
-
-<!-- تم حذف محرك النظام المدرسي القديم القديم بالكامل؛ إدارة المدارس الجديدة تتم من private-system-admin.html بعد ربط Supabase المستقل. -->
-<script id="owner-knowledge-base-entry-v1">
-function openKnowledgeBase(){
-  try{
-    sessionStorage.setItem('system_admin_context','1');
-    sessionStorage.setItem('system_admin_verified','true');
-  }catch(e){}
-  window.location.href='knowledge_base.html?systemAdmin=1&returnHome=index.html%3FsystemAdminReturn%3D1';
-}
-</script>
-<script src="platform-page-navigation.js?v=20260818-nav1"></script>
-
-<!-- PRIVATE_EDITION_BUILD_RUNTIME -->
-<script src="private-school-runtime.js"></script>
 
 </body>
 </html>
