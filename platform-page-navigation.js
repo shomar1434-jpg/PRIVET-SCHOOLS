@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-if(window.__PLATFORM_PAGE_NAVIGATION_V1__) return;
-window.__PLATFORM_PAGE_NAVIGATION_V1__=true;
+if(window.__PLATFORM_PAGE_NAVIGATION_V2__) return;
+window.__PLATFORM_PAGE_NAVIGATION_V2__=true;
 
 const ROOT_PAGES=new Set([
   'index.html','manager.html','agent.html','student_advisor.html','health_advisor.html',
@@ -46,18 +46,31 @@ function cleanInternalHomeExit(){
   const c=document.getElementById('uwHeaderActionsCluster');
   if(c&&!c.children.length)c.remove();
 }
-function hasBack(){
-  const els=[...document.querySelectorAll('a,button,[role="button"]')];
-  return els.some(el=>{
-    if(el.id==='platformContextBackBtn') return true;
-    const t=norm(el);
-    if(/(^|\s)(رجوع|عودة|العودة)(\s|$)/.test(t)&&!/(الرئيسية|القائمة|تسجيل الدخول|الخروج)/.test(t)) return true;
-    const oc=String(el.getAttribute?.('onclick')||'');
-    return /history\.(back|go\s*\(\s*-1)/.test(oc);
-  });
+function isNativeBack(el){
+  if(!el||el.id==='platformContextBackBtn') return false;
+  const text=norm(el);
+  const idClass=`${el.id||''} ${el.className||''} ${el.getAttribute?.('data-action')||''} ${el.getAttribute?.('data-nav')||''}`.toLowerCase();
+  const onclick=String(el.getAttribute?.('onclick')||'').toLowerCase();
+  const href=String(el.getAttribute?.('href')||'').toLowerCase();
+  const title=String(el.getAttribute?.('title')||el.getAttribute?.('aria-label')||'').trim();
+  // نصوص الرجوع الشائعة في الصفحات الأصلية، بما فيها "العودة لقسم ...".
+  if(/(^|\s|[←↩⬅🔙])(رجوع|عودة|العودة)(\s|$|إلى|الى|للقسم|لقسم|للصفحة|لصفحة)/.test(text)) return true;
+  if(/(العودة|عودة|رجوع)/.test(title)) return true;
+  // معرفات/كلاسات دلالية شائعة، مع استبعاد الكلمات التي لا تعني تنقلاً.
+  if(/(^|[\s_-])(back|return|go-back|back-btn|return-btn)([\s_-]|$)/.test(idClass)) return true;
+  // أزرار تعتمد history مباشرة.
+  if(/history\.(back|go\s*\(\s*-1)/.test(onclick)||/javascript:\s*history\.(back|go\s*\(\s*-1)/.test(href)) return true;
+  return false;
 }
-function addBack(){
-  if(isRootPage()||hasBack()||document.getElementById('platformContextBackBtn')) return;
+function nativeBackControls(){
+  return [...document.querySelectorAll('a,button,[role="button"]')].filter(isNativeBack);
+}
+function reconcileBack(){
+  const injected=document.getElementById('platformContextBackBtn');
+  const native=nativeBackControls();
+  // القاعدة الصارمة: إذا كانت الصفحة تملك زرها الأصلي، لا نحتفظ بأي زر محقون.
+  if(native.length){if(injected) injected.remove();return}
+  if(isRootPage()||injected) return;
   const b=document.createElement('button');
   b.id='platformContextBackBtn';b.type='button';b.className='platform-context-back';
   b.innerHTML='<span aria-hidden="true">←</span><span>رجوع</span>';
@@ -77,7 +90,11 @@ function style(){
   s.textContent=`.platform-context-back{position:fixed;top:14px;left:16px;z-index:2147482500;display:inline-flex;align-items:center;gap:7px;border:1px solid #d7e5e4;border-radius:13px;padding:9px 13px;background:#f5f8fa;color:#334155;font:800 12px Tajawal,Cairo,Tahoma,Arial,sans-serif;box-shadow:0 5px 18px rgba(15,23,42,.08);cursor:pointer}.platform-context-back:hover{background:#eaf4f2;color:#0f766e}.platform-context-back span:first-child{font-size:17px;line-height:1}@media(max-width:700px){.platform-context-back{top:10px;left:10px;padding:8px 10px}.platform-context-back span:last-child{display:none}}@media print{.platform-context-back{display:none!important}}`;
   document.head.appendChild(s);
 }
-function apply(){style();cleanInternalHomeExit();addBack()}
+function apply(){style();cleanInternalHomeExit();reconcileBack()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
-let queued=false;new MutationObserver(()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;cleanInternalHomeExit();addBack()})}).observe(document.documentElement,{childList:true,subtree:true});
+let queued=false;
+new MutationObserver(()=>{
+  if(queued)return;queued=true;
+  requestAnimationFrame(()=>{queued=false;cleanInternalHomeExit();reconcileBack()});
+}).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['id','class','title','aria-label','onclick','href']});
 })();
