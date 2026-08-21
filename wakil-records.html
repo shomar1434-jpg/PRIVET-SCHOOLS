@@ -1374,7 +1374,7 @@ function readJsonSafe(key,fallback){try{return JSON.parse(localStorage.getItem(k
 function normalizeAgencyList(v){
   var valid=['educational','school_affairs','student_affairs'];
   var aliases={
-    'educational':'educational','school_affairs':'school_affairs','student_affairs':'student_affairs',
+    'educational':'educational','educational_affairs':'educational','school_affairs':'school_affairs','student_affairs':'student_affairs',
     'deputy_academic':'educational','agent_educational':'educational','وكيل الشؤون التعليمية':'educational','وكيل/وكيلة الشؤون التعليمية':'educational','وكيل شؤون تعليمية':'educational',
     'deputy_admin':'school_affairs','agent_school_affairs':'school_affairs','وكيل الشؤون المدرسية':'school_affairs','وكيل/وكيلة الشؤون المدرسية':'school_affairs','وكيل شؤون مدرسية':'school_affairs',
     'deputy_students':'student_affairs','agent_student_affairs':'student_affairs','وكيل شؤون الطلاب':'student_affairs','وكيل/وكيلة شؤون الطلاب':'student_affairs','وكيل الشؤون الطلابية':'student_affairs'
@@ -1394,7 +1394,7 @@ function currentWakilUser(){
 }
 function currentWakilAgencies(){
   var u=currentWakilUser();
-  var candidates=[u.agent_categories,u.agency_categories,u.agency_types,u.agency_type,u.agencyType,u.vice_agency_type,u.viceAgencyType,u.role,u.dbRole,u.roleLabel,u.role_label]; var list=[]; for(var ci=0;ci<candidates.length&&!list.length;ci++) list=normalizeAgencyList(candidates[ci]);
+  var candidates=[u.roleVariant,u.role_variant,u.agent_categories,u.agency_categories,u.agency_types,u.agency_type,u.agencyType,u.vice_agency_type,u.viceAgencyType,u.role,u.dbRole,u.roleLabel,u.role_label]; var list=[]; for(var ci=0;ci<candidates.length&&!list.length;ci++) list=normalizeAgencyList(candidates[ci]);
   if(!list.length){
     var sid=u.schoolId||localStorage.getItem('current_school_id')||localStorage.getItem('school_id')||'default';
     var map=readJsonSafe('smartSchoolUnifiedOpsV2_vp_agency_map_'+sid,{});

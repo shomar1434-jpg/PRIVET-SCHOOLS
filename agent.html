@@ -3022,7 +3022,7 @@ async function loadWakilRecordsInline() {
 }
 
 
-function openAgentRecordsView(){ window.location.href='wakil-records.html?return_to=agent.html';
+function openAgentRecordsView(){ window.location.href=(window.PrivateAgentScope?window.PrivateAgentScope.recordsUrl():'wakil-records.html?return_to=agent.html');
 }
 
 function closeAgentRecordsView() {
@@ -5614,6 +5614,15 @@ IGZpeFdha2lsUGF0aHMpOwoKICBzZXRUaW1lb3V0KGZpeFdha2lsUGF0aHMsIDMwMCk7CiAgc2V0VGlt
 dGhzLCAxMDAwKTsKICBzZXRUaW1lb3V0KGZpeFdha2lsUGF0aHMsIDI1MDApOwp9KSgpOwo8L3NjcmlwdD4KCjwvYm9keT48L2h0
 bWw+
 </script>
+<script id="PRIVATE_AGENT_ROLE_VARIANT_SCOPE">
+(function(){
+  function readCtx(){try{return JSON.parse(sessionStorage.getItem('smart_school_private_session_v1')||'null')||JSON.parse(localStorage.getItem('smart_school_current_session')||'null')}catch(e){return null}}
+  function norm(v){v=String(v||'').trim();var m={educational_affairs:'educational',educational:'educational',school_affairs:'school_affairs',student_affairs:'student_affairs',deputy_academic:'educational',deputy_admin:'school_affairs',deputy_students:'student_affairs'};return m[v]||''}
+  function category(){var c=readCtx()||{};return norm(c.roleVariant||c.role_variant||c.agency_type||c.agencyType||'')}
+  function isPrivate(){var c=readCtx()||{};return c.schoolEdition==='private'||c.privateSchool===true||localStorage.getItem('smart_school_private_edition')==='private'}
+  window.PrivateAgentScope={category:category,allowed:function(cat){if(!isPrivate())return true;var a=category();if(!a)return cat==='shared';return cat==='shared'||cat===a;},recordsUrl:function(){var a=category();return 'wakil-records.html?return_to=agent.html'+(a?'&agency_type='+encodeURIComponent(a):'')}};
+})();
+</script>
 <script id="RECORDS_ARCHIVE_ENGINE">
 (function(){
   if(window.__RECORDS_ARCHIVE_ENGINE__) return;
@@ -5719,7 +5728,7 @@ bWw+
     });
 
     c.innerHTML = WAKIL_RECORD_CATEGORY_ORDER.map(function(cat){
-      const group = RECORD_FOLDERS.filter(function(f){ return (f.category || 'shared') === cat; });
+      const group = RECORD_FOLDERS.filter(function(f){ return (f.category || 'shared') === cat && (!window.PrivateAgentScope || window.PrivateAgentScope.allowed(f.category || 'shared')); });
       if(!group.length) return '';
       return '<section class="mb-8">'
         + '<div class="mb-4 bg-white/80 border border-emerald-100 rounded-[24px] p-4 flex items-center justify-between">'
@@ -5750,6 +5759,7 @@ bWw+
     if(!c) return;
 
     const folder = folderById(folderId);
+    if(window.PrivateAgentScope && !window.PrivateAgentScope.allowed(folder.category || 'shared')){alert('هذا السجل خارج نطاق الوكالة المحددة لهذا الحساب.');renderRecordsArchiveFolders();return;}
     const rows = getArchive().filter(function(r){
       return r.folderId === folderId || r.formId === folderId || r.category === folderId || r.folderName === folder.name;
     });

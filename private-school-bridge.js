@@ -25,6 +25,7 @@
     sessionStorage.removeItem(C.schoolListStorageKey);
     sessionStorage.removeItem('smart_school_private_session_v1');
     sessionStorage.removeItem('smart_school_private_schools_v1');
+    sessionStorage.removeItem('smart_school_private_memberships_v1');
     for(const k of LEGACY_KEYS){
       try{ localStorage.removeItem(k); }catch(_){}
       try{ sessionStorage.removeItem('private-owned:'+k); sessionStorage.removeItem('private-backup:'+k); sessionStorage.removeItem('private-backup:'+k+':exists'); }catch(_){}
@@ -62,7 +63,8 @@
       writeLegacy('smart_school_teacher_extra_roles_map',roleMap);
       writeLegacy('smartSchoolCloudStorage_teacher_extra_roles_map',roleMap);
     }
-    writeLegacy('smart_school_current_session',{id:ctx.userId,name:ctx.userName,email:ctx.userEmail,role:appRole,dbRole:ctx.role,schoolId:ctx.schoolId,schoolName:ctx.schoolName,schoolCode:ctx.schoolCode,schoolEdition:'private',privateSchool:true,loginMode:'private-auth',accessGrants:Array.isArray(ctx.accessGrants)?ctx.accessGrants:[],availableRoles:Array.isArray(ctx.availableRoles)?ctx.availableRoles:[],supervisorUserId:ctx.supervisorUserId||'',supervisorRole:ctx.supervisorRole||'',authenticatedAt:ctx.authenticatedAt});
+    const agentVariant=String(ctx.roleVariant||ctx.role_variant||'').trim(); const agentCategory=agentVariant==='educational_affairs'?'educational':agentVariant;
+    writeLegacy('smart_school_current_session',{id:ctx.userId,name:ctx.userName,email:ctx.userEmail,role:appRole,dbRole:ctx.role,schoolId:ctx.schoolId,schoolName:ctx.schoolName,schoolCode:ctx.schoolCode,schoolEdition:'private',privateSchool:true,loginMode:'private-auth',accessGrants:Array.isArray(ctx.accessGrants)?ctx.accessGrants:[],availableRoles:Array.isArray(ctx.availableRoles)?ctx.availableRoles:[],roleVariant:agentCategory,role_variant:agentCategory,agency_type:ctx.role==='agent'?agentCategory:'',agencyType:ctx.role==='agent'?agentCategory:'',agent_categories:ctx.role==='agent'&&agentCategory?[agentCategory]:[],agency_categories:ctx.role==='agent'&&agentCategory?[agentCategory]:[],supervisorUserId:ctx.supervisorUserId||'',supervisorRole:ctx.supervisorRole||'',membershipId:ctx.membershipId||'',authenticatedAt:ctx.authenticatedAt});
   }
   async function ensureSession(){
     const sb=getClient();
@@ -93,7 +95,8 @@
     sessionStorage.setItem(C.schoolListStorageKey,JSON.stringify(data.schools||[]));
     sessionStorage.setItem('smart_school_private_session_v1',JSON.stringify(ctx));
     sessionStorage.setItem('smart_school_private_schools_v1',JSON.stringify(data.schools||[]));
-    applyCompatibility(ctx); return data;
+    sessionStorage.setItem('smart_school_private_memberships_v1',JSON.stringify(data.memberships||[]));
+    applyCompatibility(ctx); try{window.dispatchEvent(new CustomEvent('private-school-session-established',{detail:data}))}catch(_){} return data;
   }
   function clearSystemAdminMarkers(){
     try{['system_admin_context','system_admin_verified','system_admin_edition','private_system_admin_entry','private_admin_handoff_pending'].forEach(k=>sessionStorage.removeItem(k));}catch(_){}
@@ -139,11 +142,10 @@
   async function template(payload={}){const ctx=await requireContext();return invoke('private-school-template',{schoolId:ctx.schoolId,...payload})}
   async function outputs(action,payload={}){const ctx=await requireContext();return invoke('private-school-outputs',{action,schoolId:ctx.schoolId,...payload})}
   async function selfEvaluationOutput(action='snapshot',payload={}){const ctx=await requireContext(['owner','manager']);return invoke('private-school-self-evaluation-output',{action,schoolId:ctx.schoolId,...payload})}
-  async function userProfile(action='get',payload={}){const ctx=await requireContext();return invoke('private-user-report-profile',{action,schoolId:ctx.schoolId,actorRole:ctx.role,...payload})}
   async function registrationLink(){const ctx=await requireContext(['manager']);return invoke('private-school-registration-link',{schoolId:ctx.schoolId})}
   async function inspectSchoolRegistration(token){return invoke('private-school-registration',{action:'inspect',token:clean(token)},{allowAnonymous:true})}
-  async function registerSchoolUser(payload){return invoke('private-school-registration',{action:'register',token:clean(payload.token),email:clean(payload.email),fullName:clean(payload.fullName),password:String(payload.password||''),role:clean(payload.role),roleVariant:clean(payload.roleVariant)},{allowAnonymous:true})}
+  async function registerSchoolUser(payload){return invoke('private-school-registration',{action:'register',token:clean(payload.token),email:clean(payload.email),fullName:clean(payload.fullName),password:String(payload.password||''),role:clean(payload.role)},{allowAnonymous:true})}
   async function provisionPrivateSchool(payload={}){return invoke('private-school-provisioning',{action:'create',...payload})}
   async function privateSchoolOverview(schoolId){const d=await invoke('private-school-provisioning',{action:'overview',schoolId:clean(schoolId)});if(d&&!d.ownerLoginPath&&d.ownerLoginUrl)d.ownerLoginPath=d.ownerLoginUrl;if(d&&!d.ownerLoginUrl&&d.ownerLoginPath)d.ownerLoginUrl=d.ownerLoginPath;return d}
-  g.PrivateSchoolBridge=Object.freeze({getClient,login,logout,establishContext,requireContext,privateContext,roleLanding,inspectInvite,acceptInvite,owner,manager,staff,workflows,compliance,performance,messages,tasks,directory,files,uploadModuleFile,template,outputs,selfEvaluationOutput,userProfile,registrationLink,inspectSchoolRegistration,registerSchoolUser,provisionPrivateSchool,privateSchoolOverview,applyCompatibility,clearPrivateCompat,ROLE_MAP});
+  g.PrivateSchoolBridge=Object.freeze({getClient,login,logout,establishContext,requireContext,privateContext,roleLanding,inspectInvite,acceptInvite,owner,manager,staff,workflows,compliance,performance,messages,tasks,directory,files,uploadModuleFile,template,outputs,selfEvaluationOutput,registrationLink,inspectSchoolRegistration,registerSchoolUser,provisionPrivateSchool,privateSchoolOverview,applyCompatibility,clearPrivateCompat,ROLE_MAP});
 })(window);
