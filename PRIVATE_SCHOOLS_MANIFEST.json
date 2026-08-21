@@ -1,0 +1,102 @@
+{
+  "private-supabase-bridge.js": {
+    "exists": true,
+    "size": 7407,
+    "sha256": "4c1f9971a240fef02bf51c05d9528ef76ce6347bfc1ddc4a4309605c5a8b61be"
+  },
+  "private-entry.html": {
+    "exists": true,
+    "size": 3294,
+    "sha256": "626e76fc83c64f5e827128b57c6040505a23a16b628fe481f32c80de0219941f"
+  },
+  "private-system-admin.html": {
+    "exists": true,
+    "size": 5916,
+    "sha256": "4a95575309e41ca8e5c2c68fc4de571ae3e54a97ffb08266521681c1c9ab36e7"
+  },
+  "private-owner-login.html": {
+    "exists": true,
+    "size": 3622,
+    "sha256": "cf0ca1517744a5c5507280b5fcb1340e53703898f08c8e1549d0f742fcf3df0b"
+  },
+  "private-owner-portal.html": {
+    "exists": true,
+    "size": 6752,
+    "sha256": "a6e721548a7019bd89ea04681464f1b2e9acd12fe7ee9df99f2757896804bbf4"
+  },
+  "private-manager-login.html": {
+    "exists": true,
+    "size": 3649,
+    "sha256": "5ba51ed93b2b6c064a6d68df697dbd0f45eddec93226d3a30342264c7924e8c9"
+  },
+  "private-manager-register.html": {
+    "exists": true,
+    "size": 3938,
+    "sha256": "96864d16dd69d5eee6e0a5bce74da69d73c2692604d74a8e0dde642dcb431e5b"
+  },
+  "private-invite-accept.html": {
+    "exists": true,
+    "size": 3919,
+    "sha256": "82de2eca5cc0f1a4d6b2de6147cf8a48e1d33e65fec2a88129f1d093985b0ae5"
+  },
+  "private-staff-login.html": {
+    "exists": true,
+    "size": 2155,
+    "sha256": "9c7067c82599e3cc45f94421d1e949479a35259b6ef817224c7c5923d6fad5dd"
+  },
+  "private-compliance.html": {
+    "exists": true,
+    "size": 7473,
+    "sha256": "d7b54d537b6210d7bbfc1a9250e486c64f44a201e8619cde66ca94aec6961083"
+  },
+  "private-school-identity.html": {
+    "exists": true,
+    "size": 5381,
+    "sha256": "44e00e3b0b819840e659b5fbae0549b2a8e1ef2a7e2a5dbf6f6fafbc5c14df37"
+  },
+  "private-institutional-outputs.html": {
+    "exists": true,
+    "size": 5849,
+    "sha256": "73980ba890eaeae4a5909f10a76624bcf80ff4d436f5d1ef2953faff24672655"
+  },
+  "manager.html": {
+    "exists": true,
+    "size": 4314765,
+    "sha256": "e385695352ed501dbfbe37a535c69db8d0289d48c4ec200fbb59611c2512798d"
+  },
+  "agent.html": {
+    "exists": true,
+    "size": 6873636,
+    "sha256": "48956bdc4265ad525727381841987c17c7e631cc1d14fed591aee6e40d917920"
+  },
+  "teacher.html": {
+    "exists": true,
+    "size": 10698773,
+    "sha256": "2b2041afaa57cd1c9692089f04176431e34ab1d112bb13a92f02e2cf8ecd0917"
+  },
+  "student_advisor.html": {
+    "exists": true,
+    "size": 2677568,
+    "sha256": "62b5b289e30f13560c6ef4b97849a7a8cbcefbac16ab9297a00dc395d27735c4"
+  },
+  "activity_leader.html": {
+    "exists": true,
+    "size": 387246,
+    "sha256": "0e4cbd16dba7741eb923bd5d61ab0bc01f8815a716607c8cf51aa215e266cb7b"
+  },
+  "administrative_employee_portal.html": {
+    "exists": true,
+    "size": 2374,
+    "sha256": "dc58fdf112b9a4527815ef1cef8fbdf3123c93e105afd22a81b7830aa0c35dc5"
+  },
+  "kindergarten_teacher.html": {
+    "exists": true,
+    "size": 2366,
+    "sha256": "7f5c750ad5524687e70e1f0eb748ba69615b0cc96aec9f8aa835c8cb58233a9f"
+  },
+  "health_advisor.html": {
+    "exists": true,
+    "size": 2348,
+    "sha256": "444d3352a61958a5b4c6f04174d92b6daeef12c75420b9cd7bb211acc5bf6ce0"
+  }
+}
