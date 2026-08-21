@@ -193,10 +193,19 @@ setTimeout(function(){ window.dispatchEvent(new CustomEvent('authReady')); }, 0)
             ];
             const sessionKeys = [
                 'smart_school_current_session','private_school_mode','smartSchool:activeSchool',
-                'active_school_id','active_school_name','current_school_id','current_school_name'
+                'active_school_id','active_school_name','current_school_id','current_school_name',
+                'smart_school_private_session_v1','smart_school_private_schools_v1'
             ];
-            try { localKeys.forEach(k => localStorage.removeItem(k)); } catch(e) {}
-            try { sessionKeys.forEach(k => sessionStorage.removeItem(k)); } catch(e) {}
+            // SECURITY: وضع مدير النظام يجب أن يكون محايدًا تمامًا ولا يرث أي هوية مدرسة أو مستخدم مدرسي.
+            const schoolIdentityKeys = [
+                'selected_school_id','selected_school_name','school_code','active_school_code','current_school_code',
+                'activeSchool','activeSchoolId','active_school','currentSchool','schoolContext','school_context',
+                'active_school_membership_id','smart_school_active_membership_id',
+                'private_user_display_name','private_user_role','private_user_role_label','private_user_signature_url',
+                'cached_manager_uid','cached_manager_name','manager_name','managerName','school_manager_name','schoolManagerName'
+            ];
+            try { [...localKeys,...schoolIdentityKeys].forEach(k => localStorage.removeItem(k)); } catch(e) {}
+            try { [...sessionKeys,...schoolIdentityKeys].forEach(k => sessionStorage.removeItem(k)); } catch(e) {}
             try {
                 sessionStorage.setItem('system_admin_context','1');
                 sessionStorage.setItem('system_admin_verified','true');
@@ -340,6 +349,7 @@ const launchApp = (appId) => {
             const target = files[appId];
             if (!target) return showToast('لم يتم العثور على ملف القسم');
             const isSystemAdmin = !!(currentUser?.isRootAdmin || sessionStorage.getItem('system_admin_context') === '1' || sessionStorage.getItem('system_admin_verified') === 'true');
+            if(isSystemAdmin) clearPrivateSchoolContextForSystemAdmin();
             try {
                 const tabRole=isSystemAdmin?'system_admin':(currentUser?.role || appId);
                 sessionStorage.setItem('smart_school_tab_role_v1',tabRole);

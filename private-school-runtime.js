@@ -29,12 +29,19 @@
        sessionStorage.removeItem(markerKey);sessionStorage.removeItem(backupKey);sessionStorage.removeItem(backupKey+':exists');
      }
      ['persist_school','selected_school_id','selected_school_name','school_name','school_code','smartSchool.currentSchool',
-      'smart_school_active_school','smart_school_active_school_id','smart_school_active_school_name','currentSchool','schoolContext','school_context'
-     ].forEach(k=>localStorage.removeItem(k));
+      'smart_school_active_school','smart_school_active_school_id','smart_school_active_school_name','currentSchool','schoolContext','school_context',
+      'activeSchool','activeSchoolId','active_school','active_school_id','active_school_name','active_school_code',
+      'current_school_id','current_school_name','current_school_code','school_id','smart_school_id',
+      'active_school_membership_id','smart_school_active_membership_id','smart_school_current_session',
+      'private_user_display_name','private_user_role','private_user_role_label','private_user_signature_url',
+      'cached_manager_uid','cached_manager_name','manager_name','managerName','school_manager_name','schoolManagerName'
+     ].forEach(k=>{localStorage.removeItem(k);sessionStorage.removeItem(k)});
      sessionStorage.removeItem(sessionKey);sessionStorage.removeItem(listKey);localStorage.removeItem('smart_school_private_edition');
    }catch(_){}
  }
  if(systemAdminBypass){
+   // SECURITY: مدير النظام لا يعمل داخل سياق مدرسة. نمسح أي سياق مدرسة قديم قبل عرض أي قسم.
+   clearOwnedCompatWithoutBridge();
    if(page==='school-login.html'||page==='register.html'||page==='administrative_employee_login.html'||page==='private-owner-login.html'){location.replace('index.html?systemAdminReturn=1&edition=private');return}
    document.documentElement.dataset.systemAdminBypass='1';
    try{sessionStorage.setItem('system_admin_context','1');sessionStorage.setItem('system_admin_verified','true');sessionStorage.setItem('system_admin_edition','private')}catch(_){}
