@@ -72,10 +72,42 @@
        unhide();
        return;
      }
-     const ready=()=>unhide();
+     const syncManagerSchoolIdentity=(ctx)=>{
+       if(page!=='manager.html'||!ctx)return;
+       const schoolName=String(ctx.schoolName||localStorage.getItem('active_school_name')||localStorage.getItem('current_school_name')||localStorage.getItem('school_name')||localStorage.getItem('persist_school')||'').trim();
+       if(!schoolName)return;
+       // إبقاء نفس مفاتيح هوية المدرسة المستخدمة في نسخة المدارس المستقلة.
+       try{
+         localStorage.setItem('active_school_name',schoolName);
+         localStorage.setItem('current_school_name',schoolName);
+         localStorage.setItem('school_name',schoolName);
+         localStorage.setItem('persist_school',schoolName);
+         const current=JSON.parse(localStorage.getItem('smartSchool.currentSchool')||'{}')||{};
+         current.id=ctx.schoolId||current.id||current.schoolId||'';
+         current.schoolId=ctx.schoolId||current.schoolId||current.id||'';
+         current.schoolName=schoolName;
+         if(ctx.schoolCode)current.schoolCode=ctx.schoolCode;
+         localStorage.setItem('smartSchool.currentSchool',JSON.stringify(current));
+       }catch(_){}
+       const header=document.querySelector('#welcome-dashboard .content-overlay > header')||document.querySelector('#welcome-dashboard header');
+       if(!header)return;
+       const left=header.querySelector('.flex.items-center.gap-4')||header.firstElementChild;
+       if(!left)return;
+       let badge=document.getElementById('private-manager-school-name');
+       if(!badge){
+         badge=document.createElement('span');
+         badge.id='private-manager-school-name';
+         badge.style.cssText='display:inline-flex;align-items:center;max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:7px 12px;border-radius:12px;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;font-family:Tajawal,Arial;font-size:12px;font-weight:900;';
+         left.appendChild(badge);
+       }
+       badge.textContent=schoolName;
+       badge.title=schoolName;
+     };
+     const ready=(ev)=>{syncManagerSchoolIdentity(ev&&ev.detail);unhide();};
      document.addEventListener('private-school-context-ready',ready,{once:true});
      await load('private-school-page-guard.js');
-     const navPages=new Set(['manager.html','agent.html','teacher.html','administrative_employee_portal.html','student_advisor.html','activity_leader.html','health_advisor.html','kindergarten_teacher.html','school_health_unified_registry.html']);
+     // قسم المدير يحتوي أدواته داخليًا؛ لا نحمّل شريط التنقل المكرر فوقه.
+     const navPages=new Set(['agent.html','teacher.html','administrative_employee_portal.html','student_advisor.html','activity_leader.html','health_advisor.html','kindergarten_teacher.html','school_health_unified_registry.html']);
      if(navPages.has(page)) await load('private-school-nav.js');
      if(page==='central_task_center.html') await load('private-school-task-bridge.js');
      setTimeout(()=>{if(document.documentElement.dataset.schoolEdition==='private')unhide()},2500);
