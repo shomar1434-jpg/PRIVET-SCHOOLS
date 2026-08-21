@@ -60,7 +60,11 @@
  async function boot(){
    try{
      if(!g.supabase||!g.supabase.createClient) await load('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0');
+     // يجب تحميل إعداد مشروع المدارس الخاصة المستقل قبل بناء PrivateSchoolConfig.
+     // بدونه تصبح supabaseUrl/publishableKey فارغة في صفحات التشغيل مثل manager.html.
+     if(!g.StandalonePrivateConfig) await load('standalone-private-config.js');
      await load('private-school-config.js');
+     if(!g.PrivateSchoolConfig?.supabaseUrl || !g.PrivateSchoolConfig?.publishableKey) throw new Error('إعداد مشروع المدارس الخاصة غير مكتمل');
      await load('private-school-bridge.js');
      if(page==='school-login.html'){
        await load('school-login-private.js');
