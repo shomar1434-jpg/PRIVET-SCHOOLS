@@ -19,18 +19,6 @@ function boot(){
     <div class="pm-actions">
       <button id="private-users-login-link" type="button">🔗 رابط دخول المستخدمين</button>
       <a id="private-workflows-link" href="private-workflows.html?privateEdition=1">🧭 سير الاعتمادات <span id="private-workflow-badge" class="pm-badge" style="display:none">0</span></a>
-    </div>
-    <div id="private-users-login-dialog" class="pm-login-dialog" hidden>
-      <div class="pm-login-box">
-        <button type="button" class="pm-login-close" aria-label="إغلاق">×</button>
-        <strong>رابط دخول مستخدمي المدرسة</strong>
-        <small>هذا الرابط مخصص للحسابات المسجلة والمفعلة في هذه المدرسة.</small>
-        <input id="private-users-login-url" type="text" readonly dir="ltr">
-        <div class="pm-login-actions">
-          <button id="private-users-login-copy" type="button">📋 نسخ الرابط</button>
-          <button id="private-users-login-test" type="button">↗️ تجربة الرابط</button>
-        </div>
-      </div>
     </div>`;
   el.style.cssText='position:relative;z-index:50;width:min(calc(100% - 28px),1180px);margin:14px auto 18px;background:linear-gradient(145deg,#ffffff,#f3fbf8);border:1px solid #d7e9e4;border-radius:22px;padding:16px;box-shadow:0 12px 32px rgba(20,67,78,.10);font-family:Tajawal,Arial;color:#18364a';
   const style=document.createElement('style');
@@ -49,7 +37,27 @@ function boot(){
   document.head.appendChild(style);
   const anchor=document.querySelector('header')||document.querySelector('main')||document.body.firstElementChild;
   if(anchor&&anchor.parentNode) anchor.insertAdjacentElement('afterend',el); else document.body.prepend(el);
-  (async()=>{try{for(let i=0;i<80&&!window.PrivateSchoolBridge;i++)await new Promise(r=>setTimeout(r,50));if(!window.PrivateSchoolBridge)return;const ctx=await window.PrivateSchoolBridge.requireContext(['manager']);const login=document.getElementById('private-users-login-link');const dialog=document.getElementById('private-users-login-dialog');const urlInput=document.getElementById('private-users-login-url');const copyBtn=document.getElementById('private-users-login-copy');const testBtn=document.getElementById('private-users-login-test');const closeBtn=dialog?.querySelector('.pm-login-close');const loginUrl=new URL('school-login.html',location.href);loginUrl.searchParams.set('edition','private');loginUrl.searchParams.set('schoolId',ctx.schoolId);const loginHref=loginUrl.href;if(urlInput)urlInput.value=loginHref;if(login)login.onclick=()=>{if(dialog)dialog.hidden=false};if(closeBtn)closeBtn.onclick=()=>{dialog.hidden=true};if(dialog)dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.hidden=true});if(testBtn)testBtn.onclick=()=>window.open(loginHref,'_blank','noopener,noreferrer');if(copyBtn)copyBtn.onclick=async()=>{try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(loginHref)}else{const ta=document.createElement('textarea');ta.value=loginHref;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove()}const prev=copyBtn.textContent;copyBtn.textContent='✅ تم نسخ الرابط';setTimeout(()=>{copyBtn.textContent=prev},1800)}catch(e){window.prompt('انسخ رابط دخول المستخدمين:',loginHref)}};const refresh=async()=>{try{const [wf,pf]=await Promise.all([window.PrivateSchoolBridge.workflows('context'),window.PrivateSchoolBridge.performance('queue').catch(()=>({queue:[]}))]);const count=Number(wf?.counts?.managerPending??0)+Number((pf?.queue||[]).length||0);const b=document.getElementById('private-workflow-badge');if(b){b.textContent=String(count);b.style.display=count>0?'inline-flex':'none'}}catch(_){}};await refresh();setInterval(refresh,60000)}catch(e){console.warn('[private-manager-enhancements]',e)}})();
+  (async()=>{try{for(let i=0;i<80&&!window.PrivateSchoolBridge;i++)await new Promise(r=>setTimeout(r,50));if(!window.PrivateSchoolBridge)return;const ctx=await window.PrivateSchoolBridge.requireContext(['manager']);const login=document.getElementById('private-users-login-link');const dialog=document.getElementById('private-users-login-dialog');const urlInput=document.getElementById('private-users-login-url');const copyBtn=document.getElementById('private-users-login-copy');const testBtn=document.getElementById('private-users-login-test');const closeBtn=dialog?.querySelector('.pm-login-close');const loginUrl=new URL('school-login.html',location.href);loginUrl.searchParams.set('edition','private');loginUrl.searchParams.set('schoolId',ctx.schoolId);const loginHref=loginUrl.href;if(urlInput)urlInput.value=loginHref;
+const copyLoginLink=async()=>{
+  try{
+    if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(loginHref)}
+    else{
+      const ta=document.createElement('textarea');
+      ta.value=loginHref;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    }
+    if(login){
+      const prev=login.textContent;
+      login.textContent='✅ تم نسخ رابط دخول المستخدمين';
+      setTimeout(()=>{login.textContent=prev},1800);
+    }
+  }catch(e){window.prompt('انسخ رابط دخول المستخدمين:',loginHref)}
+};
+if(login)login.onclick=copyLoginLink;
+if(closeBtn)closeBtn.onclick=()=>{if(dialog)dialog.hidden=true};
+if(dialog)dialog.hidden=true;
+if(testBtn)testBtn.onclick=()=>window.open(loginHref,'_blank','noopener,noreferrer');
+if(copyBtn)copyBtn.onclick=copyLoginLink;const refresh=async()=>{try{const [wf,pf]=await Promise.all([window.PrivateSchoolBridge.workflows('context'),window.PrivateSchoolBridge.performance('queue').catch(()=>({queue:[]}))]);const count=Number(wf?.counts?.managerPending??0)+Number((pf?.queue||[]).length||0);const b=document.getElementById('private-workflow-badge');if(b){b.textContent=String(count);b.style.display=count>0?'inline-flex':'none'}}catch(_){}};await refresh();setInterval(refresh,60000)}catch(e){console.warn('[private-manager-enhancements]',e)}})();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
