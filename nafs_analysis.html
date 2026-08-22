@@ -1561,7 +1561,7 @@
 (function(){
 'use strict';
 function esc(v){return String(v??'').replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]})}
-function bar(text,error){let e=document.getElementById('privateNafsContextBar');if(!e){e=document.createElement('div');e.id='privateNafsContextBar';document.body.insertBefore(e,document.body.firstChild)}e.className=error?'error':'';e.innerHTML='<span>'+esc(text)+'</span><button class="private-nafs-back" type="button" onclick="location.href=\'manager.html\'">العودة لقسم المدير</button>'}
+function bar(text,error){let e=document.getElementById('privateNafsContextBar');if(!e){e=document.createElement('div');e.id='privateNafsContextBar';document.body.insertBefore(e,document.body.firstChild)}e.className=error?'error':'';e.innerHTML='<span>'+esc(text)+'</span><button class="private-nafs-back" type="button" onclick="window.top.location.href=\'manager.html\'">العودة لقسم المدير</button>'}
 async function init(){try{
  if(!window.PrivateSchoolBridge) throw new Error('محرك المدارس الخاصة غير جاهز');
  const ctx=await window.PrivateSchoolBridge.requireContext(['manager']);
