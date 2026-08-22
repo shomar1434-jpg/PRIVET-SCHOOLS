@@ -84,6 +84,11 @@
       border-radius: 4px;
     }
   </style>
+
+<!-- NAFS_BOOT_SHIELD_V1 -->
+<style id="NAFS_BOOT_SHIELD_V1">html.nafs-booting body{visibility:hidden!important}html.nafs-booting::before{content:'جاري فتح تحليل نتائج نافس…';visibility:visible;position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#f8fafc;color:#0f766e;font-family:Cairo,Tajawal,sans-serif;font-weight:800;z-index:2147483647}</style>
+<script>(function(){document.documentElement.classList.add('nafs-booting');window.__nafsBootDone=function(){document.documentElement.classList.remove('nafs-booting')};setTimeout(window.__nafsBootDone,2200)})();</script>
+<!-- /NAFS_BOOT_SHIELD_V1 -->
 </head>
 <body class="min-h-screen pb-12">
 
@@ -1571,8 +1576,8 @@ async function init(){try{
  if(schoolName){appData.schoolName=schoolName;const a=document.getElementById('pdfSchoolName'),b=document.getElementById('inputSchool');if(a)a.value=schoolName;if(b)b.value=schoolName;try{renderAll()}catch(_){}}
  // اسم المدرسة مرتبط بالمدرسة النشطة ولا يعدل يدوياً.
  ['pdfSchoolName','inputSchool'].forEach(function(id){const el=document.getElementById(id);if(el){el.readOnly=true;el.classList.add('bg-slate-100','cursor-not-allowed')}});
- bar('تحليل نتائج نافس مرتبط بالمدرسة النشطة: '+(schoolName||'المدرسة الحالية')+'. ارفع بطاقة نافس PDF للقراءة والتحليل.');
- }catch(e){bar('تعذر التحقق من جلسة مدير المدرسة: '+(e?.message||String(e)),true)}
+ bar('تحليل نتائج نافس مرتبط بالمدرسة النشطة: '+(schoolName||'المدرسة الحالية')+'. ارفع بطاقة نافس PDF للقراءة والتحليل.');window.__nafsBootDone?.();
+ }catch(e){window.__nafsBootDone?.();bar('تعذر التحقق من جلسة مدير المدرسة: '+(e?.message||String(e)),true)}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(init,50)});else setTimeout(init,50);
 })();

@@ -1379,7 +1379,15 @@ body{overflow-x:hidden}
 #ssFinalBackdrop.uw-workspace-dialog .ss-final-head{position:sticky;top:0;background:#fff;z-index:5;padding-top:4px}
 </style>
 <link rel="stylesheet" href="responsive-layout.css?v=20260818-responsive-1">
-<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
+<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2">
+<!-- MANAGER_BOOT_SHIELD_V1: يمنع ظهور النصوص الخام/الوميض قبل اكتمال تهيئة قسم المدير -->
+<style id="MANAGER_BOOT_SHIELD_V1">
+html.manager-booting body{visibility:hidden!important}
+html.manager-booting::before{content:'جاري تحميل قسم المدير…';visibility:visible;position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#f8fafc;color:#0f766e;font-family:Cairo,Tajawal,sans-serif;font-weight:800;z-index:2147483647}
+</style>
+<script>(function(){document.documentElement.classList.add('manager-booting');function done(){document.documentElement.classList.remove('manager-booting')}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',function(){requestAnimationFrame(function(){requestAnimationFrame(done)})},{once:true})}else{requestAnimationFrame(done)}setTimeout(done,1800)})();</script>
+<!-- /MANAGER_BOOT_SHIELD_V1 -->
+</head>
 <body class="global-app-bg" data-ss-role="manager">
 <script data-openai-engine="true" defer="" src="./openai-engine.js"></script>
 <script data-top-ai-center="true" defer="" src="./top-ai-center.js"></script>
@@ -1475,6 +1483,18 @@ body{overflow-x:hidden}
 <div class="text-center">
 <h3 class="font-black text-xl text-slate-800">مركز المعلومات المدرسية</h3>
 <p class="text-[11px] text-slate-400 font-bold mt-2">مستودع بيانات الطلاب الرسمي للمدرسة النشطة حسب نور</p>
+</div>
+</div><div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-emerald-400 cursor-pointer transition-all flex flex-col items-center gap-4 group manager-section-card" onclick="window.top.location.href='semester_plan.html?mode=followup&role=manager'">
+<div class="w-20 h-20 bg-gradient-to-br from-emerald-600 to-teal-800 text-white rounded-[26px] flex items-center justify-center shadow-xl text-3xl">🗓️</div>
+<div class="text-center">
+<h3 class="font-black text-xl text-slate-800">متابعة الخطط الفصلية</h3>
+<p class="text-[11px] text-slate-400 font-bold mt-2">متابعة جميع خطط التوجيه الطلابي والنشاط الطلابي والتوجيه الصحي ورياض الأطفال وطلب الشواهد واعتماد الأسابيع</p>
+</div>
+</div><div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-cyan-400 cursor-pointer transition-all flex flex-col items-center gap-4 group manager-section-card" onclick="window.top.location.href='nafs_analysis.html?role=manager'">
+<div class="w-20 h-20 bg-gradient-to-br from-cyan-600 to-teal-800 text-white rounded-[26px] flex items-center justify-center shadow-xl text-3xl">📈</div>
+<div class="text-center">
+<h3 class="font-black text-xl text-slate-800">تحليل نتائج نافس</h3>
+<p class="text-[11px] text-slate-400 font-bold mt-2">قراءة بطاقة أداء المدرسة وتحليل نتائج القراءة والعلوم والرياضيات وبناء فجوات الأداء وخطة التحسين</p>
 </div>
 </div><div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-teal-500 cursor-pointer transition-all flex flex-col items-center gap-4 group manager-section-card" onclick="window.location.href='central_task_center.html?role=manager'">
 <div class="w-20 h-20 bg-gradient-to-br from-teal-600 to-slate-800 text-white rounded-[26px] flex items-center justify-center shadow-xl text-3xl">🧭</div>
@@ -4760,7 +4780,7 @@ document.addEventListener("click", function(e){
 </style>
 </head><body>${editor.innerHTML}\n
 <!-- SCHOOL COMMAND CENTER M1-M4 -->
-<script src="self-evaluation-file-engine.js?v=20260822-self-eval-file-v1"></script>
+
 </body></html>`;
       record.file = new Blob([htmlDoc], {type:'application/msword'});
       if(!/\.doc$/i.test(record.name)) record.name = record.name.replace(/\.(docx|doc)$/i,'') + '_معدل.doc';
@@ -5563,5 +5583,7 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
 
 <!-- PRIVATE_EDITION_BUILD_RUNTIME -->
 <script src="private-school-runtime.js"></script>
-<script src="private-manager-enhancements.js?v=20260820-governance2"></script></body>
+<script src="private-manager-enhancements.js?v=20260820-governance2"></script>
+<script src="self-evaluation-file-engine.js?v=20260822-self-eval-file-v1"></script>
+</body>
 </html>

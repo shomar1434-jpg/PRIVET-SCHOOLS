@@ -96,6 +96,14 @@
             }
         }
     </style>
+
+<!-- SEMESTER_BOOT_SHIELD_V2 -->
+<style id="SEMESTER_BOOT_SHIELD_V2">
+html.semester-booting body{visibility:hidden!important}
+html.semester-booting::before{content:'جاري فتح الخطة الفصلية…';visibility:visible;position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#f8fafc;color:#047857;font-family:Cairo,Tajawal,sans-serif;font-weight:800;z-index:2147483647}
+</style>
+<script>(function(){document.documentElement.classList.add('semester-booting');window.__semesterBootDone=function(){document.documentElement.classList.remove('semester-booting')};setTimeout(window.__semesterBootDone,2400)})();</script>
+<!-- /SEMESTER_BOOT_SHIELD_V2 -->
 </head>
 <body class="min-h-screen flex flex-col antialiased bg-slate-50">
 
@@ -1803,7 +1811,7 @@ function lockUnifiedConfig(template){
  const out=template?.output||{};schoolConfig.schoolName=out.schoolDisplayName||semCtx.schoolName||schoolConfig.schoolName;schoolConfig.creatorName=schoolConfig.creatorName||semCtx.userName||'';schoolConfig.creatorRole=ROLE_LABELS[semCtx.role]||semCtx.role;schoolConfig.principalName=out.managerDisplayName||schoolConfig.principalName;schoolConfig.principalSig=out.manager_signatureUrl||schoolConfig.principalSig;schoolConfig.schoolStamp=out.digital_stampUrl||schoolConfig.schoolStamp;
  localStorage.setItem('guidance_school_config',JSON.stringify(schoolConfig));
  ['cfgDirectorate','cfgSchoolName','cfgStage','cfgCreatorRole','cfgPrincipalName'].forEach(id=>{const e=document.getElementById(id);if(e){e.disabled=true;e.classList.add('opacity-70','cursor-not-allowed')}});
- const type=document.getElementById('selectPlanType');if(type){type.value=ROLE_TYPES[semCtx.role];type.disabled=true;currentPlanType=ROLE_TYPES[semCtx.role]}
+ const type=document.getElementById('selectPlanType');if(type){const onlyType=ROLE_TYPES[semCtx.role]||'';type.innerHTML='<option value="'+esc(onlyType)+'">'+esc(onlyType)+'</option>';type.value=onlyType;type.disabled=true;type.setAttribute('aria-label','نوع الخطة ثابت حسب القسم');currentPlanType=onlyType;const wrap=type.closest('div');if(wrap){let note=wrap.querySelector('.sem-role-plan-note');if(!note){note=document.createElement('div');note.className='sem-role-plan-note mt-1 text-[11px] font-bold text-emerald-700';wrap.appendChild(note)}note.textContent='الخطة مخصصة لهذا القسم فقط';}}
  try{updatePrintHeaderDetails();switchPlanConfig()}catch(_){ }
  const control=document.getElementById('sectionControl');if(control&&!document.getElementById('semUnifiedInfo')){const n=document.createElement('div');n.id='semUnifiedInfo';n.className='mb-5 p-4 rounded-2xl bg-teal-50 border border-teal-200 text-xs font-bold text-teal-900';n.textContent='بيانات المدرسة والمدير والختم مرتبطة بالإعدادات الموحدة. المتاح للمستخدم هنا: اسمه وتوقيعه الرقمي فقط.';control.prepend(n)}
  const principal=document.getElementById('canvasPrincipalSig')?.closest('.bg-slate-50');if(principal)principal.style.display='none';const stamp=document.getElementById('stampBox')?.closest('.bg-slate-50');if(stamp)stamp.style.display='none';
@@ -1811,7 +1819,7 @@ function lockUnifiedConfig(template){
 async function savePlanCloud(){if(!semCtx||semCtx.role==='manager'||semLoading)return null;const data=await invoke('save_plan',{semester:currentSemester,academicYear:currentYear,planData:getCurrentPlanList(),schoolConfig});semPlan=data.plan;return semPlan}
 async function loadUserPlan(){if(!semCtx||semCtx.role==='manager')return;semLoading=true;try{
  setBanner('جاري تحميل الخطة الفصلية المرتبطة بحسابك...','warn');
- currentPlanType=ROLE_TYPES[semCtx.role];const type=document.getElementById('selectPlanType');if(type){type.value=currentPlanType;type.disabled=true}
+ currentPlanType=ROLE_TYPES[semCtx.role];const type=document.getElementById('selectPlanType');if(type){type.innerHTML='<option value="'+esc(currentPlanType)+'">'+esc(currentPlanType)+'</option>';type.value=currentPlanType;type.disabled=true}
  const data=await invoke('my_plan',{semester:currentSemester,academicYear:currentYear});
  if(data.plan){semPlan=data.plan;const key=getCurrentPlanKey();allPlansStorage[key]=Array.isArray(data.plan.plan_data)?data.plan.plan_data:allPlansStorage[key];if(data.plan.school_config&&typeof data.plan.school_config==='object')schoolConfig={...schoolConfig,...data.plan.school_config};saveAllPlansData();applyWeeksToLocal(data.weeks||[])}else{await savePlanCloud();applyWeeksToLocal([])}
  renderData();updateKPIs();decorateUserCards();setBanner('تم ربط الخطة بحسابك ومدرستك. التنفيذ ينعكس مباشرة في متابعة المدير.');
@@ -1844,10 +1852,18 @@ window.semShowPlan=function(planId){const card=document.getElementById('semPlan_
 async function renderManager(){try{const data=await invoke('school_plans');const plans=data.plans||[];const c=managerStatusCounts(plans);document.body.innerHTML='<div class="sem-manager-shell"><div class="sem-manager-head"><div class="sem-manager-inner"><button class="sem-back" onclick="window.top.location.href=\'manager.html\'">العودة لقسم المدير</button><div class="sem-manager-title">متابعة الخطط الفصلية</div><div class="sem-manager-sub">متابعة خطط التوجيه الطلابي والنشاط الطلابي والتوجيه الصحي ورياض الأطفال، وطلب شواهد التنفيذ واعتماد الأسابيع.</div><div class="sem-kpis"><div class="sem-kpi"><span>إجمالي الأسابيع</span><b>'+c.total+'</b></div><div class="sem-kpi"><span>تم التنفيذ</span><b>'+c.completed+'</b></div><div class="sem-kpi"><span>بانتظار الاعتماد</span><b>'+c.waiting+'</b></div><div class="sem-kpi"><span>مطلوب شاهد</span><b>'+c.evidence+'</b></div></div></div></div><div class="sem-manager-main"><div class="sem-plan-grid">'+(plans.length?plans.map(p=>{const total=(p.plan_data||[]).filter(x=>!x.isVacation).length;const comp=(p.weeks||[]).filter(w=>w.status==='completed').length;const pct=total?Math.round(comp*100/total):0;return '<div class="sem-plan-card" onclick="semShowPlan(\''+p.id+'\')"><h3>'+esc(p.plan_type)+'</h3><div class="sem-plan-meta"><b>'+esc(p.user_name||'المستخدم')+'</b><br>'+esc(p.semester)+' — '+esc(p.academic_year)+'</div><div class="sem-progress"><i style="width:'+pct+'%"></i></div><div class="sem-sync">نسبة التنفيذ المعتمد: '+pct+'%</div></div>'}).join(''):'<div class="sem-empty">لا توجد خطط فصلية محفوظة من المستخدمين حتى الآن.</div>')+'</div><div id="semDetails">'+plans.map(p=>managerPlanDetail(p)).join('')+'</div></div></div>'; }catch(e){document.body.innerHTML='<div class="sem-manager-shell"><div class="sem-manager-main"><div class="sem-empty">تعذر تحميل متابعة الخطط: '+esc(errText(e))+'</div></div></div>'}}
 function managerPlanDetail(p){const wm={};(p.weeks||[]).forEach(w=>wm[String(w.week_key)]=w);return '<section class="sem-plan-detail" id="semPlan_'+p.id+'" style="display:none;margin-top:22px"><div class="sem-week-card"><h2>'+esc(p.plan_type)+' — '+esc(p.user_name||'')+'</h2><div class="sem-plan-meta">'+esc(p.semester)+' — '+esc(p.academic_year)+'</div></div><div class="sem-week-list">'+(p.plan_data||[]).filter(x=>!x.isVacation).map(item=>{const w=wm[String(item.id)]||{status:'pending'};let actions='';if(w.status==='completed'){actions='<button class="sem-btn light" disabled>✅ معتمد</button>'}else if(w.status==='awaiting_approval'&&w.evidence_file_id){actions='<button class="sem-btn blue" onclick="semOpenEvidence(\''+esc(w.evidence_url||'')+'\')">فتح الشاهد</button><button class="sem-btn primary" onclick="semManagerAction(\'approve_week\',\''+p.id+'\',\''+item.id+'\')">اعتماد الأسبوع</button><button class="sem-btn warn" onclick="semManagerAction(\'return_week\',\''+p.id+'\',\''+item.id+'\')">إعادة للتنفيذ</button>'}else{actions='<button class="sem-btn warn" onclick="semManagerAction(\'request_evidence\',\''+p.id+'\',\''+item.id+'\')">طلب شاهد التنفيذ</button>'}return '<div class="sem-week-card"><div class="sem-week-top"><div><b>'+esc(item.title)+'</b><div class="sem-plan-meta">'+esc(item.dates||'')+'<br>'+esc((item.programs||[]).join(' — '))+'</div></div><span class="sem-status '+esc(w.status)+'">'+esc(statusArabic(w.status))+'</span></div>'+(w.user_notes?'<div class="sem-evidence-box">ملاحظات المنفذ: '+esc(w.user_notes)+'</div>':'')+(w.manager_note?'<div class="sem-evidence-box">ملاحظة المدير: '+esc(w.manager_note)+'</div>':'')+'<div class="sem-actions">'+actions+'</div></div>'}).join('')+'</div></section>'}
 async function init(){try{
- if(!window.PrivateSchoolBridge)throw new Error('محرك المدارس الخاصة غير جاهز');semCtx=await window.PrivateSchoolBridge.requireContext(['manager','student_advisor','activity_leader','health_advisor','kindergarten_teacher']);
- ensureBackBar();if(semCtx.role==='manager'){const b=document.getElementById('semPageBackBar');if(b)b.remove();await renderManager();return}
- wrapUserFunctions();const tpl=await getTemplate();lockUnifiedConfig(tpl);await loadUserPlan();
- }catch(e){setBanner('تعذر فتح الخطة ضمن جلسة المدرسة: '+errText(e),'error')}
+ if(!window.PrivateSchoolBridge)throw new Error('محرك المدارس الخاصة غير جاهز');
+ const qs=new URLSearchParams(location.search);const requestedRole=(qs.get('role')||'').trim();const mode=(qs.get('mode')||'').trim();
+ const allowed=['manager','student_advisor','activity_leader','health_advisor','kindergarten_teacher','teacher'];
+ semCtx=await window.PrivateSchoolBridge.requireContext(allowed);
+ // توافق حصري مع النسخ القديمة التي خزنت معلمة رياض الأطفال تحت teacher.
+ if(semCtx.role==='teacher'&&requestedRole==='kindergarten_teacher')semCtx={...semCtx,role:'kindergarten_teacher'};
+ if(requestedRole&&requestedRole!=='manager'&&semCtx.role!==requestedRole)throw new Error('هذه الخطة مرتبطة بقسم مختلف عن حساب المستخدم الحالي.');
+ if((mode==='followup'||requestedRole==='manager')&&semCtx.role!=='manager')throw new Error('متابعة الخطط الفصلية متاحة لمدير المدرسة فقط.');
+ ensureBackBar();
+ if(semCtx.role==='manager'){const b=document.getElementById('semPageBackBar');if(b)b.remove();await renderManager();window.__semesterBootDone?.();return}
+ wrapUserFunctions();const tpl=await getTemplate();lockUnifiedConfig(tpl);await loadUserPlan();window.__semesterBootDone?.();
+ }catch(e){window.__semesterBootDone?.();setBanner('تعذر فتح الخطة ضمن جلسة المدرسة: '+errText(e),'error')}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,50));else setTimeout(init,50);
 })();
