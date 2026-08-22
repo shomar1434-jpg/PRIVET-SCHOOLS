@@ -1,25 +1,82 @@
-# إغلاق تعارض بوابات الدخول في المدارس الخاصة
+# تصحيح مركزي: منع إرجاع مستخدمي المدارس الخاصة إلى بوابة الدخول
 
-## السبب الجذري
-- صفحة المالك كانت تولد رابط المدير إلى `private-manager-login.html`.
-- إحدى نسخ `private-manager-login.html` القديمة كانت تستخدم `mock-supabase.js`.
-- بعد الانتقال إلى `manager.html` كان الحارس المركزي يبحث عن جلسة Supabase حقيقية، فلا يجدها، فيعيد المدير إلى صفحة الدخول.
-- لذلك كانت إصلاحات `school-login.html` السابقة لا تُستخدم أصلًا في مسار المدير القادم من المالك.
+## التشخيص
+صفحات الأدوار كانت تحمل `private-session-reset.js` ثم `private-school-preflight.js` في بداية الصفحة،
+بينما محرك Supabase الخاص `private-school-runtime.js` يعمل في نهاية الصفحة.
+هذا يسمح لطبقة مبكرة باتخاذ قرار جلسة قبل جاهزية التحقق الحقيقي.
 
-## التصحيح النهائي
-- رابط المدير من صفحة المالك أصبح:
-  `school-login.html?edition=private&schoolId=<school_id>&role=manager`
-- `private-manager-login.html` أصبح مجرد Compatibility Redirect إلى نفس البوابة المركزية.
-- المدير والوكيل والمعلم والموجهون والإداري يستخدمون الآن محرك جلسة واحد:
-  `PrivateSchoolBridge -> private-school-session -> roleLanding`.
-- لم يعد يوجد محرك مصادقة مستقل للمدير.
+كما أن الصفحات تحتوي طبقات توافق مأخوذة من بنية المدارس المستقلة القديمة؛
+تبقى لاستخدام وظائف الملفات والتخزين والتكليفات، لكنها لم تعد سلطة المصادقة في الإصدار الخاص.
 
-## الفحوص
+## التصحيح
+- إزالة تشغيل `private-session-reset.js` تلقائيًا عند فتح صفحات الأدوار المحمية.
+- إزالة `private-school-preflight.js` من صفحات الأدوار.
+- إضافة `private-role-entry-compat.js` في بداية كل صفحة:
+  - لا يعيد التوجيه إطلاقًا.
+  - لا يمسح الجلسة.
+  - يستعيد `school_id` والدور والمستخدم من سياق Private الذي أنشأته بوابة الدخول.
+  - يجهز مفاتيح التوافق اللازمة للسكربتات القديمة.
+- التحقق الأمني الوحيد الذي يملك حق إعادة المستخدم للدخول أصبح:
+  `private-school-page-guard.js` بعد جاهزية Supabase و`PrivateSchoolBridge`.
+- الموظف الإداري أصبح يقبل سياق Private الصحيح قبل الحارس الإداري القديم.
+
+## صفحات الأدوار المغلقة في التصحيح
 {
+  "manager.html": {
+    "preflight_removed": true,
+    "reset_removed": true,
+    "compat_loaded": true,
+    "runtime_loaded": true
+  },
+  "agent.html": {
+    "preflight_removed": true,
+    "reset_removed": true,
+    "compat_loaded": true,
+    "runtime_loaded": true
+  },
+  "teacher.html": {
+    "preflight_removed": true,
+    "reset_removed": true,
+    "compat_loaded": true,
+    "runtime_loaded": true
+  },
+  "student_advisor.html": {
+    "preflight_removed": true,
+    "reset_removed": true,
+    "compat_loaded": true,
+    "runtime_loaded": true
+  },
+  "activity_leader.html": {
+    "preflight_removed": true,
+    "reset_removed": true,
+    "compat_loaded": true,
+    "runtime_loaded": true
+  },
+  "kindergarten_teacher.html": {
+    "preflight_removed": true,
+    "reset_removed": true,
+    "compat_loaded": true,
+    "runtime_loaded": true
+  },
+  "health_advisor.html": {
+    "preflight_removed": true,
+    "reset_removed": true,
+    "compat_loaded": true,
+    "runtime_loaded": true
+  },
+  "administrative_employee_portal.html": {
+    "preflight_removed": true,
+    "reset_removed": true,
+    "compat_loaded": true,
+    "runtime_loaded": true
+  }
+}
+
+## فحوص JavaScript والمحاكاة
+{
+  "private-role-entry-compat.js": "PASS",
   "private-school-bridge.js": "PASS",
   "private-school-runtime.js": "PASS",
-  "private-school-page-guard.js": "PASS"
+  "private-school-page-guard.js": "PASS",
+  "compat_context_simulation": "PASS"
 }
-- عدم وجود `mock-supabase.js` في بوابة المدير القديمة: PASS
-- عدم وجود fallback إلى `private-manager-login.html` داخل صفحة المالك: PASS
-- رابط المالك يثبت `role=manager`: PASS
