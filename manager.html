@@ -3803,14 +3803,41 @@ body{overflow-x:hidden}
   }
   window.ssFinalDisableUser=async function(id){var a=users(); var u=a.find(function(x){return x.id===id}); if(!u)return; if(u.isOwner||u.isPrimaryManager||u.role==='owner'||u.role==='manager'||u.id==='manager'||u.id==='owner'){alert('لا يمكن تعطيل حساب المالك أو المدير الرئيسي.');return;} if(!confirm('هل تريد تعطيل حساب '+(u.name||'هذا المستخدم')+'؟'))return; a=a.map(function(x){if(x.id===id){x.status='disabled';x.active=false;x.isActive=false;}return x});saveUsers(a);try{if(localStorage.getItem('smart_school_private_edition')==='private'&&window.PrivateSchoolBridge&&u?.privateMembershipId)await window.PrivateSchoolBridge.manager('set_member_status',{memberId:u.privateMembershipId,status:'disabled'});else if(window.SmartSchoolSupabase && id && !String(id).startsWith('reg_') && !String(id).startsWith('user_')) await window.SmartSchoolSupabase.updateUserStatus(id,'disabled');}catch(e){console.warn('تعذر تعطيل المستخدم في Supabase',e)}showActivation();}
   window.ssFinalDeleteUser=async function(id){var a=users(); var u=a.find(function(x){return x.id===id}); if(!u)return; if(u.isOwner||u.isPrimaryManager||u.role==='owner'||u.role==='manager'||u.id==='manager'||u.id==='owner'){alert('لا يمكن حذف حساب المالك أو المدير الرئيسي.');return;} if(!confirm('هل تريد حذف حساب '+(u.name||'هذا المستخدم')+'؟\nسيتم حذفه من قائمة مستخدمي المدرسة وتعطيل دخوله.'))return; a=a.map(function(x){if(x.id===id){x.status='deleted'; x.deletedAt=new Date().toISOString(); x.active=false; x.isActive=false;} return x}); saveUsers(a); try{if(localStorage.getItem('smart_school_private_edition')==='private'&&window.PrivateSchoolBridge&&u?.privateMembershipId)await window.PrivateSchoolBridge.manager('delete_member',{memberId:u.privateMembershipId});else if(window.SmartSchoolSupabase && id && !String(id).startsWith('reg_') && !String(id).startsWith('user_')){if(window.SmartSchoolSupabase.deleteUser){await window.SmartSchoolSupabase.deleteUser(id);}else{await window.SmartSchoolSupabase.updateUserStatus(id,'deleted');}}}catch(e){console.warn('تعذر حذف المستخدم في Supabase، تم إخفاؤه محلياً فقط',e)} showActivation();}
+  function ssReadableError(e,fallback){
+    var fb=fallback||'تعذر تنفيذ العملية';
+    if(!e)return fb;
+    if(typeof e==='string')return e==='[object Object]'?fb:e;
+    if(typeof e.message==='string'&&e.message.trim()&&e.message.trim()!=='[object Object]')return e.message.trim();
+    if(typeof e.error==='string'&&e.error.trim()&&e.error.trim()!=='[object Object]')return e.error.trim();
+    if(e.payload){
+      if(typeof e.payload.error==='string'&&e.payload.error.trim()&&e.payload.error.trim()!=='[object Object]')return e.payload.error.trim();
+      if(e.payload.error&&typeof e.payload.error.message==='string')return e.payload.error.message;
+      if(typeof e.payload.message==='string'&&e.payload.message.trim())return e.payload.message.trim();
+    }
+    if(e.details&&typeof e.details==='string'&&e.details.trim())return e.details.trim();
+    try{var j=JSON.stringify(e);return j&&j!=='{}'&&j!=='"[object Object]"'?j:fb;}catch(_){return fb;}
+  }
   window.ssFinalAddRole=function(id){
     var u=users().find(function(x){return x.id===id}); if(!u)return;
     if(localStorage.getItem('smart_school_private_edition')!=='private'||!window.PrivateSchoolBridge||!u.privateMembershipId){alert('إضافة الدور المزدوج متاحة للحسابات المرتبطة بالسحابة في المدارس الخاصة.');return;}
     var opts={agent:'وكيل/وكيلة',student_advisor:'موجه/موجهة طلابية',teacher:'معلم/ة',health_advisor:'الموجه الصحي',kindergarten_teacher:'معلمة رياض الأطفال',activity_leader:'رائد/ة النشاط',administrative_employee:'موظف إداري'};
-    panel('إضافة دور إضافي','<div class="ss-card blue"><b>'+esc(u.name||u.email)+'</b><div class="ss-muted">سيبقى الدور الحالي كما هو ويضاف دور مستقل للحساب نفسه داخل هذه المدرسة.</div></div><div class="ss-field"><label>الدور الإضافي</label><select id="extraMemberRole">'+Object.entries(opts).map(function(p){return '<option value="'+p[0]+'">'+p[1]+'</option>'}).join('')+'</select></div><div class="ss-field" id="extraAgencyWrap" style="display:none"><label>تصنيف الوكيل</label>'+agencyCheckboxes('extraAgency',[])+'</div><button class="ss-action" id="saveExtraMemberRole">إضافة الدور</button>');
+    if(u.role==='agent') delete opts.agent;
+    panel('إضافة دور إضافي','<div class="ss-card blue"><b>'+esc(u.name||u.email)+'</b><div class="ss-muted">سيبقى الدور الحالي كما هو ويضاف دور مستقل للحساب نفسه داخل هذه المدرسة. <b>اختصاصات الوكيل الثلاثة لا تعد أدوارًا إضافية</b>؛ يتم تعديلها من زر «تعديل» للحساب نفسه.</div></div><div class="ss-field"><label>الدور الإضافي</label><select id="extraMemberRole">'+Object.entries(opts).map(function(p){return '<option value="'+p[0]+'">'+p[1]+'</option>'}).join('')+'</select></div><div class="ss-field" id="extraAgencyWrap" style="display:none"><label>تصنيف الوكيل</label>'+agencyCheckboxes('extraAgency',[])+'</div><button class="ss-action" id="saveExtraMemberRole">إضافة الدور</button>');
     function syncExtra(){var w=document.getElementById('extraAgencyWrap');if(w)w.style.display=val('extraMemberRole')==='agent'?'grid':'none'}
     document.getElementById('extraMemberRole').onchange=syncExtra;syncExtra();
-    document.getElementById('saveExtraMemberRole').onclick=async function(){var role=val('extraMemberRole'),cats=role==='agent'?selectedAgencyList('extraAgency'):[];if(role==='agent'&&!cats.length){alert('حدد تصنيف الوكيل قبل إضافة الدور.');return;}try{await window.PrivateSchoolBridge.manager('add_member_role',{sourceMemberId:u.privateMembershipId,newRole:role,roleVariants:cats,roleVariant:cats.join(',')});await hydrateUsersFromSupabase();await showActivation();}catch(e){alert(e.message==='member_role_already_exists'?'هذا الدور موجود بالفعل للحساب داخل المدرسة.':(e.message||'تعذر إضافة الدور'));}}
+    document.getElementById('saveExtraMemberRole').onclick=async function(){
+      var role=val('extraMemberRole'),cats=role==='agent'?selectedAgencyList('extraAgency'):[];
+      if(role==='agent'&&!cats.length){alert('حدد تصنيف الوكيل قبل إضافة الدور.');return;}
+      try{
+        await window.PrivateSchoolBridge.manager('add_member_role',{sourceMemberId:u.privateMembershipId,newRole:role,roleVariants:cats,roleVariant:cats.join(',')});
+        await hydrateUsersFromSupabase();
+        await showActivation();
+      }catch(e){
+        var m=ssReadableError(e,'تعذر إضافة الدور');
+        if(m==='member_role_already_exists')m='هذا الدور موجود بالفعل للحساب داخل المدرسة.';
+        alert(m);
+      }
+    }
   }
   window.ssFinalEditUser=function(id){
     var u=users().find(function(x){return x.id===id}); if(!u)return;
@@ -3848,7 +3875,7 @@ body{overflow-x:hidden}
         await hydrateUsersFromSupabase();
         await showActivation();
       }catch(e){
-        var m=e&&e.message||'تعذر تعديل المستخدم';
+        var m=ssReadableError(e,'تعذر تعديل المستخدم');
         if(m==='member_role_already_exists')m='هذا الحساب يملك هذا الدور بالفعل داخل المدرسة.';
         if(m==='agent_role_variant_required')m='يجب تحديد تصنيف الوكيل.';
         alert(m);

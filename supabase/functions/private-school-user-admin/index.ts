@@ -15,9 +15,9 @@ Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{head
  const displayName=clean(b.displayName||b.fullName||m.display_name),newRole=clean(b.role||m.role),status=clean(b.status||m.status);const variants=newRole==='agent'?agentVariants(b.roleVariants??b.roleVariant??m.role_variant):[];
  if(!displayName||!allowed.includes(newRole))return json({error:'invalid_role'},400);if(!['pending','active','disabled'].includes(status))return json({error:'invalid_status'},400);if(newRole==='agent'&&!variants.length)return json({error:'agent_role_variant_required'},400);
  if(newRole!==m.role){const ex=await db.from('school_members').select('id').eq('school_id',sid).eq('user_id',m.user_id).eq('role',newRole).neq('id',id).neq('status','deleted').limit(1);if(ex.error)throw ex.error;if((ex.data||[]).length)return json({error:'member_role_already_exists'},409)}
- const patch:any={display_name:displayName,role:newRole,status,role_variant:newRole==='agent'?variants.join(','):null,updated_at:new Date().toISOString()};
+ const patch:any={display_name:displayName,role:newRole,status,role_variant:newRole==='agent'?variants.join(','):null};
  if(status==='active'){patch.activated_at=new Date().toISOString();patch.activated_by=user.id;patch.disabled_at=null;patch.disabled_by=null}else if(status==='disabled'){patch.disabled_at=new Date().toISOString();patch.disabled_by=user.id}
  const up=await db.from('school_members').update(patch).eq('id',id).select('*').single();if(up.error)throw up.error;
  try{const au=await db.auth.admin.getUserById(m.user_id);if(!au.error&&au.data?.user){const md=au.data.user.user_metadata||{};await db.auth.admin.updateUserById(m.user_id,{user_metadata:{...md,full_name:displayName}})}}catch(_){ }
  return json({ok:true,member:{...up.data,role_variants:newRole==='agent'?variants:[]}});
-}catch(e){return json({error:e instanceof Error?e.message:String(e)},500)}});
+}catch(e){const msg=e instanceof Error?e.message:(e&&typeof e==='object'&&'message' in e?String((e as any).message):JSON.stringify(e));return json({error:msg||'تعذر تنفيذ العملية'},500)}});
