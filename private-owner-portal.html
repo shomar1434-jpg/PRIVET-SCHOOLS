@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-<script src="private-auth-storage.js"></script><script src="private-storage-namespace.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script>
+<script src="private-auth-storage.js"></script><script src="private-session-reset.js?v=20260820-session-reset1"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>بوابة مالك المدرسة</title>
@@ -94,11 +94,11 @@ function render(){
  $('owners').innerHTML=owners.length?owners.map(o=>`<div class="manager-row"><div class="row-head"><div><div class="name">${esc(o.fullName||o.name||'مالك المدرسة')} ${o.is_primary?'• المالك الأساسي':''}</div><div class="email">${esc(o.email||'')}</div></div><span class="badge ${statusClass(o.status||'active')}">${esc(statusLabel(o.status||'active'))}</span></div><div class="actions">${portal.canManageOwners&&!o.is_primary?`<button class="btn danger" data-delete-owner="${esc(o.userId||o.user_id)}">حذف المالك الإضافي</button>`:''}</div></div>`).join(''):'<div class="muted">لا توجد بيانات ملاك.</div>';
  const addOwnerCard=$('addOwner')?.closest('.card'); if(addOwnerCard) addOwnerCard.style.display=portal?.canManageOwners?'block':'none';
  if(active){
-   const login=abs(`school-login.html?edition=private&schoolId=${encodeURIComponent(ctx.schoolId)}&role=manager`);
-   $('activeLoginBox').innerHTML=`<div class="linkbox">${esc(login)}</div><div class="actions"><button class="btn primary" data-copy-login="${esc(login)}">نسخ رابط دخول المدير</button><button class="btn blue" data-open-login="${esc(login)}">فتح رابط الدخول</button></div>`;
+   const login=abs(`school-login.html?edition=private&schoolId=${encodeURIComponent(ctx.schoolId)}`);
+   $('activeLoginBox').innerHTML=`<div class="linkbox">${esc(login)}</div><div class="actions"><button class="btn primary" data-copy-login="${esc(login)}">نسخ رابط دخول المدرسة</button><button class="btn blue" data-open-login="${esc(login)}">فتح بوابة المدرسة</button></div>`;
  }else $('activeLoginBox').innerHTML='';
  $('managers').innerHTML=managers.length?managers.map(m=>{
-   const login=m.status==='active'?abs(`school-login.html?edition=private&schoolId=${encodeURIComponent(ctx.schoolId)}&role=manager`):'';
+   const login=m.status==='active'?abs(`school-login.html?edition=private&schoolId=${encodeURIComponent(ctx.schoolId)}`):'';
    return `<div class="manager-row"><div class="row-head"><div><div class="name">${esc(m.fullName||'مدير/مديرة المدرسة')}</div><div class="email">${esc(m.email||'')}</div></div><span class="badge ${statusClass(m.status)}">${esc(statusLabel(m.status))}</span></div>
    <div class="actions">
    ${m.status!=='active'?`<button class="btn primary" data-activate="${esc(m.membershipId)}">تفعيل مدير المدرسة</button>`:''}
@@ -141,7 +141,7 @@ $('createInvite').onclick=async()=>{
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
  try{
-  if(b.dataset.activate){const r=await PrivateSchoolBridge.owner('activate_manager',{memberId:b.dataset.activate});await load();if(r){const link=abs(`school-login.html?edition=private&schoolId=${encodeURIComponent(ctx.schoolId)}&role=manager`);await copyText(link);alert('تم تفعيل مدير المدرسة ونسخ رابط الدخول.');}}
+  if(b.dataset.activate){const r=await PrivateSchoolBridge.owner('activate_manager',{memberId:b.dataset.activate});await load();if(r){const link=abs(`school-login.html?edition=private&schoolId=${encodeURIComponent(ctx.schoolId)}`);await copyText(link);alert('تم تفعيل مدير المدرسة ونسخ رابط دخول المدرسة الموحد.');}}
   if(b.dataset.disable){if(confirm('تعطيل حساب مدير المدرسة؟')){await PrivateSchoolBridge.owner('disable_manager',{memberId:b.dataset.disable});await load();}}
   if(b.dataset.delete){if(confirm('سيتم حذف ارتباط هذا المدير بالمدرسة. هل أنت متأكد؟')){await PrivateSchoolBridge.owner('delete_manager',{memberId:b.dataset.delete});await load();}}
   if(b.dataset.cancel){await PrivateSchoolBridge.owner('cancel_manager_invitation',{invitationId:b.dataset.cancel});await load();}
@@ -163,7 +163,7 @@ load();
       if(!sid)return;
       document.querySelectorAll('a[href*="private-manager-login.html"],input[value*="private-manager-login.html"]').forEach(el=>{
         const u=new URL('school-login.html',location.href);
-        u.searchParams.set('edition','private');u.searchParams.set('schoolId',sid);u.searchParams.set('role','manager');
+        u.searchParams.set('edition','private');u.searchParams.set('schoolId',sid);
         if(el.tagName==='A')el.href=u.href; else el.value=u.href;
       });
     }catch(_){}

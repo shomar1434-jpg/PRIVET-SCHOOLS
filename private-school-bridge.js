@@ -37,6 +37,11 @@
     return clients[scope];
   }
   function clean(v){return String(v??'').trim()}
+  function schoolLoginPath(schoolId){
+    const sid=clean(schoolId||privateContext()?.schoolId);
+    return 'school-login.html?edition=private'+(sid?'&schoolId='+encodeURIComponent(sid):'');
+  }
+  function schoolIdFromUrl(){try{const q=new URLSearchParams(location.search||'');return clean(q.get('schoolId')||q.get('school_id'))}catch(_){return ''}}
   function safeJson(s,fallback){try{return JSON.parse(s)}catch(_){return fallback}}
   function privateContext(){return safeJson(ssGet(C.sessionStorageKey)||ssGet('smart_school_private_session_v1')||'null',null)}
   function clearPrivateCompat(){
@@ -122,12 +127,13 @@
     try{['system_admin_context','system_admin_verified','system_admin_edition','private_system_admin_entry','private_admin_handoff_pending'].forEach(k=>ssDel(k));}catch(_){}
   }
   async function login(email,password,schoolId='',actorRole=''){
-    // دخول مالك/مدير/مستخدم مدرسة يجب أن يبدأ بسياق مدرسة نظيف لا يحمل صلاحيات مدير النظام.
     clearPrivateCompat();
     clearSystemAdminMarkers();
-    const sb=getClient(actorRole); const r=await sb.auth.signInWithPassword({email:clean(email).toLowerCase(),password:String(password||'')});
+    const sb=getClient(actorRole==='owner'?'owner':'');
+    const r=await sb.auth.signInWithPassword({email:clean(email).toLowerCase(),password:String(password||'')});
     if(r.error) throw new Error('بيانات الدخول غير صحيحة أو الحساب غير متاح');
-    try{return await establishContext(schoolId,actorRole)}catch(e){await sb.auth.signOut();clearPrivateCompat();throw e}
+    try{return await establishContext(clean(schoolId)||schoolIdFromUrl(),actorRole)}
+    catch(e){try{await sb.auth.signOut()}catch(_){} clearPrivateCompat();throw e}
   }
   async function logout(){
     const role=privateContext()?.role||'';
@@ -136,8 +142,11 @@
   async function requireContext(allowedRoles){
     let ctx=privateContext();
     const session=await ensureSession(ctx?.role||'');
-    if(!session){clearPrivateCompat();throw new Error('انتهت جلسة الدخول')}
-    if(!ctx || ctx.edition!=='private' || ctx.userId!==session.user.id){ctx=(await establishContext(ctx?.schoolId||'',ctx?.role||'')).context}
+    if(!session) throw new Error('انتهت جلسة الدخول');
+    if(!ctx || ctx.edition!=='private' || ctx.userId!==session.user.id){
+      const sid=clean(ctx?.schoolId)||schoolIdFromUrl();
+      ctx=(await establishContext(sid,clean(ctx?.role))).context;
+    }
     if(Array.isArray(allowedRoles)&&allowedRoles.length&&!allowedRoles.includes(ctx.role)) throw new Error('لا تملك صلاحية فتح هذه الصفحة');
     applyCompatibility(ctx); return ctx;
   }
@@ -170,5 +179,5 @@
   async function registerSchoolUser(payload){return invoke('private-school-registration',{action:'register',token:clean(payload.token),email:clean(payload.email),fullName:clean(payload.fullName),password:String(payload.password||''),role:clean(payload.role)},{allowAnonymous:true})}
   async function provisionPrivateSchool(payload={}){return invoke('private-school-provisioning',{action:'create',...payload})}
   async function privateSchoolOverview(schoolId){const d=await invoke('private-school-provisioning',{action:'overview',schoolId:clean(schoolId)});if(d&&!d.ownerLoginPath&&d.ownerLoginUrl)d.ownerLoginPath=d.ownerLoginUrl;if(d&&!d.ownerLoginUrl&&d.ownerLoginPath)d.ownerLoginUrl=d.ownerLoginPath;return d}
-  g.PrivateSchoolBridge=Object.freeze({getClient,authScope,login,logout,establishContext,requireContext,privateContext,roleLanding,inspectInvite,acceptInvite,owner,manager,staff,workflows,compliance,performance,messages,tasks,directory,files,uploadModuleFile,template,outputs,selfEvaluationOutput,registrationLink,inspectSchoolRegistration,registerSchoolUser,provisionPrivateSchool,privateSchoolOverview,applyCompatibility,clearPrivateCompat,ROLE_MAP});
+  g.PrivateSchoolBridge=Object.freeze({getClient,authScope,schoolLoginPath,login,logout,establishContext,requireContext,privateContext,roleLanding,inspectInvite,acceptInvite,owner,manager,staff,workflows,compliance,performance,messages,tasks,directory,files,uploadModuleFile,template,outputs,selfEvaluationOutput,registrationLink,inspectSchoolRegistration,registerSchoolUser,provisionPrivateSchool,privateSchoolOverview,applyCompatibility,clearPrivateCompat,ROLE_MAP});
 })(window);
