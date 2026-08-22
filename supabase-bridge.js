@@ -19,12 +19,12 @@
   }
 
   function getClient(){
-    if(client) return client;
-    if(!window.supabase || !window.supabase.createClient){
-      console.error('Supabase library is not loaded');
-      return null;
+    if(window.__PRIVATE_EDITION_BUILD__===true && window.PrivateSchoolBridge && typeof window.PrivateSchoolBridge.getClient==='function'){
+      try{return window.PrivateSchoolBridge.getClient()}catch(e){console.warn('تعذر استخدام عميل المدارس الخاصة الموحد',e)}
     }
-    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{storageKey:'PRIVATE_SCHOOLS_SCHOOL_USER_AUTH_V1',persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    if(client) return client;
+    if(!window.supabase || !window.supabase.createClient){console.error('Supabase library is not loaded');return null}
+    client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{storageKey:'LEGACY_PRIVATE_COMPAT_AUTH_V1',persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
     return client;
   }
 
