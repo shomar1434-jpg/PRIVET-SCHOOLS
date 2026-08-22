@@ -6,32 +6,68 @@
  const params=new URLSearchParams(location.search);
  const isPrivate=params.get('privateEdition')==='1'||params.get('edition')==='private'||localStorage.getItem('smart_school_private_edition')==='private';
  if(!isPrivate)return;
- const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const withPrivate=u=>{try{const x=new URL(u,location.href);x.searchParams.set('privateEdition','1');return x.pathname.split('/').pop()+x.search+x.hash}catch(_){return u}};
+ const workflowUrl='private-workflows.html?privateEdition=1';
+
+ function removeLegacyBar(){
+  const old=document.getElementById('private-school-nav');
+  if(old)old.remove();
+ }
+
+ function workflowCardHtml(){
+  return `
+   <div id="private-discipline-requests-card" class="bg-white/90 backdrop-blur p-10 rounded-[45px] shadow-lg border border-white hover:border-rose-400 cursor-pointer transition-all flex flex-col items-center gap-4 group hover:-translate-y-2" role="button" tabindex="0" aria-label="طلبات حالات الانضباط">
+    <div class="w-20 h-20 bg-gradient-to-br from-rose-500 to-red-700 text-white rounded-3xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform text-4xl">📝</div>
+    <h3 class="font-bold text-xl text-slate-700">طلبات حالات الانضباط</h3>
+    <p class="text-[10px] text-slate-500 text-center leading-relaxed font-bold">رفع ومتابعة طلبات الغياب والاستئذان والإجازات والانتداب والدورات.</p>
+   </div>`;
+ }
+
+ function installStandardWorkflowCard(){
+  if(document.getElementById('private-discipline-requests-card'))return true;
+  const main=document.querySelector('#welcome-dashboard main');
+  if(!main)return false;
+  let grid=null;
+  const grids=Array.from(main.querySelectorAll('.grid.grid-cols-1'));
+  grid=grids.find(el=>el.querySelector('h3')&&el.children.length>=1)||null;
+  if(!grid)return false;
+  const holder=document.createElement('div');holder.innerHTML=workflowCardHtml().trim();
+  const card=holder.firstElementChild;
+  card.addEventListener('click',()=>location.href=workflowUrl);
+  card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();location.href=workflowUrl;}});
+  grid.appendChild(card);
+  return true;
+ }
+
+ function installAdminWorkflowCard(){
+  if(document.getElementById('private-discipline-requests-card'))return true;
+  const grid=document.querySelector('#employeeMode.cards');
+  if(!grid)return false;
+  const card=document.createElement('div');
+  card.id='private-discipline-requests-card';card.className='card';card.tabIndex=0;card.setAttribute('role','button');
+  card.innerHTML='<div class="ico">📝</div><h2>طلبات حالات الانضباط</h2><p>رفع ومتابعة طلبات الغياب والاستئذان والإجازات والانتداب والدورات.</p><span class="btn">فتح الطلبات</span>';
+  const go=()=>location.href=workflowUrl;card.onclick=go;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go();}};
+  grid.appendChild(card);
+  return true;
+ }
+
+ function installWorkflowCard(ctx){
+  if(['owner','manager'].includes(ctx.role))return;
+  const adminPage=page==='administrative_employee_portal.html'||ctx.role==='administrative_employee';
+  let attempts=0;
+  const tryInstall=()=>{
+   removeLegacyBar();
+   const ok=adminPage?installAdminWorkflowCard():installStandardWorkflowCard();
+   if(!ok&&attempts++<30)setTimeout(tryInstall,250);
+  };
+  tryInstall();
+ }
+
  async function boot(){
+  removeLegacyBar();
   if(!g.PrivateSchoolBridge)return;
   let ctx;try{ctx=await g.PrivateSchoolBridge.requireContext();}catch(_){return}
-  if(document.getElementById('private-school-nav'))return;
-  const workflowLabel=['agent','manager'].includes(ctx.role)?'سير الاعتمادات':'طلبات حالات الانضباط';
-  const links=[['الرئيسية',withPrivate(g.PrivateSchoolBridge.roleLanding(ctx))],[workflowLabel,'private-workflows.html?privateEdition=1'],['المراسلات','internal_messages.html?privateEdition=1']];
-  if(['owner','manager'].includes(ctx.role))links.push(['فحص الالتزام','private-compliance.html?privateEdition=1']);
-  if(['owner','manager'].includes(ctx.role))links.push(['المخرجات','private-outputs.html?privateEdition=1']);
-  if(['owner','manager'].includes(ctx.role))links.push(['الهوية والقالب','private-template-settings.html?privateEdition=1']);
-  if(ctx.role==='manager')links.push(['إدارة المستخدمين','private-manager-users.html?privateEdition=1']);
-  if(ctx.role==='manager'){
-    const openPrivateUsers=()=>location.href='private-manager-users.html?privateEdition=1';
-    try{g.showRegLink=openPrivateUsers;g.showActivation=openPrivateUsers;}catch(_){}
-    document.addEventListener('click',function(ev){const el=ev.target&&ev.target.closest&&ev.target.closest('#ssRegLink,#ssActivate,[onclick*=\"showRegLink\"],[onclick*=\"showActivation\"]');if(!el)return;ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();openPrivateUsers();},true);
-  }
-  if(ctx.role==='owner')links[0]=['بوابة المالك','private-owner-portal.html?privateEdition=1'];
-  const roleNames={owner:'المالك',manager:'مدير/ة المدرسة',agent:'الوكيل/الوكيلة',teacher:'المعلم/المعلمة',student_advisor:'الموجه/ة الطلابي/ة',activity_leader:'رائد/ة النشاط',kindergarten_teacher:'معلم/ة رياض الأطفال',health_advisor:'الموجه/ة الصحي/ة',administrative_employee:'الموظف/ة الإداري/ة'};
-  const available=Array.isArray(ctx.availableRoles)&&ctx.availableRoles.length?ctx.availableRoles:[ctx.role];
-  const roleSelector=available.length>1?`<select id="private-nav-role" style="border:1px solid #ffffff33;background:#fff;color:#0f172a;border-radius:10px;padding:7px 9px;font-weight:700">${available.map(r=>`<option value="${esc(r)}" ${r===ctx.role?'selected':''}>${esc(roleNames[r]||r)}</option>`).join('')}</select>`:'';
-  const bar=document.createElement('div');bar.id='private-school-nav';bar.setAttribute('dir','rtl');bar.style.cssText='position:sticky;top:0;z-index:2147483000;background:linear-gradient(135deg,#0b3d2f,#1b8a61);color:#fff;padding:8px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:Tajawal,Cairo,Arial;box-shadow:0 4px 14px #0002';
-  bar.innerHTML=`<strong style="margin-left:auto">${esc(ctx.schoolName||'المدرسة الخاصة')}</strong>${roleSelector}`+links.map(([t,u])=>`<a href="${esc(u)}" style="color:#fff;text-decoration:none;background:#ffffff18;border:1px solid #ffffff22;padding:7px 10px;border-radius:10px;font-size:13px">${esc(t)}</a>`).join('')+`<button id="private-nav-logout" style="border:0;border-radius:10px;padding:7px 10px;cursor:pointer">خروج</button>`;
-  document.body.prepend(bar);
-  const roleSel=document.getElementById('private-nav-role');if(roleSel)roleSel.onchange=async()=>{const chosen=roleSel.value;if(!chosen||chosen===ctx.role)return;roleSel.disabled=true;try{const data=await g.PrivateSchoolBridge.establishContext(ctx.schoolId,chosen);const next=data.context;location.replace(g.PrivateSchoolBridge.roleLanding(next)+(g.PrivateSchoolBridge.roleLanding(next).includes('?')?'&':'?')+'privateEdition=1')}catch(e){alert(e.message||'تعذر تبديل الدور');roleSel.disabled=false;roleSel.value=ctx.role}};
-  document.getElementById('private-nav-logout').onclick=async()=>{try{await g.PrivateSchoolBridge.logout()}catch(_){};try{g.PrivateSessionReset?.clearActiveSchoolContext?.({clearSystemAdmin:true})}catch(_){};location.replace(ctx.role==='owner'?('private-owner-login.html?fresh=1&schoolId='+encodeURIComponent(ctx.schoolId)):('school-login.html?fresh=1&edition=private&schoolId='+encodeURIComponent(ctx.schoolId)))};
+  installWorkflowCard(ctx);
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })(window);
