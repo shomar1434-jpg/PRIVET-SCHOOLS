@@ -44,15 +44,6 @@ button{width:100%;padding:13px;border:0;border-radius:12px;background:#0f6b4a;co
 <option value="administrative_employee">موظف إداري</option>
 </select>
 </div>
-<div class="field full" id="agentVariantField" hidden>
-<label>تصنيف الوكيل/الوكيلة</label>
-<select id="roleVariant">
-<option value="">اختر التصنيف</option>
-<option value="educational_affairs">وكيل الشؤون التعليمية</option>
-<option value="school_affairs">وكيل الشؤون المدرسية</option>
-<option value="student_affairs">وكيل شؤون الطلاب</option>
-</select>
-</div>
 </div>
 <button id="submit" type="submit">إرسال طلب التسجيل للمدير</button>
 <div id="msg" class="msg"></div>
@@ -69,10 +60,11 @@ const map={
  registration_link_expired:'انتهت صلاحية رابط التسجيل. اطلب رابطًا جديدًا من مدير المدرسة.',
  school_not_active:'المدرسة غير مفعلة.',
  email_reserved:'هذا البريد غير متاح للتسجيل.',
- already_registered_in_school:'هذا البريد مسجل في المدرسة بالفعل.',
+ already_registered_in_school:'هذا الحساب مفعل في المدرسة بالفعل.',
+ account_disabled_in_school:'هذا الحساب معطل من مدير المدرسة. راجع مدير المدرسة لإعادة تفعيله.',
+ account_removed_from_school:'سبق حذف هذا الحساب من المدرسة. راجع مدير المدرسة إذا أردت إعادة إضافته.',
  existing_account_password_invalid:'كلمة المرور لا تطابق الحساب الموجود.',
- invalid_registration_input:'تحقق من جميع البيانات وكلمة المرور.',
- agent_role_variant_required:'اختر تصنيف الوكيل/الوكيلة.'
+ invalid_registration_input:'تحقق من جميع البيانات وكلمة المرور.'
 };
 async function init(){
  try{
@@ -85,12 +77,6 @@ async function init(){
   $('school').style.color='#b42318';
  }
 }
-$('role').onchange=()=>{
- const isAgent=$('role').value==='agent';
- $('agentVariantField').hidden=!isAgent;
- $('roleVariant').required=isAgent;
- if(!isAgent)$('roleVariant').value='';
-};
 $('form').onsubmit=async e=>{
  e.preventDefault();
  const b=$('submit');b.disabled=true;$('msg').className='msg';$('msg').textContent='جارٍ إرسال طلب التسجيل...';
@@ -100,8 +86,7 @@ $('form').onsubmit=async e=>{
    fullName:$('name').value.trim(),
    email:$('email').value.trim(),
    password:$('password').value,
-   role:$('role').value,
-   roleVariant:$('roleVariant').value
+   role:$('role').value
   });
   $('msg').className='msg ok waiting';
   $('msg').textContent='تم إرسال طلب التسجيل بنجاح. الحساب الآن بانتظار تفعيل مدير المدرسة. بعد التفعيل استخدم رابط دخول المدرسة.';

@@ -3733,14 +3733,33 @@ body{overflow-x:hidden}
   }
   window.ssOpenFollow = ssOpenFollow;
   async function showActivation(){
-    await resolveManagerSchoolContext();
-    const u=await hydrateUsersFromSupabase();
+    // افتح الواجهة فوراً من النسخة المحلية، ثم حدّثها سحابياً دون حجب المستخدم.
+    const u=users();
     panel('تنشيط المستخدمين وإدارة الصلاحيات',
-      '<div class="ss-card blue"><b>إدارة الحسابات المسجلة في المدرسة</b><div class="ss-muted">إضافة المستخدمين تتم من «رابط تسجيل المستخدمين» فقط. بعد التسجيل يظهر الحساب هنا بانتظار التفعيل. حدّد دور المستخدم، وتصنيف الوكيل عند الحاجة، ثم فعّل الحساب.</div></div>'+ 
+      '<div class="ss-card blue"><b>إدارة الحسابات المسجلة في المدرسة</b><div class="ss-muted">إضافة المستخدمين تتم من «رابط تسجيل المستخدمين» فقط. بعد التسجيل يظهر الحساب هنا بانتظار التفعيل. يحدد مدير المدرسة الدور النهائي، ويجب عليه تحديد تصنيف الوكيل/الوكيلة من «تعديل» قبل التفعيل.</div></div>'+ 
       '<div class="ss-actions"><button class="ss-action blue" id="refreshUsers">تحديث المستخدمين من السحابة</button><button class="ss-action" id="openRegistrationFromActivation">فتح رابط تسجيل المستخدمين</button></div>'+ 
+      '<div class="ss-muted" id="usersCloudStatus" style="margin-top:8px">جارٍ مزامنة الحسابات مع السحابة...</div>'+
       '<hr style="margin:14px 0;border:0;border-top:1px solid #e5e7eb"><div id="userList">'+renderUserList(u)+'</div>');
-    document.getElementById('refreshUsers').onclick=async function(){const list=await hydrateUsersFromSupabase();document.getElementById('userList').innerHTML=renderUserList(list);};
-    document.getElementById('openRegistrationFromActivation').onclick=showRegLink;
+    var refreshBtn=document.getElementById('refreshUsers');
+    var regBtn=document.getElementById('openRegistrationFromActivation');
+    if(regBtn)regBtn.onclick=showRegLink;
+    async function refreshCloud(){
+      var status=document.getElementById('usersCloudStatus');
+      if(refreshBtn)refreshBtn.disabled=true;
+      if(status)status.textContent='جارٍ مزامنة الحسابات مع السحابة...';
+      try{
+        if(!currentSchoolId())await resolveManagerSchoolContext();
+        const list=await hydrateUsersFromSupabase();
+        var target=document.getElementById('userList');
+        if(target)target.innerHTML=renderUserList(list);
+        if(status)status.textContent='تم تحديث الحسابات من السحابة.';
+      }catch(e){
+        if(status)status.textContent='تعذر تحديث الحسابات الآن؛ تم عرض آخر نسخة محفوظة.';
+        console.warn('تعذر تحديث إدارة الحسابات',e);
+      }finally{if(refreshBtn)refreshBtn.disabled=false;}
+    }
+    if(refreshBtn)refreshBtn.onclick=refreshCloud;
+    refreshCloud();
   }
   window.showActivation=showActivation;
   function renderUserList(arr){return arr.filter(function(u){return u.status!=='deleted'}).map(function(u){
