@@ -74,7 +74,16 @@
  async function boot(){
    try{
      if(!g.supabase||!g.supabase.createClient) await load('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.111.0');
+     // Load the standalone project configuration before deriving PrivateSchoolConfig.
+     // Without this ordering, role landing pages create a Supabase client with an empty URL
+     // after a successful login, which throws: "supabaseUrl is required".
+     if(!g.StandalonePrivateConfig?.supabaseUrl || !g.StandalonePrivateConfig?.publishableKey){
+       await load('standalone-private-config.js');
+     }
      await load('private-school-config.js');
+     if(!g.PrivateSchoolConfig?.supabaseUrl || !g.PrivateSchoolConfig?.publishableKey){
+       throw new Error('إعداد اتصال Supabase للمدارس الخاصة غير مكتمل');
+     }
      await load('private-school-bridge.js');
 
      if(page==='school-login.html'){
