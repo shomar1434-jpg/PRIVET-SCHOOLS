@@ -1476,18 +1476,6 @@ body{overflow-x:hidden}
 <h3 class="font-black text-xl text-slate-800">مركز المعلومات المدرسية</h3>
 <p class="text-[11px] text-slate-400 font-bold mt-2">مستودع بيانات الطلاب الرسمي للمدرسة النشطة حسب نور</p>
 </div>
-</div><div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-emerald-400 cursor-pointer transition-all flex flex-col items-center gap-4 group manager-section-card" onclick="window.top.location.href='semester_plan.html?mode=followup'">
-<div class="w-20 h-20 bg-gradient-to-br from-emerald-600 to-teal-800 text-white rounded-[26px] flex items-center justify-center shadow-xl text-3xl">🗓️</div>
-<div class="text-center">
-<h3 class="font-black text-xl text-slate-800">متابعة الخطط الفصلية</h3>
-<p class="text-[11px] text-slate-400 font-bold mt-2">متابعة التنفيذ حسب دور المستخدم وطلب الشواهد واعتماد تنفيذ الأسابيع</p>
-</div>
-</div><div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-cyan-400 cursor-pointer transition-all flex flex-col items-center gap-4 group manager-section-card" onclick="window.top.location.href='nafs_analysis.html'">
-<div class="w-20 h-20 bg-gradient-to-br from-cyan-600 to-teal-800 text-white rounded-[26px] flex items-center justify-center shadow-xl text-3xl">📈</div>
-<div class="text-center">
-<h3 class="font-black text-xl text-slate-800">تحليل نتائج نافس</h3>
-<p class="text-[11px] text-slate-400 font-bold mt-2">قراءة بطاقة أداء المدرسة وتحليل نتائج القراءة والعلوم والرياضيات وبناء فجوات الأداء وخطة التحسين</p>
-</div>
 </div><div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-teal-500 cursor-pointer transition-all flex flex-col items-center gap-4 group manager-section-card" onclick="window.location.href='central_task_center.html?role=manager'">
 <div class="w-20 h-20 bg-gradient-to-br from-teal-600 to-slate-800 text-white rounded-[26px] flex items-center justify-center shadow-xl text-3xl">🧭</div>
 <div class="text-center">
@@ -1616,7 +1604,10 @@ body{overflow-x:hidden}
 <button class="p-2 text-slate-400 hover:bg-slate-100 rounded-full" onclick="closeSelfEvaluationArchiveView()" title="العودة"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></button>
 <h2 class="font-bold text-lg text-slate-700 flex items-center gap-2">🗄️ أرشيف التقويم الذاتي</h2>
 </div>
-<div class="flex gap-2"><button class="hidden bg-slate-100 text-slate-600 px-3 py-2 rounded-xl text-[10px] font-bold border border-slate-200" id="self-eval-back-to-folders" onclick="renderSelfEvaluationArchiveFolders()">رجوع للمجلدات</button></div>
+<div class="flex gap-2 flex-wrap">
+<button class="bg-teal-700 text-white px-4 py-2 rounded-xl text-[11px] font-black shadow-sm" onclick="openSelfEvaluationFile()" title="إنشاء ملف التقويم الذاتي حسب ترتيب مجلدات الأرشيف">🖨️ طباعة ملف التقويم الذاتي</button>
+<button class="hidden bg-slate-100 text-slate-600 px-3 py-2 rounded-xl text-[10px] font-bold border border-slate-200" id="self-eval-back-to-folders" onclick="renderSelfEvaluationArchiveFolders()">رجوع للمجلدات</button>
+</div>
 </header>
 <main class="max-w-6xl mx-auto p-4 md:p-8 relative z-10" id="self-evaluation-archive-content"></main>
 </div>
@@ -3601,15 +3592,15 @@ body{overflow-x:hidden}
     if(v.charAt(0)==='['){try{return normalizeAgencyList(JSON.parse(v));}catch(e){}}
     return [...new Set(v.split(/[،,|]/).map(one).filter(function(x){return ['educational','school_affairs','student_affairs'].indexOf(x)>-1;}))];
   }
-  function agencyListByUser(u){u=u||{};var m=agencyMap(); var id=String(u.id||''); var email=String(u.email||'').toLowerCase(); var raw=u.role_variants || u.roleVariants || u.role_variant || u.roleVariant || u.agent_categories || u.agency_categories || u.agency_types || u.agency_type || u.agencyType || u.vice_agency_type || u.viceAgencyType || u.roleLabel || u.role_label || (id&&m[id]) || (email&&m[email]) || ''; return normalizeAgencyList(raw)}
+  function agencyListByUser(u){u=u||{};var m=agencyMap(); var id=String(u.id||''); var email=String(u.email||'').toLowerCase(); var raw=(id&&m[id]) || (email&&m[email]) || u.role_variant || u.roleVariant || u.agent_categories || u.agency_categories || u.agency_types || u.agency_type || u.agencyType || u.vice_agency_type || u.viceAgencyType || u.roleLabel || u.role_label || ''; return normalizeAgencyList(raw)}
   function agencyByUser(u){return agencyListByUser(u).join(',')}
   function saveAgencyForUser(u,agency){var list=normalizeAgencyList(agency); var m=agencyMap(); var id=String((u&&u.id)||''); var email=String((u&&u.email)||'').toLowerCase(); if(id)m[id]=list; if(email)m[email]=list; write(agencyStoreKey(),m)}
   function agencyLabel(v){var list=normalizeAgencyList(v); if(!list.length) return 'لم يحدد بعد'; var opts=vpAgencyOptions(); return list.map(function(x){return opts[x]||x}).join(' + ')}
-  function agencyCheckboxes(prefix,selected){var opts=vpAgencyOptions(); var list=normalizeAgencyList(selected); return '<div class="ss-agency-checks" style="display:grid;gap:9px;margin-top:6px">'+Object.entries(opts).map(function(p){return '<label style="display:flex;gap:9px;align-items:center;padding:10px 12px;border:1px solid #dbeafe;border-radius:12px;background:#f8fbff;font-weight:900;cursor:pointer"><input type="checkbox" id="'+prefix+'_'+p[0]+'" value="'+p[0]+'" '+(list.indexOf(p[0])>-1?'checked':'')+'> '+p[1]+'</label>'}).join('')+'</div>';}
-  function selectedAgencyList(prefix){return Object.keys(vpAgencyOptions()).filter(function(k){var e=document.getElementById(prefix+'_'+k);return e&&e.checked;});}
+  function agencyCheckboxes(prefix,selected){var opts=vpAgencyOptions(); var list=normalizeAgencyList(selected); var cur=list[0]||''; return '<select id="'+prefix+'_single" class="ss-select"><option value="">اختر تصنيف الوكيل</option>'+Object.entries(opts).map(function(p){return '<option value="'+p[0]+'" '+(cur===p[0]?'selected':'')+'>'+p[1]+'</option>'}).join('')+'</select>';}
+  function selectedAgencyList(prefix){var e=document.getElementById(prefix+'_single'); return e&&e.value?[e.value]:[];}
   async function persistDeputyClassification(u,list){list=normalizeAgencyList(list);if(!u||u.role!=='agent'||!list.length)return true;var payload={userId:u.id,email:u.email,classification:list[0]};try{
     if(localStorage.getItem('smart_school_private_edition')==='private'&&window.PrivateSchoolBridge&&u.privateMembershipId){
-      await window.PrivateSchoolBridge.manager('set_member_role_variant',{memberId:u.privateMembershipId,roleVariants:list,roleVariant:list.join(',')});
+      await window.PrivateSchoolBridge.manager('set_member_role_variant',{memberId:u.privateMembershipId,roleVariant:list[0]});
       return true;
     }
     if(window.CloudTaskEngine&&window.CloudTaskEngine.setDeputyClassification){await window.CloudTaskEngine.setDeputyClassification(payload);return true;}
@@ -3646,7 +3637,7 @@ body{overflow-x:hidden}
   function saveTeacherExtraRolesForUser(user,roles){roles=normalizeTeacherExtraRoles(roles); var map=readTeacherExtraRoleMap(); if(user){ if(user.id) map['id:'+user.id]=roles; if(user.email) map['email:'+String(user.email).trim().toLowerCase()]=roles; } writeTeacherExtraRoleMap(map); }
   function getTeacherExtraRolesForUser(user){var map=readTeacherExtraRoleMap(); var roles=[]; if(user){ roles=normalizeTeacherExtraRoles(user.teacher_extra_roles||user.additional_assignments||user.extra_roles||user.extraRoles); if(!roles.length && user.id) roles=normalizeTeacherExtraRoles(map['id:'+user.id]); if(!roles.length && user.email) roles=normalizeTeacherExtraRoles(map['email:'+String(user.email).trim().toLowerCase()]); } return roles; }
 
-  function normalizeSchoolUser(u){var role=dbRoleToLocal(u.dbRole||u.role); var obj={id:u.id||uid('user'),name:u.name||u.fullName||u.full_name||'',email:u.email||'',password:u.password||'',role:role,status:u.status||((u.active||u.isActive)?'active':'pending'),active:u.active||u.isActive||u.status==='active',isActive:u.active||u.isActive||u.status==='active',schoolId:u.schoolId||u.school_id||currentSchoolId(),schoolName:u.schoolName||currentSchoolName(),isPrimaryManager:!!(u.isPrimaryManager||u.is_primary_manager),permissions:u.permissions||[],privateMembershipId:u.privateMembershipId||u.membershipId||u.membership_id||'',role_variants:u.role_variants||u.roleVariants||[],roleVariants:u.roleVariants||u.role_variants||[],role_variant:u.role_variant||u.roleVariant||'',roleVariant:u.roleVariant||u.role_variant||''}; obj.agent_categories=role==='agent'?agencyListByUser(Object.assign({},u,obj)):[]; obj.agency_categories=obj.agent_categories; obj.agency_types=obj.agent_categories; obj.agency_type=obj.agent_categories.join(','); obj.agencyType=obj.agency_type; var teacherRoles=role==='teacher'?normalizeTeacherExtraRoles(u.teacher_extra_roles||u.additional_assignments||u.extra_roles||u.extraRoles):[]; if(role==='teacher' && !teacherRoles.length) teacherRoles=getTeacherExtraRolesForUser(Object.assign({},u,obj)); obj.teacher_extra_roles=role==='teacher'?teacherRoles:[]; obj.additional_assignments=role==='teacher'?teacherRoles:[]; obj.extra_roles=role==='teacher'?teacherRoles:[]; return obj}
+  function normalizeSchoolUser(u){var role=dbRoleToLocal(u.dbRole||u.role); var obj={id:u.id||uid('user'),name:u.name||u.fullName||u.full_name||'',email:u.email||'',password:u.password||'',role:role,status:u.status||((u.active||u.isActive)?'active':'pending'),active:u.active||u.isActive||u.status==='active',isActive:u.active||u.isActive||u.status==='active',schoolId:u.schoolId||u.school_id||currentSchoolId(),schoolName:u.schoolName||currentSchoolName(),isPrimaryManager:!!(u.isPrimaryManager||u.is_primary_manager),permissions:u.permissions||[],privateMembershipId:u.privateMembershipId||u.membershipId||u.membership_id||'',role_variant:u.role_variant||u.roleVariant||'',roleVariant:u.roleVariant||u.role_variant||''}; obj.agent_categories=role==='agent'?agencyListByUser(Object.assign({},u,obj)):[]; obj.agency_categories=obj.agent_categories; obj.agency_types=obj.agent_categories; obj.agency_type=obj.agent_categories.join(','); obj.agencyType=obj.agency_type; var teacherRoles=role==='teacher'?normalizeTeacherExtraRoles(u.teacher_extra_roles||u.additional_assignments||u.extra_roles||u.extraRoles):[]; if(role==='teacher' && !teacherRoles.length) teacherRoles=getTeacherExtraRolesForUser(Object.assign({},u,obj)); obj.teacher_extra_roles=role==='teacher'?teacherRoles:[]; obj.additional_assignments=role==='teacher'?teacherRoles:[]; obj.extra_roles=role==='teacher'?teacherRoles:[]; return obj}
   function users(){var u=read(NS+'_users',[]).filter(function(x){return x&&x.status!=='deleted'}).map(normalizeSchoolUser); var sid=currentSchoolId(); if(sid) u=u.filter(function(x){return !x.schoolId || String(x.schoolId)===String(sid) || x.isPrimaryManager}); return u}
   function saveUsers(u){write(NS+'_users',(u||[]).map(normalizeSchoolUser));try{window.dispatchEvent(new CustomEvent('school-information-updated',{detail:{source:'users'}}))}catch(e){}}
   async function hydrateUsersFromSupabase(){try{var sid=currentSchoolId();if(!sid)return users();if(localStorage.getItem('smart_school_private_edition')==='private'&&window.PrivateSchoolBridge){var d=await window.PrivateSchoolBridge.manager('get_portal');var privateRows=(d.members||[]).filter(function(m){return m.role!=='owner'&&m.role!=='manager'}).map(function(m){return normalizeSchoolUser({id:m.userId||m.user_id||m.id,privateMembershipId:m.membershipId||m.id,name:m.fullName||m.display_name||m.email,email:m.email||'',role:m.role,status:m.status,schoolId:sid,role_variant:m.role_variant||''})});saveUsers(privateRows);return users();}if(!window.SmartSchoolSupabase)return users();var remote=await window.SmartSchoolSupabase.listUsersBySchool(sid);if(remote&&remote.length){saveUsers(remote.map(normalizeSchoolUser));return users();}}catch(e){console.warn('تعذر تحديث مستخدمي المدرسة من Supabase',e)}return users()}
@@ -3745,33 +3736,14 @@ body{overflow-x:hidden}
   }
   window.ssOpenFollow = ssOpenFollow;
   async function showActivation(){
-    // افتح الواجهة فوراً من النسخة المحلية، ثم حدّثها سحابياً دون حجب المستخدم.
-    const u=users();
+    await resolveManagerSchoolContext();
+    const u=await hydrateUsersFromSupabase();
     panel('تنشيط المستخدمين وإدارة الصلاحيات',
-      '<div class="ss-card blue"><b>إدارة الحسابات المسجلة في المدرسة</b><div class="ss-muted">إضافة المستخدمين تتم من «رابط تسجيل المستخدمين» فقط. بعد التسجيل يظهر الحساب هنا بانتظار التفعيل. يحدد مدير المدرسة الدور النهائي، ويجب عليه تحديد تصنيف الوكيل/الوكيلة من «تعديل» قبل التفعيل.</div></div>'+ 
+      '<div class="ss-card blue"><b>إدارة الحسابات المسجلة في المدرسة</b><div class="ss-muted">إضافة المستخدمين تتم من «رابط تسجيل المستخدمين» فقط. بعد التسجيل يظهر الحساب هنا بانتظار التفعيل. حدّد دور المستخدم، وتصنيف الوكيل عند الحاجة، ثم فعّل الحساب.</div></div>'+ 
       '<div class="ss-actions"><button class="ss-action blue" id="refreshUsers">تحديث المستخدمين من السحابة</button><button class="ss-action" id="openRegistrationFromActivation">فتح رابط تسجيل المستخدمين</button></div>'+ 
-      '<div class="ss-muted" id="usersCloudStatus" style="margin-top:8px">جارٍ مزامنة الحسابات مع السحابة...</div>'+
       '<hr style="margin:14px 0;border:0;border-top:1px solid #e5e7eb"><div id="userList">'+renderUserList(u)+'</div>');
-    var refreshBtn=document.getElementById('refreshUsers');
-    var regBtn=document.getElementById('openRegistrationFromActivation');
-    if(regBtn)regBtn.onclick=showRegLink;
-    async function refreshCloud(){
-      var status=document.getElementById('usersCloudStatus');
-      if(refreshBtn)refreshBtn.disabled=true;
-      if(status)status.textContent='جارٍ مزامنة الحسابات مع السحابة...';
-      try{
-        if(!currentSchoolId())await resolveManagerSchoolContext();
-        const list=await hydrateUsersFromSupabase();
-        var target=document.getElementById('userList');
-        if(target)target.innerHTML=renderUserList(list);
-        if(status)status.textContent='تم تحديث الحسابات من السحابة.';
-      }catch(e){
-        if(status)status.textContent='تعذر تحديث الحسابات الآن؛ تم عرض آخر نسخة محفوظة.';
-        console.warn('تعذر تحديث إدارة الحسابات',e);
-      }finally{if(refreshBtn)refreshBtn.disabled=false;}
-    }
-    if(refreshBtn)refreshBtn.onclick=refreshCloud;
-    refreshCloud();
+    document.getElementById('refreshUsers').onclick=async function(){const list=await hydrateUsersFromSupabase();document.getElementById('userList').innerHTML=renderUserList(list);};
+    document.getElementById('openRegistrationFromActivation').onclick=showRegLink;
   }
   window.showActivation=showActivation;
   function renderUserList(arr){return arr.filter(function(u){return u.status!=='deleted'}).map(function(u){
@@ -3815,41 +3787,14 @@ body{overflow-x:hidden}
   }
   window.ssFinalDisableUser=async function(id){var a=users(); var u=a.find(function(x){return x.id===id}); if(!u)return; if(u.isOwner||u.isPrimaryManager||u.role==='owner'||u.role==='manager'||u.id==='manager'||u.id==='owner'){alert('لا يمكن تعطيل حساب المالك أو المدير الرئيسي.');return;} if(!confirm('هل تريد تعطيل حساب '+(u.name||'هذا المستخدم')+'؟'))return; a=a.map(function(x){if(x.id===id){x.status='disabled';x.active=false;x.isActive=false;}return x});saveUsers(a);try{if(localStorage.getItem('smart_school_private_edition')==='private'&&window.PrivateSchoolBridge&&u?.privateMembershipId)await window.PrivateSchoolBridge.manager('set_member_status',{memberId:u.privateMembershipId,status:'disabled'});else if(window.SmartSchoolSupabase && id && !String(id).startsWith('reg_') && !String(id).startsWith('user_')) await window.SmartSchoolSupabase.updateUserStatus(id,'disabled');}catch(e){console.warn('تعذر تعطيل المستخدم في Supabase',e)}showActivation();}
   window.ssFinalDeleteUser=async function(id){var a=users(); var u=a.find(function(x){return x.id===id}); if(!u)return; if(u.isOwner||u.isPrimaryManager||u.role==='owner'||u.role==='manager'||u.id==='manager'||u.id==='owner'){alert('لا يمكن حذف حساب المالك أو المدير الرئيسي.');return;} if(!confirm('هل تريد حذف حساب '+(u.name||'هذا المستخدم')+'؟\nسيتم حذفه من قائمة مستخدمي المدرسة وتعطيل دخوله.'))return; a=a.map(function(x){if(x.id===id){x.status='deleted'; x.deletedAt=new Date().toISOString(); x.active=false; x.isActive=false;} return x}); saveUsers(a); try{if(localStorage.getItem('smart_school_private_edition')==='private'&&window.PrivateSchoolBridge&&u?.privateMembershipId)await window.PrivateSchoolBridge.manager('delete_member',{memberId:u.privateMembershipId});else if(window.SmartSchoolSupabase && id && !String(id).startsWith('reg_') && !String(id).startsWith('user_')){if(window.SmartSchoolSupabase.deleteUser){await window.SmartSchoolSupabase.deleteUser(id);}else{await window.SmartSchoolSupabase.updateUserStatus(id,'deleted');}}}catch(e){console.warn('تعذر حذف المستخدم في Supabase، تم إخفاؤه محلياً فقط',e)} showActivation();}
-  function ssReadableError(e,fallback){
-    var fb=fallback||'تعذر تنفيذ العملية';
-    if(!e)return fb;
-    if(typeof e==='string')return e==='[object Object]'?fb:e;
-    if(typeof e.message==='string'&&e.message.trim()&&e.message.trim()!=='[object Object]')return e.message.trim();
-    if(typeof e.error==='string'&&e.error.trim()&&e.error.trim()!=='[object Object]')return e.error.trim();
-    if(e.payload){
-      if(typeof e.payload.error==='string'&&e.payload.error.trim()&&e.payload.error.trim()!=='[object Object]')return e.payload.error.trim();
-      if(e.payload.error&&typeof e.payload.error.message==='string')return e.payload.error.message;
-      if(typeof e.payload.message==='string'&&e.payload.message.trim())return e.payload.message.trim();
-    }
-    if(e.details&&typeof e.details==='string'&&e.details.trim())return e.details.trim();
-    try{var j=JSON.stringify(e);return j&&j!=='{}'&&j!=='"[object Object]"'?j:fb;}catch(_){return fb;}
-  }
   window.ssFinalAddRole=function(id){
     var u=users().find(function(x){return x.id===id}); if(!u)return;
     if(localStorage.getItem('smart_school_private_edition')!=='private'||!window.PrivateSchoolBridge||!u.privateMembershipId){alert('إضافة الدور المزدوج متاحة للحسابات المرتبطة بالسحابة في المدارس الخاصة.');return;}
     var opts={agent:'وكيل/وكيلة',student_advisor:'موجه/موجهة طلابية',teacher:'معلم/ة',health_advisor:'الموجه الصحي',kindergarten_teacher:'معلمة رياض الأطفال',activity_leader:'رائد/ة النشاط',administrative_employee:'موظف إداري'};
-    if(u.role==='agent') delete opts.agent;
-    panel('إضافة دور إضافي','<div class="ss-card blue"><b>'+esc(u.name||u.email)+'</b><div class="ss-muted">سيبقى الدور الحالي كما هو ويضاف دور مستقل للحساب نفسه داخل هذه المدرسة. <b>اختصاصات الوكيل الثلاثة لا تعد أدوارًا إضافية</b>؛ يتم تعديلها من زر «تعديل» للحساب نفسه.</div></div><div class="ss-field"><label>الدور الإضافي</label><select id="extraMemberRole">'+Object.entries(opts).map(function(p){return '<option value="'+p[0]+'">'+p[1]+'</option>'}).join('')+'</select></div><div class="ss-field" id="extraAgencyWrap" style="display:none"><label>تصنيف الوكيل</label>'+agencyCheckboxes('extraAgency',[])+'</div><button class="ss-action" id="saveExtraMemberRole">إضافة الدور</button>');
+    panel('إضافة دور إضافي','<div class="ss-card blue"><b>'+esc(u.name||u.email)+'</b><div class="ss-muted">سيبقى الدور الحالي كما هو ويضاف دور مستقل للحساب نفسه داخل هذه المدرسة.</div></div><div class="ss-field"><label>الدور الإضافي</label><select id="extraMemberRole">'+Object.entries(opts).map(function(p){return '<option value="'+p[0]+'">'+p[1]+'</option>'}).join('')+'</select></div><div class="ss-field" id="extraAgencyWrap" style="display:none"><label>تصنيف الوكيل</label>'+agencyCheckboxes('extraAgency',[])+'</div><button class="ss-action" id="saveExtraMemberRole">إضافة الدور</button>');
     function syncExtra(){var w=document.getElementById('extraAgencyWrap');if(w)w.style.display=val('extraMemberRole')==='agent'?'grid':'none'}
     document.getElementById('extraMemberRole').onchange=syncExtra;syncExtra();
-    document.getElementById('saveExtraMemberRole').onclick=async function(){
-      var role=val('extraMemberRole'),cats=role==='agent'?selectedAgencyList('extraAgency'):[];
-      if(role==='agent'&&!cats.length){alert('حدد تصنيف الوكيل قبل إضافة الدور.');return;}
-      try{
-        await window.PrivateSchoolBridge.manager('add_member_role',{sourceMemberId:u.privateMembershipId,newRole:role,roleVariants:cats,roleVariant:cats.join(',')});
-        await hydrateUsersFromSupabase();
-        await showActivation();
-      }catch(e){
-        var m=ssReadableError(e,'تعذر إضافة الدور');
-        if(m==='member_role_already_exists')m='هذا الدور موجود بالفعل للحساب داخل المدرسة.';
-        alert(m);
-      }
-    }
+    document.getElementById('saveExtraMemberRole').onclick=async function(){var role=val('extraMemberRole'),cats=role==='agent'?selectedAgencyList('extraAgency'):[];if(role==='agent'&&!cats.length){alert('حدد تصنيف الوكيل قبل إضافة الدور.');return;}try{await window.PrivateSchoolBridge.manager('add_member_role',{sourceMemberId:u.privateMembershipId,newRole:role,roleVariant:cats[0]||''});await hydrateUsersFromSupabase();await showActivation();}catch(e){alert(e.message==='member_role_already_exists'?'هذا الدور موجود بالفعل للحساب داخل المدرسة.':(e.message||'تعذر إضافة الدور'));}}
   }
   window.ssFinalEditUser=function(id){
     var u=users().find(function(x){return x.id===id}); if(!u)return;
@@ -3862,7 +3807,7 @@ body{overflow-x:hidden}
       '<option value="administrative_employee">موظف إداري</option></select></div>'+
       '<div class="ss-field" id="eAgencyField"><label>تصنيف الوكيل/الوكيلة</label>'+
       agencyCheckboxes('eAgency',u.agent_categories||u.agency_categories||u.agency_type||u.agencyType)+
-      '<div class="ss-muted">يمكن اختيار اختصاص واحد أو أكثر، وحتى الاختصاصات الثلاثة معًا. تظهر للوكيل سجلات كل الاختصاصات المحددة إضافة إلى السجلات المشتركة.</div></div>'+
+      '<div class="ss-muted">يحدد السجلات والأرشيف المرتبط بنوع الوكالة.</div></div>'+
       '<div class="ss-field"><label>الحالة</label><select id="eStatus">'+
       '<option value="pending">بانتظار التفعيل</option><option value="active">مفعل</option><option value="disabled">معطل</option></select></div>'+
       '<button class="ss-action" id="saveEdit">حفظ التعديل</button>');
@@ -3879,15 +3824,14 @@ body{overflow-x:hidden}
           memberId:u.privateMembershipId,
           displayName:val('eName'),
           role:role,
-          roleVariants:cats,
-          roleVariant:cats.join(','),
+          roleVariant:cats[0]||'',
           status:val('eStatus')
         });
         if(role==='agent')saveAgencyForUser(u,cats);
         await hydrateUsersFromSupabase();
         await showActivation();
       }catch(e){
-        var m=ssReadableError(e,'تعذر تعديل المستخدم');
+        var m=e&&e.message||'تعذر تعديل المستخدم';
         if(m==='member_role_already_exists')m='هذا الحساب يملك هذا الدور بالفعل داخل المدرسة.';
         if(m==='agent_role_variant_required')m='يجب تحديد تصنيف الوكيل.';
         alert(m);
@@ -3900,8 +3844,10 @@ body{overflow-x:hidden}
       await resolveManagerSchoolContext();
       var sid=currentSchoolId();
       if(!sid)throw new Error('تعذر تحديد المدرسة الحالية.');
-      if(!window.PrivateSchoolBridge||!window.PrivateSchoolBridge.schoolLoginPath)throw new Error('محرك رابط دخول المدرسة غير جاهز.');
-      var href=new URL(window.PrivateSchoolBridge.schoolLoginPath(sid),location.href).href;
+      var link=new URL('school-login.html',location.href);
+      link.searchParams.set('edition','private');
+      link.searchParams.set('schoolId',sid);
+      var href=link.href;
       try{await navigator.clipboard.writeText(href);}catch(_){}
       window.open(href,'_blank','noopener');
       alert('تم نسخ رابط دخول المدرسة وفتح البوابة في نافذة مستقلة.');
@@ -4814,6 +4760,7 @@ document.addEventListener("click", function(e){
 </style>
 </head><body>${editor.innerHTML}\n
 <!-- SCHOOL COMMAND CENTER M1-M4 -->
+<script src="self-evaluation-file-engine.js?v=20260822-self-eval-file-v1"></script>
 </body></html>`;
       record.file = new Blob([htmlDoc], {type:'application/msword'});
       if(!/\.doc$/i.test(record.name)) record.name = record.name.replace(/\.(docx|doc)$/i,'') + '_معدل.doc';
