@@ -84,7 +84,7 @@
      if(!g.PrivateSchoolConfig?.supabaseUrl || !g.PrivateSchoolConfig?.publishableKey){
        throw new Error('إعداد اتصال Supabase للمدارس الخاصة غير مكتمل');
      }
-     await load('private-school-bridge.js');
+     await load('private-school-bridge.js?v=20260822-userflow1');
 
      if(page==='school-login.html'){
        // The actual school-login.html already owns the login form; helper is optional.
@@ -97,7 +97,7 @@
      await optional('private-school-isolation.js');
 
      // CRITICAL: authenticate exactly once, and wait for verification to finish.
-     await load('private-school-page-guard.js?v=20260822-unified1');
+     await load('private-school-page-guard.js?v=20260822-userflow1');
      if(g.__privateSchoolGuardReady) await g.__privateSchoolGuardReady;
      if(document.documentElement.dataset.privateAuthVerified!=='1'){
        // page guard owns any redirect. Do not create a second redirect path here.

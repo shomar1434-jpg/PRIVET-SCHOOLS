@@ -1,6 +1,6 @@
 (function(g){
 'use strict';
-if(g.__PRIVATE_SCHOOL_PAGE_GUARD_V3__)return;g.__PRIVATE_SCHOOL_PAGE_GUARD_V3__=true;
+if(g.__PRIVATE_SCHOOL_PAGE_GUARD_V4__)return;g.__PRIVATE_SCHOOL_PAGE_GUARD_V4__=true;
 const page=(location.pathname.split('/').pop()||'').toLowerCase();
 const roleByPage={
  'manager.html':['manager'],'agent.html':['agent'],'teacher.html':['teacher'],'student_advisor.html':['student_advisor'],
@@ -10,21 +10,80 @@ const roleByPage={
 const publicPages=new Set(['','index.html','school-login.html','private-owner-login.html','private-manager-login.html','private-school-user-register.html','private-invite-accept.html']);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 function sid(){try{const q=new URLSearchParams(location.search||'');return q.get('schoolId')||q.get('school_id')||g.PrivateSchoolBridge?.privateContext?.()?.schoolId||''}catch(_){return ''}}
-function block(err){
- document.documentElement.classList.remove('private-auth-pending');document.documentElement.dataset.privateAuthBlocked='1';
- let el=document.getElementById('private-auth-blocker');if(!el){el=document.createElement('div');el.id='private-auth-blocker';document.body.appendChild(el)}
- el.style.cssText='position:fixed;inset:0;z-index:2147483646;background:#f8fafc;display:grid;place-items:center;padding:22px;font-family:Tajawal,Cairo,Arial,sans-serif;direction:rtl';
- const login=g.PrivateSchoolBridge?.schoolLoginPath?.(sid())||('school-login.html?edition=private'+(sid()?'&schoolId='+encodeURIComponent(sid()):''));
- el.innerHTML='<div style="width:min(520px,96vw);background:white;border:1px solid #dbe7e4;border-radius:22px;padding:26px;box-shadow:0 22px 60px #0f172a18;text-align:center"><div style="font-size:42px">🔐</div><h2 style="color:#15445a;margin:8px 0">تعذر التحقق من جلسة المدرسة</h2><p style="color:#64748b;line-height:1.8">لم يتم تحويلك تلقائيًا إلى صفحة الدخول لمنع حلقات تسجيل الدخول. يمكنك إعادة المحاولة أو فتح بوابة نفس المدرسة.</p><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button id="private-auth-retry" style="border:0;border-radius:12px;padding:11px 18px;background:#0f766e;color:white;font-weight:800;cursor:pointer">إعادة التحقق</button><button id="private-auth-login" style="border:0;border-radius:12px;padding:11px 18px;background:#e2e8f0;color:#334155;font-weight:800;cursor:pointer">بوابة دخول المدرسة</button></div><small style="display:block;color:#94a3b8;margin-top:12px">'+String(err?.message||'تعذر التحقق').replace(/[<>&]/g,'')+'</small></div>';
- document.getElementById('private-auth-retry').onclick=()=>location.reload();document.getElementById('private-auth-login').onclick=()=>location.href=login;
+function markVerified(ctx){
+ document.documentElement.dataset.schoolEdition='private';
+ document.documentElement.dataset.privateRole=ctx?.role||'';
+ document.documentElement.dataset.privateAuthVerified='1';
+ document.documentElement.classList.remove('private-auth-pending');
+ try{window.dispatchEvent(new CustomEvent('private-school-context-ready',{detail:ctx}))}catch(_){}
+ return ctx;
+}
+function sameSchool(ctx){const requested=sid();return !requested||String(ctx?.schoolId||'')===String(requested)}
+function roleAllowed(ctx,allowed){return !Array.isArray(allowed)||!allowed.length||allowed.includes(ctx?.role)}
+async function cachedAuthenticatedContext(allowed){
+ try{
+  const ctx=g.PrivateSchoolBridge?.privateContext?.();
+  if(!ctx||ctx.edition!=='private'||!sameSchool(ctx)||!roleAllowed(ctx,allowed))return null;
+  const sb=g.PrivateSchoolBridge?.getClient?.(ctx.role||'');
+  if(!sb)return null;
+  const r=await sb.auth.getSession();
+  const session=r?.data?.session;
+  if(!session?.user?.id||String(session.user.id)!==String(ctx.userId||''))return null;
+  try{g.PrivateSchoolBridge.applyCompatibility?.(ctx)}catch(_){}
+  return ctx;
+ }catch(_){return null}
+}
+function goToOwnRole(ctx){
+ try{
+  const target=g.PrivateSchoolBridge?.roleLanding?.(ctx);
+  if(!target)return false;
+  const current=(location.pathname.split('/').pop()||'').toLowerCase();
+  if(String(target).toLowerCase()===current)return false;
+  const u=new URL(target,location.href);u.searchParams.set('privateEdition','1');u.searchParams.set('schoolId',ctx.schoolId);location.replace(u.href);return true;
+ }catch(_){return false}
+}
+function goToSchoolLogin(){
+ const schoolId=sid();
+ const login=g.PrivateSchoolBridge?.schoolLoginPath?.(schoolId)||('school-login.html?edition=private'+(schoolId?'&schoolId='+encodeURIComponent(schoolId):''));
+ location.replace(login);
 }
 async function verify(){
  if(publicPages.has(page))return {public:true};
  if(!g.PrivateSchoolBridge?.requireContext)throw new Error('محرك جلسة المدرسة غير جاهز');
  const allowed=roleByPage[page]||undefined;
  let last=null;
- for(const wait of [0,250,750,1500]){if(wait)await sleep(wait);try{const ctx=await g.PrivateSchoolBridge.requireContext(allowed);const requested=sid();if(requested&&String(ctx.schoolId)!==String(requested))throw new Error('school_context_mismatch');document.documentElement.dataset.schoolEdition='private';document.documentElement.dataset.privateRole=ctx.role||'';document.documentElement.dataset.privateAuthVerified='1';window.dispatchEvent(new CustomEvent('private-school-context-ready',{detail:ctx}));return ctx}catch(e){last=e}}
- throw last||new Error('تعذر التحقق من الجلسة');
+ for(const wait of [0,180,450,900]){
+  if(wait)await sleep(wait);
+  try{
+   const ctx=await g.PrivateSchoolBridge.requireContext(allowed);
+   if(!sameSchool(ctx))throw new Error('school_context_mismatch');
+   return markVerified(ctx);
+  }catch(e){last=e}
+ }
+ // A recent, matching Supabase auth session is sufficient to keep an already authenticated
+ // user inside the role interface if a transient context/Edge request failed during page boot.
+ const cached=await cachedAuthenticatedContext(allowed);
+ if(cached)return markVerified(cached);
+ // If the user is authenticated but landed on a page for another role, send them to their own
+ // role interface instead of a login or verification screen.
+ const anyCtx=g.PrivateSchoolBridge?.privateContext?.();
+ if(anyCtx&&anyCtx.edition==='private'&&sameSchool(anyCtx)){
+  const sb=g.PrivateSchoolBridge?.getClient?.(anyCtx.role||'');
+  try{
+   const r=await sb?.auth?.getSession?.();
+   if(r?.data?.session?.user?.id===anyCtx.userId && goToOwnRole(anyCtx))return anyCtx;
+  }catch(_){}
+ }
+ throw last||new Error('انتهت جلسة الدخول');
 }
-g.__privateSchoolGuardReady=(async()=>{try{return await verify()}catch(e){console.warn('[private-page-guard]',e);block(e);throw e}})();
+g.__privateSchoolGuardReady=(async()=>{
+ try{return await verify()}
+ catch(e){
+  console.warn('[private-page-guard]',e);
+  // No intermediate verification/error screen. A genuinely missing/expired session returns only
+  // to the canonical login page for the same school.
+  goToSchoolLogin();
+  throw e;
+ }
+})();
 })(window);

@@ -3841,10 +3841,8 @@ body{overflow-x:hidden}
       await resolveManagerSchoolContext();
       var sid=currentSchoolId();
       if(!sid)throw new Error('تعذر تحديد المدرسة الحالية.');
-      var link=new URL('school-login.html',location.href);
-      link.searchParams.set('edition','private');
-      link.searchParams.set('schoolId',sid);
-      var href=link.href;
+      if(!window.PrivateSchoolBridge||!window.PrivateSchoolBridge.schoolLoginPath)throw new Error('محرك رابط دخول المدرسة غير جاهز.');
+      var href=new URL(window.PrivateSchoolBridge.schoolLoginPath(sid),location.href).href;
       try{await navigator.clipboard.writeText(href);}catch(_){}
       window.open(href,'_blank','noopener');
       alert('تم نسخ رابط دخول المدرسة وفتح البوابة في نافذة مستقلة.');
