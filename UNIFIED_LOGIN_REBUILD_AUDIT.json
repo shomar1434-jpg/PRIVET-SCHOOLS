@@ -1,0 +1,35 @@
+{
+  "reference_source": "user uploaded تجارب.zip",
+  "namespace_removed_html_count": 96,
+  "unified_school_login": "school-login.html?edition=private&schoolId=<school_id>",
+  "registration_portal": "private-school-user-register.html?token=<token>",
+  "manager_special_login": "compatibility redirect only",
+  "page_guard": "retry + fail-closed overlay; no automatic login redirect",
+  "legacy_supabase_bridge": "reuses PrivateSchoolBridge canonical client",
+  "preserved_markers": {
+    "private-compliance.html": {
+      "compliance": true,
+      "evidence": true
+    },
+    "PHASE_AUDIT_AR.md": {
+      "staff_discipline_movements": true,
+      "private-school-workflows": true
+    },
+    "private-manager-enhancements.js": {
+      "private-workflow-badge": true,
+      "private-users-login-link": true
+    },
+    "private-school-user-register.html": {
+      "وكيل/وكيلة": true
+    },
+    "agent.html": {
+      "educational": true,
+      "school_affairs": true,
+      "student_affairs": true
+    },
+    "private-school-isolation.js": {
+      "VAULT_PREFIX": true,
+      "schoolId": true
+    }
+  }
+}

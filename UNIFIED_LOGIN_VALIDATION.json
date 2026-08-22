@@ -1,0 +1,39 @@
+{
+  "errors": [],
+  "js_checks": {
+    "private-school-bridge.js": "PASS",
+    "private-school-runtime.js": "PASS",
+    "private-school-page-guard.js": "PASS",
+    "private-manager-enhancements.js": "PASS",
+    "supabase-bridge.js": "PASS",
+    "private-auth-storage.js": "PASS",
+    "private-session-reset.js": "PASS"
+  },
+  "missing_local_scripts": {},
+  "preserved": {
+    "private-compliance.html": {
+      "compliance": true,
+      "evidence": true
+    },
+    "PHASE_AUDIT_AR.md": {
+      "staff_discipline_movements": true,
+      "private-school-workflows": true
+    },
+    "private-manager-enhancements.js": {
+      "private-workflow-badge": true,
+      "private-users-login-link": true
+    },
+    "private-school-user-register.html": {
+      "وكيل/وكيلة": true
+    },
+    "agent.html": {
+      "educational": true,
+      "school_affairs": true,
+      "student_affairs": true
+    },
+    "private-school-isolation.js": {
+      "VAULT_PREFIX": true,
+      "schoolId": true
+    }
+  }
+}
