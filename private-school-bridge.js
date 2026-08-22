@@ -10,6 +10,12 @@
   });
   const LEGACY_KEYS=['activeSchool','activeSchoolId','active_school','active_school_code','active_school_id','active_school_login_url','active_school_name','current_school_id','current_school_code','current_school_name','school_id','smart_school_id','smart_school_active_role','currentRole','currentUserId','current_user_id','currentUserName','currentUserEmail','smart_school_current_session','smart_school_teacher_extra_roles_map','smartSchoolCloudStorage_teacher_extra_roles_map'];
   const clients={owner:null,school:null};
+  const A=g.PrivateAuthStorage||null;
+  const ssGet=(k)=>A?A.sessionGet(k):sessionStorage.getItem(k);
+  const ssSet=(k,v)=>A?A.sessionSet(k,v):sessionStorage.setItem(k,v);
+  const ssDel=(k)=>A?A.sessionRemove(k):sessionStorage.removeItem(k);
+  const lsSet=(k,v)=>A?A.localSet(k,v):localStorage.setItem(k,v);
+  const lsDel=(k)=>A?A.localRemove(k):localStorage.removeItem(k);
   function authScope(roleHint=''){
     const hinted=String(roleHint||'').trim();
     if(hinted==='owner') return 'owner';
@@ -26,42 +32,43 @@
     if(clients[scope]) return clients[scope];
     if(!g.supabase || !g.supabase.createClient) throw new Error('مكتبة Supabase غير جاهزة');
     const storageKey=scope==='owner'?'PRIVATE_SCHOOLS_OWNER_AUTH_V1':'PRIVATE_SCHOOLS_SCHOOL_USER_AUTH_V1';
-    clients[scope]=g.supabase.createClient(C.supabaseUrl,C.publishableKey,{auth:{storageKey,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    const rawStorage=A?.local||undefined;
+    clients[scope]=g.supabase.createClient(C.supabaseUrl,C.publishableKey,{auth:{storageKey,...(rawStorage?{storage:rawStorage}:{}),persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     return clients[scope];
   }
   function clean(v){return String(v??'').trim()}
   function safeJson(s,fallback){try{return JSON.parse(s)}catch(_){return fallback}}
-  function privateContext(){return safeJson(sessionStorage.getItem(C.sessionStorageKey)||'null',null)}
+  function privateContext(){return safeJson(ssGet(C.sessionStorageKey)||ssGet('smart_school_private_session_v1')||'null',null)}
   function clearPrivateCompat(){
     try{ g.PrivateSessionReset?.clearActiveSchoolContext?.({}); }catch(_){}
-    sessionStorage.removeItem(C.sessionStorageKey);
-    sessionStorage.removeItem(C.schoolListStorageKey);
-    sessionStorage.removeItem('smart_school_private_session_v1');
-    sessionStorage.removeItem('smart_school_private_schools_v1');
-    sessionStorage.removeItem('smart_school_private_memberships_v1');
+    ssDel(C.sessionStorageKey);
+    ssDel(C.schoolListStorageKey);
+    ssDel('smart_school_private_session_v1');
+    ssDel('smart_school_private_schools_v1');
+    ssDel('smart_school_private_memberships_v1');
     for(const k of LEGACY_KEYS){
-      try{ localStorage.removeItem(k); }catch(_){}
-      try{ sessionStorage.removeItem('private-owned:'+k); sessionStorage.removeItem('private-backup:'+k); sessionStorage.removeItem('private-backup:'+k+':exists'); }catch(_){}
+      try{ lsDel(k); }catch(_){}
+      try{ ssDel('private-owned:'+k); ssDel('private-backup:'+k); ssDel('private-backup:'+k+':exists'); }catch(_){}
     }
     [
       'persist_school','selected_school_id','selected_school_name','school_name','school_code','active_school_membership_id',
       'smart_school_active_membership_id','smartSchool.currentSchool','smart_school_active_school','smart_school_active_school_id',
       'smart_school_active_school_name','currentSchool','schoolContext','school_context'
-    ].forEach(k=>{try{localStorage.removeItem(k)}catch(_){}});
-    localStorage.removeItem('smart_school_private_edition');
+    ].forEach(k=>{try{lsDel(k)}catch(_){}});
+    lsDel('smart_school_private_edition');
   }
   function writeLegacy(k,v){
     try{
-      sessionStorage.setItem('private-owned:'+k,'1');
-      sessionStorage.removeItem('private-backup:'+k);
-      sessionStorage.removeItem('private-backup:'+k+':exists');
+      ssSet('private-owned:'+k,'1');
+      ssDel('private-backup:'+k);
+      ssDel('private-backup:'+k+':exists');
     }catch(_){}
-    localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v));
+    lsSet(k,typeof v==='string'?v:JSON.stringify(v));
   }
   function applyCompatibility(ctx){
     if(!ctx || ctx.edition!=='private') throw new Error('سياق مدرسة خاصة غير صالح');
     const appRole=ROLE_MAP[ctx.role]||ctx.role;
-    localStorage.setItem('smart_school_private_edition','private');
+    lsSet('smart_school_private_edition','private');
     writeLegacy('activeSchoolId',ctx.schoolId); writeLegacy('active_school_id',ctx.schoolId); writeLegacy('current_school_id',ctx.schoolId); writeLegacy('school_id',ctx.schoolId); writeLegacy('smart_school_id',ctx.schoolId);
     writeLegacy('active_school_code',ctx.schoolCode||''); writeLegacy('current_school_code',ctx.schoolCode||'');
     writeLegacy('active_school_name',ctx.schoolName||''); writeLegacy('current_school_name',ctx.schoolName||'');
@@ -104,15 +111,15 @@
     const data=await invoke('private-school-session',{schoolId:clean(schoolId),activeRole:requestedRole,role:requestedRole},{authRole:requestedRole});
     const ctx=data.context;
     if(!ctx || ctx.edition!=='private') throw new Error('تعذر إنشاء سياق المدرسة الخاصة');
-    sessionStorage.setItem(C.sessionStorageKey,JSON.stringify(ctx));
-    sessionStorage.setItem(C.schoolListStorageKey,JSON.stringify(data.schools||[]));
-    sessionStorage.setItem('smart_school_private_session_v1',JSON.stringify(ctx));
-    sessionStorage.setItem('smart_school_private_schools_v1',JSON.stringify(data.schools||[]));
-    sessionStorage.setItem('smart_school_private_memberships_v1',JSON.stringify(data.memberships||[]));
+    ssSet(C.sessionStorageKey,JSON.stringify(ctx));
+    ssSet(C.schoolListStorageKey,JSON.stringify(data.schools||[]));
+    ssSet('smart_school_private_session_v1',JSON.stringify(ctx));
+    ssSet('smart_school_private_schools_v1',JSON.stringify(data.schools||[]));
+    ssSet('smart_school_private_memberships_v1',JSON.stringify(data.memberships||[]));
     applyCompatibility(ctx); try{window.dispatchEvent(new CustomEvent('private-school-session-established',{detail:data}))}catch(_){} return data;
   }
   function clearSystemAdminMarkers(){
-    try{['system_admin_context','system_admin_verified','system_admin_edition','private_system_admin_entry','private_admin_handoff_pending'].forEach(k=>sessionStorage.removeItem(k));}catch(_){}
+    try{['system_admin_context','system_admin_verified','system_admin_edition','private_system_admin_entry','private_admin_handoff_pending'].forEach(k=>ssDel(k));}catch(_){}
   }
   async function login(email,password,schoolId='',actorRole=''){
     // دخول مالك/مدير/مستخدم مدرسة يجب أن يبدأ بسياق مدرسة نظيف لا يحمل صلاحيات مدير النظام.

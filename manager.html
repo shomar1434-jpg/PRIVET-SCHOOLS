@@ -3,7 +3,7 @@
 <html dir="rtl" lang="ar">
 <head>
 
-<script src="private-storage-namespace.js"></script>
+<script src="private-auth-storage.js"></script><script src="private-storage-namespace.js"></script>
 <!-- PRIVATE_EDITION_BUILD_HEAD -->
 <script src="private-edition-bootstrap.js"></script>
 <script src="private-role-entry-compat.js?v=20260822-entry1"></script>
@@ -2141,7 +2141,7 @@ body{overflow-x:hidden}
 
         function deactivateSystem() {
             if(confirm("تحذير: سيتم إلغاء تنشيط النظام ومسح كافة البيانات والإعدادات نهائياً. هل أنت متأكد؟")) {
-                localStorage.clear();
+                localStorage.removeItem('school_active');
                 window.location.reload();
             }
         }

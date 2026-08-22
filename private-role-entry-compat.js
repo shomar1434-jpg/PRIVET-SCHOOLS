@@ -4,18 +4,22 @@ if(g.__PRIVATE_ROLE_ENTRY_COMPAT_V1__) return;
 g.__PRIVATE_ROLE_ENTRY_COMPAT_V1__=true;
 g.__PRIVATE_EDITION_BUILD__=true;
 
+const A=g.PrivateAuthStorage||null;
+const rawSGet=(k)=>A?A.sessionGet(k):sessionStorage.getItem(k);
+const rawSSet=(k,v)=>A?A.sessionSet(k,v):sessionStorage.setItem(k,v);
+const rawLSet=(k,v)=>A?A.localSet(k,v):localStorage.setItem(k,v);
 function j(v,d){try{return JSON.parse(v||'')||d}catch(_){return d}}
 function s(v){return String(v==null?'':v).trim()}
 function put(k,v){
   try{localStorage.setItem(k,typeof v==='string'?v:JSON.stringify(v))}catch(_){}
 }
 function mark(k){
-  try{sessionStorage.setItem('private-owned:'+k,'1')}catch(_){}
+  try{rawSSet('private-owned:'+k,'1')}catch(_){}
 }
 function set(k,v){put(k,v);mark(k)}
 function boot(){
-  const ctx=j(sessionStorage.getItem('smart_school_private_session_v1'),null) ||
-            j(sessionStorage.getItem('private_school_session'),null);
+  const ctx=j(rawSGet('smart_school_private_session_v1'),null) ||
+            j(rawSGet('private_school_session'),null);
   if(!ctx || s(ctx.edition)!=='private' || !s(ctx.schoolId)){
     // Do not redirect here. The real Supabase page guard decides later.
     document.documentElement.classList.add('private-auth-pending');
@@ -25,7 +29,7 @@ function boot(){
   document.documentElement.classList.add('private-auth-pending');
   document.documentElement.dataset.schoolEdition='private';
   document.documentElement.dataset.privateEntryPrepared='1';
-  try{localStorage.setItem('smart_school_private_edition','private')}catch(_){}
+  try{rawLSet('smart_school_private_edition','private')}catch(_){}
 
   const roleMap={
     owner:'owner', manager:'leadership', agent:'agency', teacher:'performance',
@@ -61,8 +65,8 @@ function boot(){
   // but they are not the authentication authority in the private edition.
   try{
     sessionStorage.setItem('private_school_auth_authority','private-school-session');
-    sessionStorage.setItem('private_school_entry_school_id',s(ctx.schoolId));
-    sessionStorage.setItem('private_school_entry_role',s(ctx.role));
+    rawSSet('private_school_entry_school_id',s(ctx.schoolId));
+    rawSSet('private_school_entry_role',s(ctx.role));
   }catch(_){}
 }
 boot();

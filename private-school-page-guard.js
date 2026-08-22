@@ -49,7 +49,7 @@ g.__privateSchoolGuardReady=(async()=>{
     console.warn('Private page guard rejected protected page:',err);
     let sid=requestedSchool();
     if(!sid){
-      try{sid=JSON.parse(sessionStorage.getItem('smart_school_private_session_v1')||'null')?.schoolId||''}catch(_){}
+      try{sid=JSON.parse((window.PrivateAuthStorage?.sessionGet('smart_school_private_session_v1')||sessionStorage.getItem('smart_school_private_session_v1')||'null'))?.schoolId||''}catch(_){}
     }
     // Only this explicit auth/context rejection may return the user to login.
     location.replace(loginUrl(sid,'auth'));
