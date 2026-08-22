@@ -5619,9 +5619,10 @@ bWw+
 (function(){
   function readCtx(){try{return JSON.parse(sessionStorage.getItem('smart_school_private_session_v1')||'null')||JSON.parse(localStorage.getItem('smart_school_current_session')||'null')}catch(e){return null}}
   function norm(v){v=String(v||'').trim();var m={educational_affairs:'educational',educational:'educational',school_affairs:'school_affairs',student_affairs:'student_affairs',deputy_academic:'educational',deputy_admin:'school_affairs',deputy_students:'student_affairs'};return m[v]||''}
-  function category(){var c=readCtx()||{};return norm(c.roleVariant||c.role_variant||c.agency_type||c.agencyType||'')}
-  function isPrivate(){var c=readCtx()||{};return c.schoolEdition==='private'||c.privateSchool===true||localStorage.getItem('smart_school_private_edition')==='private'}
-  window.PrivateAgentScope={category:category,allowed:function(cat){if(!isPrivate())return true;var a=category();if(!a)return cat==='shared';return cat==='shared'||cat===a;},recordsUrl:function(){var a=category();return 'wakil-records.html?return_to=agent.html'+(a?'&agency_type='+encodeURIComponent(a):'')}};
+  function categories(){var c=readCtx()||{},raw=c.roleVariants||c.role_variants||c.roleVariant||c.role_variant||c.agent_categories||c.agency_categories||c.agency_types||c.agency_type||c.agencyType||'';if(Array.isArray(raw))return [...new Set(raw.map(norm).filter(Boolean))];return [...new Set(String(raw||'').split(/[،,|]/).map(norm).filter(Boolean))]}
+  function category(){var a=categories();return a[0]||''}
+  function isPrivate(){var c=readCtx()||{};return c.schoolEdition==='private'||c.edition==='private'||c.privateSchool===true||localStorage.getItem('smart_school_private_edition')==='private'}
+  window.PrivateAgentScope={category:category,categories:categories,allowed:function(cat){if(!isPrivate())return true;var a=categories();if(!a.length)return cat==='shared';return cat==='shared'||a.indexOf(cat)>-1;},recordsUrl:function(){var a=categories();return 'wakil-records.html?return_to=agent.html'+(a.length?'&agency_types='+encodeURIComponent(a.join(',')):'')}};
 })();
 </script>
 <script id="RECORDS_ARCHIVE_ENGINE">
