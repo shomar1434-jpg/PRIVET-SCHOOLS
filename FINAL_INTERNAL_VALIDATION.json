@@ -1,0 +1,53 @@
+{
+  "reference_file_count": 407,
+  "output_file_count": 411,
+  "missing_reference_files": [],
+  "new_files": [
+    "FINAL_INTERNAL_VALIDATION.json",
+    "UNIFIED_LOGIN_REBUILD_AUDIT.json",
+    "UNIFIED_LOGIN_REBUILD_AUDIT_AR.md",
+    "UNIFIED_LOGIN_VALIDATION.json"
+  ],
+  "namespace_refs": [],
+  "manager_role_forced_links": [],
+  "legacy_manager_login_backend": [],
+  "automatic_guard_redirect": false,
+  "core_js": {
+    "private-school-bridge.js": "PASS",
+    "private-school-runtime.js": "PASS",
+    "private-school-page-guard.js": "PASS",
+    "private-manager-enhancements.js": "PASS",
+    "supabase-bridge.js": "PASS",
+    "private-auth-storage.js": "PASS",
+    "private-session-reset.js": "PASS"
+  },
+  "preserved": {
+    "private-compliance.html": true,
+    "private-school-user-register.html": true,
+    "PHASE_AUDIT_AR.md": {
+      "staff_discipline_movements": true,
+      "employee_request_events": true,
+      "private-school-workflows": true
+    },
+    "private-manager-enhancements.js": {
+      "private-workflow-badge": true,
+      "private-users-login-link": true
+    },
+    "agent.html": {
+      "educational": true,
+      "school_affairs": true,
+      "student_affairs": true
+    },
+    "private-school-isolation.js": {
+      "VAULT_PREFIX": true,
+      "schoolId": true
+    },
+    "internal_messages_app.js": {
+      "message": true
+    },
+    "private-discipline-sync.js": {
+      "discipline": true
+    }
+  },
+  "errors": []
+}
