@@ -14,13 +14,13 @@
 *{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#f5faf8,#edf7f8);font-family:Tajawal,"Segoe UI",Arial,sans-serif;color:var(--ink)}
 .wrap{width:min(1180px,calc(100% - 28px));margin:auto;padding:22px 0 36px}.top{display:flex;justify-content:space-between;align-items:center;gap:18px;background:linear-gradient(120deg,var(--navy),#0b6a5c);color:#fff;border-radius:24px;padding:20px 24px;box-shadow:0 14px 34px #15445a24}.top h1{margin:0;font-size:25px}.top p{margin:6px 0 0;color:#d9eeee}.btn{border:0;border-radius:12px;padding:11px 16px;font:inherit;font-weight:900;cursor:pointer}.logout{background:#fff;color:var(--navy)}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:18px}.card{background:#fff;border:1px solid #dbe7eb;border-radius:20px;padding:18px;box-shadow:0 10px 28px #15445a0c}.card h2{margin:0 0 10px;font-size:18px}.metric{font-size:28px;font-weight:900;color:var(--navy)}.muted{font-size:13px;color:var(--muted);line-height:1.7}.field{margin:10px 0}.field label{display:block;font-size:12px;font-weight:900;margin-bottom:5px}.field input{width:100%;padding:11px 12px;border:1px solid #cbdbe1;border-radius:11px;font:inherit}.primary{background:var(--green);color:#fff}.secondary{background:#e9f4f2;color:#145447}.danger{background:#fff0f0;color:#b42318}.blue{background:#eaf3fb;color:#245f90}.gold{background:#f8f4e8;color:#665b34}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.list{margin-top:10px}.manager-row,.invite-row{border:1px solid #e0e9ed;border-radius:15px;padding:13px;margin-top:10px;background:#fbfdfd}.row-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.name{font-weight:900}.email{font-size:12px;color:var(--muted);margin-top:4px}.badge{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900}.b-active{background:#e7f8ef;color:#087548}.b-pending{background:#fff7df;color:#8a6500}.b-disabled{background:#f1f3f5;color:#59636b}.msg{min-height:20px;margin-top:8px;font-size:13px}.ok{color:#087548}.err{color:#b42318}.linkbox{margin-top:10px;padding:10px;border-radius:12px;background:#f1f8f7;font-size:12px;word-break:break-all;direction:ltr;text-align:left}
-.gov{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.gov a{text-decoration:none;color:var(--navy);background:#f4f9f8;border:1px solid #dce8e5;padding:14px;border-radius:15px;text-align:center;font-weight:900}
+.gov{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.gov a{text-decoration:none;color:var(--navy);background:#f4f9f8;border:1px solid #dce8e5;padding:14px;border-radius:15px;text-align:center;font-weight:900}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.gov{grid-template-columns:1fr 1fr}}@media(max-width:520px){.top{align-items:flex-start;flex-direction:column}.gov{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="top"><div><h1 id="title">بوابة مالك المدرسة</h1><p id="identity">جارٍ تحميل بيانات المدرسة...</p></div><div class="actions" style="margin-top:0"><button class="btn secondary" id="refreshPortal">تحديث</button><button class="btn logout" id="logout">تسجيل الخروج</button></div></header>
+<header class="top"><div><h1 id="title">بوابة مالك المدرسة</h1><p id="identity">جارٍ تحميل بيانات المدرسة...</p></div><div class="actions" style="margin-top:0"><a href="internal_messages.html?privateEdition=1&return_to=private-owner-portal.html" class="im-static-messaging-btn" title="فتح مركز المراسلات الداخلية"><span aria-hidden="true">✉️</span><span>المراسلات الداخلية</span><span class="im-toolbar-badge" aria-label="عدد الرسائل غير المقروءة"></span></a><button class="btn secondary" id="refreshPortal">تحديث</button><button class="btn logout" id="logout">تسجيل الخروج</button></div></header>
 
 <section class="grid">
 <article class="card"><h2>مدير المدرسة النشط</h2><div id="activeManager" class="metric">—</div><div id="activeManagerEmail" class="muted"></div><div id="activeLoginBox"></div></article>
@@ -70,7 +70,6 @@
 <a href="private-compliance.html?privateEdition=1">✅ فحص الالتزام</a>
 <a href="private-template-settings.html?privateEdition=1">🎨 هوية وقالب المدرسة</a>
 <a href="private-outputs.html?privateEdition=1">📚 المخرجات المؤسسية</a>
-<a href="internal_messages.html?privateEdition=1&return_to=private-owner-portal.html">✉️ مراسلة مدير/مديرة المدرسة</a>
 <a href="private-workflows.html?privateEdition=1">🧭 اعتماد طلبات مدير المدرسة</a>
 </div>
 </section>
@@ -154,6 +153,8 @@ document.addEventListener('click',async e=>{
 $('refreshPortal').onclick=load;$('logout').onclick=async()=>{const sid=ctx?.schoolId||'';await PrivateSchoolBridge.logout();location.replace('private-owner-login.html?schoolId='+encodeURIComponent(sid))};window.addEventListener('focus',()=>{if(ctx)load()});
 load();
 </script>
+
+<script src="internal-messaging.js?v=20260822-private-messaging-unified1"></script>
 
 <script id="canonical-private-manager-login-link">
 (function(){

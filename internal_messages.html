@@ -113,13 +113,16 @@ function returnToSection(){
  const p=new URLSearchParams(location.search),r=p.get("return_to");
  const safeMain=/^(manager|agent|teacher|health_advisor|kindergarten_teacher|student_advisor|activity_leader|administrative_employee_portal|private-owner-portal)\.html(?:\?.*)?$/i;
  if(r&&safeMain.test(r)){location.href=r;return}
- const role=(localStorage.getItem("platform_file_session_role")||"").toLowerCase();
- const map={manager:"manager.html",school_manager:"manager.html",principal:"manager.html",agent:"agent.html",deputy:"agent.html",deputy_admin:"agent.html",deputy_academic:"agent.html",deputy_students:"agent.html",teacher:"teacher.html",health_advisor:"health_advisor.html",kindergarten_teacher:"kindergarten_teacher.html",student_advisor:"student_advisor.html",counselor:"student_advisor.html",activity_leader:"activity_leader.html",admin_employee:"administrative_employee_portal.html",administrative_employee:"administrative_employee_portal.html",employee:"administrative_employee_portal.html"};
+ let role=(localStorage.getItem("platform_file_session_role")||"").toLowerCase();
+ try{role=window.PrivateSchoolBridge?.privateContext?.()?.role||role}catch(_){}
+ const map={owner:"private-owner-portal.html",manager:"manager.html",school_manager:"manager.html",principal:"manager.html",agent:"agent.html",deputy:"agent.html",deputy_admin:"agent.html",deputy_academic:"agent.html",deputy_students:"agent.html",teacher:"teacher.html",health_advisor:"health_advisor.html",kindergarten_teacher:"kindergarten_teacher.html",student_advisor:"student_advisor.html",counselor:"student_advisor.html",activity_leader:"activity_leader.html",admin_employee:"administrative_employee_portal.html",administrative_employee:"administrative_employee_portal.html",employee:"administrative_employee_portal.html"};
  location.href=map[role]||"index.html";
 }
 </script>
 <script src="platform-cloud-session.js?v=20260818-session-v12"></script>
 <script src="cloud-file-engine.js"></script>
+<!-- PRIVATE_EDITION_BUILD_RUNTIME: load before messaging so private schools never fall back to the public message engine -->
+<script src="private-school-runtime.js"></script>
 <script src="internal-messaging.js"></script>
 <script src="internal_messages_app.js"></script>
 
@@ -133,6 +136,4 @@ function returnToSection(){
 <script src="top-ai-center.js"></script>
 <script src="platform-page-navigation.js?v=20260818-nav1"></script>
 
-<!-- PRIVATE_EDITION_BUILD_RUNTIME -->
-<script src="private-school-runtime.js"></script>
 </body></html>
