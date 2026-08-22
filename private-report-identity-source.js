@@ -29,6 +29,11 @@ function syncLegacy(){
   store('setting_stamp',o.digital_stampUrl||'');
   store('setting_school_logo',o.school_logoUrl||'');
   store('setting_ministry_logo',o.ministry_logoUrl||'');
+  store('setting_school_phone',o.schoolPhone||o.school_phone||'');
+  store('setting_school_email',o.schoolEmail||o.school_email||'');
+  store('setting_school_address',o.schoolAddress||o.school_address||'');
+  store('setting_contact_footer',o.contactFooter||o.contact_footer||'');
+  store('setting_default_orientation',o.defaultOrientation||o.default_orientation||'auto');
   store('persist_name_m',p.display_name||ctx?.userName||ctx?.userEmail||'');
   store('persist_sig_data',p.signatureUrl||'');
   try{
@@ -44,7 +49,12 @@ function syncLegacy(){
       userSignature:p.signatureUrl||'',
       stamp:o.digital_stampUrl||'',
       schoolLogo:o.school_logoUrl||'',
-      ministryLogo:o.ministry_logoUrl||''
+      ministryLogo:o.ministry_logoUrl||'',
+      phone:o.schoolPhone||o.school_phone||'',
+      email:o.schoolEmail||o.school_email||'',
+      address:o.schoolAddress||o.school_address||'',
+      contactFooter:o.contactFooter||o.contact_footer||'',
+      orientation:o.defaultOrientation||o.default_orientation||'auto'
     });
   }catch(_){}
   g.dispatchEvent(new CustomEvent('platformSettingsUpdated'));
