@@ -1664,6 +1664,17 @@ async function loadReadinessSchoolUsers(){
  try{
   if(window.CloudTaskEngine){const r=await CloudTaskEngine.listUsers();(r.users||[]).forEach(add)}
  }catch(e){console.warn("Readiness cloud users load failed",e)}
+ // مدير المدرسة هو مستخدم تنفيذي داخل محرك الجاهزية أيضاً.
+ // بعض مصادر المستخدمين السحابية تستبعد المدير من قائمة المسند إليهم، لذلك نضمن إدراجه
+ // من الجلسة الفعلية الحالية دون إنشاء مستخدم وهمي أو عضوية إضافية.
+ try{
+  const sessionRole=String(window.PlatformCloudSession?.role?.()||"").trim().toLowerCase();
+  const sessionUserId=String(window.PlatformCloudSession?.userId?.()||currentPublicUserId()||"").trim();
+  const managerName=String(state?.settings?.manager||readPlatformCustomSettings()?.manager||"").trim();
+  if(sessionUserId&&isUuid(sessionUserId)&&["manager","leadership","school_manager","principal"].includes(sessionRole)){
+   add({id:sessionUserId,user_id:sessionUserId,full_name:managerName||"مدير المدرسة",display_name:managerName||"مدير المدرسة",role:"manager",status:"active",readinessSource:"active_manager_session"});
+  }
+ }catch(e){console.warn("Readiness manager session inclusion failed",e)}
  // احتياط محلي/مركز المعلومات: لا يغيّر الفئة الوظيفية، ويُستخدم فقط لإظهار الاسم إذا تعذر المصدر السحابي.
  try{
   if(window.SchoolInformationSource){
