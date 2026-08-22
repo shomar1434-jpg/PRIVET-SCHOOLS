@@ -3,15 +3,12 @@
  if(g.__privateSchoolRuntimeLoaded)return;g.__privateSchoolRuntimeLoaded=true;
  const q=new URLSearchParams(location.search);
  const page=(location.pathname.split('/').pop()||'').toLowerCase();
- const A=g.PrivateAuthStorage||null;
- const sg=k=>A?A.sessionGet(k):sessionStorage.getItem(k);const ss=(k,v)=>A?A.sessionSet(k,v):sessionStorage.setItem(k,v);
- const lg=k=>A?A.localGet(k):localStorage.getItem(k);const ld=k=>A?A.localRemove(k):localStorage.removeItem(k);
  const explicit=g.__PRIVATE_EDITION_BUILD__===true||q.get('privateEdition')==='1'||q.get('edition')==='private';
- const systemAdminBypass=q.get('systemAdmin')==='1'||q.get('systemAdminReturn')==='1'||q.get('admin')==='true'||q.get('bypass')==='true'||q.get('mode')==='system_admin'||sg('system_admin_context')==='1'||sg('system_admin_verified')==='true';
+ const systemAdminBypass=q.get('systemAdmin')==='1'||q.get('systemAdminReturn')==='1'||q.get('admin')==='true'||q.get('bypass')==='true'||q.get('mode')==='system_admin'||sessionStorage.getItem('system_admin_context')==='1'||sessionStorage.getItem('system_admin_verified')==='true';
  const sessionKey='smart_school_private_session_v1';
  const listKey='smart_school_private_schools_v1';
- const hasStoredContext=!!sg(sessionKey);
- const hasMarker=lg('smart_school_private_edition')==='private';
+ const hasStoredContext=!!sessionStorage.getItem(sessionKey);
+ const hasMarker=localStorage.getItem('smart_school_private_edition')==='private';
  const privateMode=!systemAdminBypass&&(explicit||(hasMarker&&hasStoredContext));
  const unhide=()=>document.documentElement.classList.remove('private-auth-pending');
 
@@ -88,7 +85,7 @@
      await optional('private-school-isolation.js');
 
      // CRITICAL: authenticate exactly once, and wait for verification to finish.
-     await load('private-school-page-guard.js?v=20260822-unified1');
+     await load('private-school-page-guard.js?v=20260822-session2');
      if(g.__privateSchoolGuardReady) await g.__privateSchoolGuardReady;
      if(document.documentElement.dataset.privateAuthVerified!=='1'){
        // page guard owns any redirect. Do not create a second redirect path here.
@@ -99,6 +96,8 @@
 
      // Everything below is enhancement-only. Failure must leave the authenticated page open.
      const navPages=new Set(['manager.html','agent.html','teacher.html','administrative_employee_portal.html','student_advisor.html','activity_leader.html','health_advisor.html','kindergarten_teacher.html','school_health_unified_registry.html','staff_discipline.html','wakil_staff_discipline.html']);
+     const identityPages=new Set([...navPages,'internal_messages.html']);
+     if(identityPages.has(page)) await optional('private-report-identity-source.js');
      if(navPages.has(page)){
        await optional('private-school-nav.js');
        await optional('private-multi-school-switcher.js');
@@ -107,9 +106,8 @@
    }catch(err){
      // A true auth rejection is already handled by private-school-page-guard.js.
      // Generic runtime/dependency errors MUST NOT eject an authenticated user.
-     console.error('Private school runtime failure:',err);
+     console.error('Private school runtime non-auth failure:',err);
      unhide();
-     if(document.getElementById('private-auth-blocker')) return;
      const box=document.createElement('div');
      box.id='private-runtime-warning';
      box.style.cssText='position:fixed;left:12px;bottom:12px;z-index:2147483600;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;border-radius:12px;padding:9px 12px;font:700 11px Tajawal,Cairo,Arial;max-width:320px';

@@ -37,7 +37,7 @@ function boot(){
   document.head.appendChild(style);
   const anchor=document.querySelector('header')||document.querySelector('main')||document.body.firstElementChild;
   if(anchor&&anchor.parentNode) anchor.insertAdjacentElement('afterend',el); else document.body.prepend(el);
-  (async()=>{try{for(let i=0;i<80&&!window.PrivateSchoolBridge;i++)await new Promise(r=>setTimeout(r,50));if(!window.PrivateSchoolBridge)return;const ctx=await window.PrivateSchoolBridge.requireContext(['manager']);const login=document.getElementById('private-users-login-link');const dialog=document.getElementById('private-users-login-dialog');const urlInput=document.getElementById('private-users-login-url');const copyBtn=document.getElementById('private-users-login-copy');const testBtn=document.getElementById('private-users-login-test');const closeBtn=dialog?.querySelector('.pm-login-close');const loginHref=new URL(window.PrivateSchoolBridge.schoolLoginPath(ctx.schoolId),location.href).href;if(urlInput)urlInput.value=loginHref;
+  (async()=>{try{for(let i=0;i<80&&!window.PrivateSchoolBridge;i++)await new Promise(r=>setTimeout(r,50));if(!window.PrivateSchoolBridge)return;const ctx=await window.PrivateSchoolBridge.requireContext(['manager']);const login=document.getElementById('private-users-login-link');const dialog=document.getElementById('private-users-login-dialog');const urlInput=document.getElementById('private-users-login-url');const copyBtn=document.getElementById('private-users-login-copy');const testBtn=document.getElementById('private-users-login-test');const closeBtn=dialog?.querySelector('.pm-login-close');const loginUrl=new URL('school-login.html',location.href);loginUrl.searchParams.set('edition','private');loginUrl.searchParams.set('schoolId',ctx.schoolId);const loginHref=loginUrl.href;if(urlInput)urlInput.value=loginHref;
 const copyLoginLink=async()=>{
   try{
     if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(loginHref)}
@@ -53,7 +53,10 @@ const copyLoginLink=async()=>{
     }
   }catch(e){window.prompt('انسخ رابط دخول المستخدمين:',loginHref)}
 };
-if(login)login.onclick=copyLoginLink;
+if(login)login.onclick=async()=>{
+  await copyLoginLink();
+  window.open(loginHref,'_blank','noopener,noreferrer');
+};
 if(closeBtn)closeBtn.onclick=()=>{if(dialog)dialog.hidden=true};
 if(dialog)dialog.hidden=true;
 if(testBtn)testBtn.onclick=()=>window.open(loginHref,'_blank','noopener,noreferrer');

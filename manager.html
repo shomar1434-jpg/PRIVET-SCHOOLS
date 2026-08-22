@@ -3,7 +3,7 @@
 <html dir="rtl" lang="ar">
 <head>
 
-<script src="private-auth-storage.js"></script>
+<script src="private-auth-storage.js"></script><script src="private-storage-namespace.js"></script>
 <!-- PRIVATE_EDITION_BUILD_HEAD -->
 <script src="private-edition-bootstrap.js"></script>
 <script src="private-role-entry-compat.js?v=20260822-entry1"></script>
@@ -82,9 +82,6 @@ body.portfolio-open .ai-center-trigger{
 <link href="https://upload.wikimedia.org/wikipedia/ar/1/17/Saudi_Ministry_of_Education_Logo_2025.png" rel="apple-touch-icon"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="standalone-private-config.js"></script>
-<script src="private-school-config.js"></script>
-<script src="private-school-bridge.js"></script>
 <script src="supabase-bridge.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -3712,6 +3709,7 @@ body{overflow-x:hidden}
     var __uw=document.getElementById('ssFinalBackdrop'); if(__uw)__uw.classList.add('uw-workspace-dialog');
   }
   window.openUserFollowupManagement=openUserFollowupManagement;
+  try{if(new URLSearchParams(location.search||'').get('open')==='user-management')setTimeout(openUserFollowupManagement,700)}catch(_){}
 
   function showUsers(role){
     var list=users().filter(function(u){return u.role===role && u.status==='active'});
@@ -3734,12 +3732,16 @@ body{overflow-x:hidden}
     window.location.href = file + params;
   }
   window.ssOpenFollow = ssOpenFollow;
-  async function showActivation(){await resolveManagerSchoolContext(); await hydrateUsersFromSupabase(); var u=users(); panel('تنشيط المستخدمين وإدارة الصلاحيات','<div class="ss-grid"><div class="ss-field"><label>الاسم</label><input id="uName" placeholder="اسم المستخدم"></div><div class="ss-field"><label>البريد</label><input id="uEmail" placeholder="بريد منصة مدرستي"></div><div class="ss-field"><label>الرقم السري</label><input id="uPass" placeholder="الرقم السري"></div><div class="ss-field"><label>الدور</label><select id="uRole"><option value="agent">وكيل/وكيلة</option><option value="student_advisor">موجه/موجهة طلابية</option><option value="teacher">معلم/ة</option><option value="health_advisor">الموجه الصحي</option><option value="kindergarten_teacher">معلمة رياض الأطفال</option><option value="activity_leader">رائد/ة النشاط</option><option value="administrative_employee">موظف إداري</option></select></div><div class="ss-field" id="uAgencyField"><label>تصنيف الوكيل/الوكيلة</label>'+agencyCheckboxes('uAgency',[])+'<div class="ss-muted">يحدد مدير المدرسة نوع الوكالة، وتظهر السجلات والأرشيف المرتبطان بهذا التصنيف.</div></div><div class="ss-field" id="uTeacherExtraField"><label>التكليفات الإضافية للمعلم/المعلمة</label>'+teacherExtraRoleCheckboxes('uTeacherExtra',[])+'<div class="ss-muted">تظهر المجلدات والسجلات المرتبطة داخل مكتبة قسم المعلم/المعلمة عند تفعيل التكليف.</div></div><div class="ss-field"><label>الحالة</label><select id="uStatus"><option value="pending">بانتظار التفعيل</option><option value="active">مفعل</option></select></div></div><div class="ss-field"><label>الصلاحيات</label><input id="uPerm" placeholder="مثال: alerts, meetings, archive-view"></div><div class="ss-actions"><button class="ss-action" id="addUser">إضافة/حفظ مستخدم</button><button class="ss-action blue" id="refreshUsers">تحديث المستخدمين من السحابة</button></div><hr style="margin:14px 0;border:0;border-top:1px solid #e5e7eb"><div id="userList">'+renderUserList(u)+'</div>');
-    function syncAgencyVisibility(){var f=document.getElementById('uAgencyField'); if(f) f.style.display=val('uRole')==='agent'?'grid':'none'; var tf=document.getElementById('uTeacherExtraField'); if(tf) tf.style.display=val('uRole')==='teacher'?'grid':'none';}
-    document.getElementById('uRole').onchange=syncAgencyVisibility; syncAgencyVisibility();
-    hydrateUsersFromSupabase().then(function(list){var box=document.getElementById('userList'); if(box) box.innerHTML=renderUserList(list);});
-    document.getElementById('refreshUsers').onclick=function(){hydrateUsersFromSupabase().then(function(list){document.getElementById('userList').innerHTML=renderUserList(list);});};
-    document.getElementById('addUser').onclick=async function(){var cats=selectedAgencyList('uAgency'); var teacherExtra=selectedTeacherExtraRoles('uTeacherExtra'); var nu={id:uid('user'),name:val('uName'),email:val('uEmail'),password:val('uPass')||'123456',role:val('uRole'),status:val('uStatus'),schoolId:currentSchoolId(),schoolName:currentSchoolName(),permissions:val('uPerm').split(',').map(function(x){return x.trim()}).filter(Boolean),agent_categories:val('uRole')==='agent'?cats:[],agency_categories:val('uRole')==='agent'?cats:[],agency_types:val('uRole')==='agent'?cats:[],agency_type:val('uRole')==='agent'?cats.join(','):'',teacher_extra_roles:val('uRole')==='teacher'?teacherExtra:[],additional_assignments:val('uRole')==='teacher'?teacherExtra:[],extra_roles:val('uRole')==='teacher'?teacherExtra:[]}; if(!nu.name||!nu.email){alert('أدخل الاسم والبريد');return;} try{if(nu.role==='agent') saveAgencyForUser(nu,cats); if(nu.role==='teacher') saveTeacherExtraRolesForUser(nu,teacherExtra); if(window.SmartSchoolSupabase&&nu.schoolId){var savedUser=await window.SmartSchoolSupabase.upsertSchoolUser(nu); if(savedUser&&savedUser.id)nu.id=savedUser.id; if(nu.role==='agent'){if(!cats.length)throw new Error('يجب اختيار تصنيف واحد للوكيل');await persistDeputyClassification(nu,cats);} var arr=users(); arr=arr.filter(function(x){return String(x.id)!==String(nu.id)&&String(x.email||'').toLowerCase()!==String(nu.email||'').toLowerCase()}); arr.unshift(nu); saveUsers(arr); await hydrateUsersFromSupabase();}else{var arr=users(); arr.unshift(nu); saveUsers(arr);} showActivation();}catch(e){alert(e.message||e);}}}
+  async function showActivation(){
+    await resolveManagerSchoolContext();
+    const u=await hydrateUsersFromSupabase();
+    panel('تنشيط المستخدمين وإدارة الصلاحيات',
+      '<div class="ss-card blue"><b>إدارة الحسابات المسجلة في المدرسة</b><div class="ss-muted">إضافة المستخدمين تتم من «رابط تسجيل المستخدمين» فقط. بعد التسجيل يظهر الحساب هنا بانتظار التفعيل. حدّد دور المستخدم، وتصنيف الوكيل عند الحاجة، ثم فعّل الحساب.</div></div>'+ 
+      '<div class="ss-actions"><button class="ss-action blue" id="refreshUsers">تحديث المستخدمين من السحابة</button><button class="ss-action" id="openRegistrationFromActivation">فتح رابط تسجيل المستخدمين</button></div>'+ 
+      '<hr style="margin:14px 0;border:0;border-top:1px solid #e5e7eb"><div id="userList">'+renderUserList(u)+'</div>');
+    document.getElementById('refreshUsers').onclick=async function(){const list=await hydrateUsersFromSupabase();document.getElementById('userList').innerHTML=renderUserList(list);};
+    document.getElementById('openRegistrationFromActivation').onclick=showRegLink;
+  }
   window.showActivation=showActivation;
   function renderUserList(arr){return arr.filter(function(u){return u.status!=='deleted'}).map(function(u){var protectedAccount=(u.isOwner||u.isPrimaryManager||u.role==='owner'||u.role==='manager'||u.id==='manager' || u.id==='owner'); var roleLabel=(u.role==='agent'?'وكيل':(u.role==='student_advisor'?'موجه/موجهة طلابية':(u.role==='activity_leader'?'رائد/ة النشاط':(u.role==='administrative_employee'?'موظف إداري':(u.role==='health_advisor'?'الموجه الصحي':(u.role==='kindergarten_teacher'?'معلمة رياض الأطفال':(u.role==='teacher'?'معلم':'مدير'))))))); var statusLabel=(u.status==='active'?'مفعل':(u.status==='disabled'?'معطل':'بانتظار التفعيل')); var agencyInfo=u.role==='agent'?' — <b style="color:#0f766e">'+esc(agencyLabel(u.agent_categories||u.agency_categories||u.agency_type))+'</b>':''; var tRoles=getTeacherExtraRolesForUser(u); var teacherInfo=u.role==='teacher'&&tRoles.length?' — <b style="color:#7c3aed">'+esc(teacherExtraRolesLabel(tRoles))+'</b>':''; return '<div class="ss-card"><b>'+esc(u.name||'مستخدم')+'</b><div class="ss-muted">'+esc(u.email||'')+' — '+roleLabel+agencyInfo+teacherInfo+' — '+statusLabel+'</div><div class="ss-actions"><button class="ss-action blue" onclick="ssFinalActivate(\''+u.id+'\')">تفعيل</button>'+(!protectedAccount?'<button class="ss-action secondary" onclick="ssFinalDisableUser(\''+u.id+'\')">تعطيل</button>':'')+'<button class="ss-action secondary" onclick="ssFinalEditUser(\''+u.id+'\')">تعديل</button>'+(!protectedAccount?'<button class="ss-action gold" onclick="ssFinalAddRole(\''+u.id+'\')">➕ إضافة دور</button>':'')+(!protectedAccount?'<button class="ss-action red" title="حذف الحساب" onclick="ssFinalDeleteUser(\''+u.id+'\')">🗑️ حذف</button>':'')+'</div></div>'}).join('')||'<div class="ss-empty">لا توجد حسابات.</div>'}
   window.ssFinalActivate=async function(id){

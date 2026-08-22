@@ -1,0 +1,293 @@
+{
+  "summary": {
+    "passed": 71,
+    "total": 71,
+    "failed": 0
+  },
+  "checks": {
+    "manager_duplicate_top_nav_removed": {
+      "pass": true,
+      "detail": ""
+    },
+    "manager_login_button_copies_link": {
+      "pass": true,
+      "detail": ""
+    },
+    "manager_login_button_opens_portal": {
+      "pass": true,
+      "detail": ""
+    },
+    "manager_login_link_is_canonical": {
+      "pass": true,
+      "detail": ""
+    },
+    "manager_user_management_internal": {
+      "pass": true,
+      "detail": ""
+    },
+    "manager_manual_user_creation_removed": {
+      "pass": true,
+      "detail": ""
+    },
+    "manager_registration_link_preserved": {
+      "pass": true,
+      "detail": ""
+    },
+    "manager_followup_hub_preserved": {
+      "pass": true,
+      "detail": ""
+    },
+    "manager_agent_classification_preserved": {
+      "pass": true,
+      "detail": ""
+    },
+    "manager_dual_roles_preserved": {
+      "pass": true,
+      "detail": ""
+    },
+    "old_invitation_page_removed": {
+      "pass": true,
+      "detail": ""
+    },
+    "old_users_page_redirects_internal": {
+      "pass": true,
+      "detail": ""
+    },
+    "registration_no_agent_variant": {
+      "pass": true,
+      "detail": ""
+    },
+    "registration_pending_manager_activation": {
+      "pass": true,
+      "detail": ""
+    },
+    "owner_and_users_same_school_login": {
+      "pass": true,
+      "detail": ""
+    },
+    "owner_uses_original_messaging_center": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_submit_to_agent": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_agent_approve_to_manager": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_agent_return_reason_required": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_agent_reject_stops": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_employee_resubmit": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_manager_final_approve": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_manager_reject": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_discipline_idempotent": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_ui_three_request_types": {
+      "pass": true,
+      "detail": ""
+    },
+    "workflow_ui_return_edit_resubmit": {
+      "pass": true,
+      "detail": ""
+    },
+    "discipline_sync_request_link": {
+      "pass": true,
+      "detail": ""
+    },
+    "discipline_sync_loaded_manager": {
+      "pass": true,
+      "detail": ""
+    },
+    "discipline_sync_loaded_agent": {
+      "pass": true,
+      "detail": ""
+    },
+    "messages_owner_to_manager_only": {
+      "pass": true,
+      "detail": ""
+    },
+    "messages_manager_no_owner": {
+      "pass": true,
+      "detail": ""
+    },
+    "messages_agent_manager_and_users": {
+      "pass": true,
+      "detail": ""
+    },
+    "messages_regular_users_to_agent_only": {
+      "pass": true,
+      "detail": ""
+    },
+    "messages_group_manager_agent_only": {
+      "pass": true,
+      "detail": ""
+    },
+    "old_messaging_ui_uses_private_backend": {
+      "pass": true,
+      "detail": ""
+    },
+    "messages_plural_role_labels": {
+      "pass": true,
+      "detail": ""
+    },
+    "template_school_owner_manager_contacts": {
+      "pass": true,
+      "detail": ""
+    },
+    "template_signatures_and_stamp": {
+      "pass": true,
+      "detail": ""
+    },
+    "custom_settings_name_signature_only": {
+      "pass": true,
+      "detail": ""
+    },
+    "identity_source_runtime_loaded": {
+      "pass": true,
+      "detail": ""
+    },
+    "identity_source_messaging_loaded": {
+      "pass": true,
+      "detail": ""
+    },
+    "compliance_no_not_applicable": {
+      "pass": true,
+      "detail": ""
+    },
+    "compliance_pdf_images": {
+      "pass": true,
+      "detail": ""
+    },
+    "compliance_replace_remove": {
+      "pass": true,
+      "detail": ""
+    },
+    "compliance_print_fixed_a4": {
+      "pass": true,
+      "detail": ""
+    },
+    "compliance_evidence_centered": {
+      "pass": true,
+      "detail": ""
+    },
+    "compliance_each_page_break": {
+      "pass": true,
+      "detail": ""
+    },
+    "home_logout_system_admin_separated": {
+      "pass": true,
+      "detail": ""
+    },
+    "school_logout_returns_same_school": {
+      "pass": true,
+      "detail": ""
+    },
+    "agent_three_variants_present": {
+      "pass": true,
+      "detail": ""
+    },
+    "agent_records_variant_logic": {
+      "pass": true,
+      "detail": ""
+    },
+    "strict_school_isolation_layer_present": {
+      "pass": true,
+      "detail": ""
+    },
+    "login_guard_private_context": {
+      "pass": true,
+      "detail": ""
+    },
+    "single_private_bridge_role_landing": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_private-school-nav.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_private-manager-enhancements.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_internal-messaging.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_internal_messages_app.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_private-school-runtime.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_private-report-identity-source.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_private-discipline-sync.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_school_navigation_guard.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_private-school-bridge.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "js_syntax_private-school-page-guard.js": {
+      "pass": true,
+      "detail": ""
+    },
+    "inline_syntax_manager.html": {
+      "pass": true,
+      "detail": "[]"
+    },
+    "inline_syntax_private-owner-portal.html": {
+      "pass": true,
+      "detail": "[]"
+    },
+    "inline_syntax_private-manager-users.html": {
+      "pass": true,
+      "detail": "[]"
+    },
+    "inline_syntax_private-messages.html": {
+      "pass": true,
+      "detail": "[]"
+    },
+    "inline_syntax_internal_messages.html": {
+      "pass": true,
+      "detail": "[]"
+    },
+    "inline_syntax_private-compliance.html": {
+      "pass": true,
+      "detail": "[]"
+    },
+    "inline_syntax_private-template-settings.html": {
+      "pass": true,
+      "detail": "[]"
+    }
+  }
+}

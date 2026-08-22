@@ -1,6 +1,8 @@
 (function(g){
  'use strict';
  if(g.__privateSchoolNavLoaded)return;g.__privateSchoolNavLoaded=true;
+ const page=(location.pathname.split('/').pop()||'').toLowerCase();
+ if(page==='manager.html')return;
  const params=new URLSearchParams(location.search);
  const isPrivate=params.get('privateEdition')==='1'||params.get('edition')==='private'||localStorage.getItem('smart_school_private_edition')==='private';
  if(!isPrivate)return;

@@ -1,1 +1,20 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>بوابة دخول المدرسة</title><script>(function(){const q=new URLSearchParams(location.search||''),sid=q.get('schoolId')||q.get('school_id')||'';const u=new URL('school-login.html',location.href);u.searchParams.set('edition','private');if(sid)u.searchParams.set('schoolId',sid);location.replace(u.href)})();</script></head><body></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>تحويل إلى بوابة دخول المدرسة</title>
+<script>
+(function(){
+  const q=new URLSearchParams(location.search||'');
+  const sid=q.get('schoolId')||q.get('school_id')||'';
+  const next=new URL('school-login.html',location.href);
+  next.searchParams.set('edition','private');
+  if(sid)next.searchParams.set('schoolId',sid);
+  next.searchParams.set('role','manager');
+  location.replace(next.href);
+})();
+</script>
+</head>
+<body></body>
+</html>
