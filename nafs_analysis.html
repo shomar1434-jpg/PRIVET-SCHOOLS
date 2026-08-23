@@ -55,92 +55,146 @@
     }
 
     @page {
-      size: A4 landscape;
-      margin: 7mm;
+      size: 297mm 210mm;
+      margin: 6mm;
     }
     @media print {
+      /* المساحة الفعلية القابلة للطباعة بعد الهوامش = 285 × 198 مم.
+         لا نثبت body على 297×210 لأن ذلك كان سبب التجاوز والصفحة الفارغة. */
       html, body {
-        width: 297mm !important;
-        min-height: 210mm !important;
+        width: auto !important;
+        height: auto !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
+        overflow: visible !important;
         background: #fff !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
-      .no-print { display: none !important; }
-      main, .max-w-7xl, .max-w-6xl, .max-w-5xl {
-        max-width: none !important;
+      body { zoom: 1 !important; }
+      .no-print, header.no-print, nav.no-print, aside.no-print {
+        display: none !important;
+      }
+      main {
         width: 100% !important;
-        margin: 0 auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
       }
       .view-section.hidden { display: none !important; }
       .view-section:not(.hidden) {
         display: block !important;
         width: 100% !important;
+        max-width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
+        overflow: visible !important;
       }
-      .view-section:not(.hidden) > * {
-        break-inside: avoid;
-        page-break-inside: avoid;
+
+      /* البطاقات المفردة: صفحة A4 عرضية واحدة فقط */
+      body.nafs-print-single .view-section:not(.hidden) {
+        height: 196mm !important;
+        max-height: 196mm !important;
+        overflow: hidden !important;
+        break-after: avoid-page !important;
+        page-break-after: avoid !important;
       }
-      #dashboardCanvas,
-      #view-fullReport > .bg-white,
-      #view-executiveSummary > .bg-white {
+      body.nafs-print-single #dashboardCanvas,
+      body.nafs-print-single #view-fullReport > .bg-white,
+      body.nafs-print-single #view-executiveSummary > .bg-white {
         width: 100% !important;
-        max-width: none !important;
+        max-width: 100% !important;
+        height: 196mm !important;
+        max-height: 196mm !important;
+        min-height: 0 !important;
         margin: 0 !important;
-        padding: 6mm !important;
+        padding: 5mm !important;
         border-radius: 0 !important;
         box-shadow: none !important;
         overflow: hidden !important;
+        break-inside: avoid-page !important;
+        page-break-inside: avoid !important;
       }
-      #view-visualDashboard #dashboardCanvas,
-      #view-fullReport > .bg-white,
-      #view-executiveSummary > .bg-white {
-        min-height: 190mm !important;
-        max-height: 190mm !important;
+      body.nafs-print-single .view-section:not(.hidden) > * {
+        break-inside: avoid-page !important;
+        page-break-inside: avoid !important;
       }
-      #view-visualDashboard #dashboardCanvas *,
-      #view-fullReport > .bg-white *,
-      #view-executiveSummary > .bg-white * {
-        box-sizing: border-box !important;
-      }
-      #view-visualDashboard .p-8, #view-visualDashboard .p-6,
-      #view-fullReport .p-8, #view-fullReport .p-6,
-      #view-executiveSummary .p-8, #view-executiveSummary .p-6 {
-        padding: 8px !important;
-      }
-      #view-visualDashboard .gap-6, #view-fullReport .gap-6,
-      #view-executiveSummary .gap-6 { gap: 10px !important; }
-      #view-visualDashboard .mb-8, #view-fullReport .mb-8,
-      #view-executiveSummary .mb-8 { margin-bottom: 10px !important; }
-      #view-timelineImpact {
+
+      /* ضغط بصري متوازن للطباعة فقط، دون تغيير العرض على الشاشة */
+      body.nafs-print-single .p-10,
+      body.nafs-print-single .p-8 { padding: 10px !important; }
+      body.nafs-print-single .p-6 { padding: 8px !important; }
+      body.nafs-print-single .p-5,
+      body.nafs-print-single .p-4 { padding: 6px !important; }
+      body.nafs-print-single .gap-8,
+      body.nafs-print-single .gap-6 { gap: 9px !important; }
+      body.nafs-print-single .gap-5,
+      body.nafs-print-single .gap-4 { gap: 7px !important; }
+      body.nafs-print-single .mb-10,
+      body.nafs-print-single .mb-8 { margin-bottom: 9px !important; }
+      body.nafs-print-single .mb-6,
+      body.nafs-print-single .mb-5,
+      body.nafs-print-single .mb-4 { margin-bottom: 7px !important; }
+      body.nafs-print-single h1 { margin-top: 0 !important; margin-bottom: 7px !important; }
+      body.nafs-print-single h2,
+      body.nafs-print-single h3 { margin-top: 0 !important; margin-bottom: 5px !important; }
+      body.nafs-print-single .rounded-3xl,
+      body.nafs-print-single .rounded-2xl { border-radius: 10px !important; }
+
+      /* خطة التحسين/قياس الأثر: تسمح بعدة صفحات لكن لا تقسّم الجداول أو الصفوف */
+      body.nafs-print-multipage #view-timelineImpact {
         width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
       }
-      #view-timelineImpact > * {
-        break-inside: avoid !important;
+      body.nafs-print-multipage #view-timelineImpact > * {
+        break-inside: avoid-page !important;
         page-break-inside: avoid !important;
-        margin-bottom: 5mm !important;
+        margin: 0 0 5mm !important;
       }
-      #view-timelineImpact table,
-      #view-timelineImpact tr,
-      #view-timelineImpact td,
-      #view-timelineImpact th {
-        break-inside: avoid !important;
+      body.nafs-print-multipage #view-timelineImpact table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        break-inside: auto !important;
+        page-break-inside: auto !important;
+      }
+      body.nafs-print-multipage #view-timelineImpact thead {
+        display: table-header-group !important;
+      }
+      body.nafs-print-multipage #view-timelineImpact tr,
+      body.nafs-print-multipage #view-timelineImpact td,
+      body.nafs-print-multipage #view-timelineImpact th {
+        break-inside: avoid-page !important;
         page-break-inside: avoid !important;
       }
+
+      /* إلغاء أي فواصل قديمة كانت تنتج صفحات فارغة */
       .page-break {
-        page-break-before: auto !important;
         break-before: auto !important;
+        page-break-before: auto !important;
+        break-after: auto !important;
+        page-break-after: auto !important;
       }
       .print-shadow-none {
         box-shadow: none !important;
         border: 1px solid #d1d5db !important;
       }
-      table { width: 100% !important; }
-      svg, canvas, img { max-width: 100% !important; }
+      table { max-width: 100% !important; }
+      svg, canvas, img {
+        max-width: 100% !important;
+        height: auto;
+      }
+      /* يمنع صفحة ثانية بسبب عناصر زخرفية أو pseudo-elements */
+      body::before, body::after,
+      .view-section:not(.hidden)::before,
+      .view-section:not(.hidden)::after {
+        max-height: 0 !important;
+      }
     }
 
     /* Custom Scrollbar */
@@ -179,7 +233,7 @@
         <button onclick="openModal('editModal')" class="bg-amber-500 hover:bg-amber-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
           <i class="fa-solid fa-pen-to-square"></i> تعديل البيانات
         </button>
-        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+        <button onclick="printNafsCard()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
           <i class="fa-solid fa-print"></i> طباعة / تصدير PDF
         </button>
       </div>
@@ -2000,6 +2054,40 @@
       closeModal('editModal');
       renderAll();
     }
-  </script>
+  
+    // ============================================================
+    // PRINT CONTROLLER — A4 LANDSCAPE / NO BLANK PAGES
+    // ============================================================
+    function getActiveNafsView() {
+      return Array.from(document.querySelectorAll('.view-section'))
+        .find(el => !el.classList.contains('hidden')) || null;
+    }
+
+    function prepareNafsPrintLayout() {
+      const body = document.body;
+      body.classList.remove('nafs-print-single','nafs-print-multipage');
+      const active = getActiveNafsView();
+      if (!active) return;
+      if (active.id === 'view-timelineImpact') {
+        body.classList.add('nafs-print-multipage');
+      } else if (active.id !== 'view-pdfInput') {
+        body.classList.add('nafs-print-single');
+      }
+    }
+
+    function clearNafsPrintLayout() {
+      document.body.classList.remove('nafs-print-single','nafs-print-multipage');
+    }
+
+    function printNafsCard() {
+      prepareNafsPrintLayout();
+      // إعطاء المتصفح إطار رسم واحد لتطبيق قواعد الطباعة قبل فتح المعاينة.
+      requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
+    }
+
+    window.addEventListener('beforeprint', prepareNafsPrintLayout);
+    window.addEventListener('afterprint', clearNafsPrintLayout);
+
+</script>
 </body>
 </html>
