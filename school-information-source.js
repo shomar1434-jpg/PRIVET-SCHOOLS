@@ -8,7 +8,7 @@ const CFG={
 };
 const SECTION_MAP={'1':'أ','2':'ب','3':'ج','4':'د','5':'هـ','6':'و','7':'ز','8':'ح','9':'ط','10':'ي','11':'ك','12':'ل'};
 const ROLE_AR={manager:'مدير/ة المدرسة',school_manager:'مدير/ة المدرسة',agent:'وكيل/ة',deputy:'وكيل/ة',teacher:'معلم/ة',student_advisor:'موجه/موجهة طلابية',counselor:'موجه/موجهة طلابية',activity_leader:'رائد/ة النشاط',admin_employee:'موظف/ة إداري/ة',administrative_employee:'موظف/ة إداري/ة',employee:'موظف/ة',health_advisor:'الموجه الصحي',kindergarten_teacher:'معلمة رياض الأطفال',principal:'مدير/ة المدرسة'};
-const state={students:[],staff:[],administrativeStaff:[],loaded:false,loading:null,schoolId:'',year:'',updatedAt:'',version:'2.3.0-deputy-teacher-source'};
+const state={students:[],staff:[],administrativeStaff:[],loaded:false,loading:null,schoolId:'',year:'',updatedAt:'',version:'2.4.0-teacher-sync-filtered'};
 const safe=v=>String(v==null?'':v).trim();
 const norm=v=>safe(v).replace(/[إأآا]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/[ـ\u064B-\u0652]/g,'').replace(/\s+/g,' ').toLowerCase();
 const readJson=k=>{try{return JSON.parse(localStorage.getItem(k)||sessionStorage.getItem(k)||'null')}catch(_){return null}};
@@ -75,12 +75,29 @@ async function load(force){
     state.schoolId=sid;state.year=yr;
     const [cs,cu,ca]=await Promise.all([cloudStudents(),cloudStaff(),cloudAdministrativeStaff()]);
     state.students=dedupe([...studentLocal(),...cs].map(mapStudent).filter(x=>x.name&&!/محذوف/.test(norm(x.status))),x=>safe(x.student_number||x.national_id)||norm(x.name)+'|'+norm(x.grade)+'|'+norm(x.section));
-    state.staff=dedupe([...staffLocal(),...cu].map(mapStaff).filter(x=>x.name),x=>safe(x.id)||norm(x.email)||norm(x.name)+'|'+norm(x.role));
+    state.staff=dedupe([...staffLocal(),...cu].map(mapStaff).filter(x=>{
+      if(!x.name)return false;
+      const sidNow=safe(sid);
+      const rowSid=safe(x.school_id);
+      return !sidNow || !rowSid || rowSid===sidNow;
+    }),x=>safe(x.id)||norm(x.email)||norm(x.name)+'|'+norm(x.role));
     state.administrativeStaff=dedupe((ca||[]).map(mapStaff).filter(x=>x.name&&['admin_employee','administrative_employee'].includes(norm(x.role))),x=>safe(x.id)||norm(x.email)||norm(x.name));
     state.loaded=true;state.loading=null;state.updatedAt=new Date().toISOString();refreshLists();emit('school-information-ready',snapshot());emit('school-information-change',snapshot());return state;
   })();return state.loading;
 }
-function teachers(){return state.staff.filter(x=>/teacher|kindergarten_teacher|معلم|معلمة رياض/.test(norm(x.role+' '+x.role_label)))}
+function canonicalRole(v){
+  const r=norm(v);
+  if(['teacher','kindergarten_teacher'].includes(r)) return r;
+  if(/(^|\s)معلم(\/ه|ه|ة)?($|\s)|معلمه رياض الاطفال|معلمة رياض الأطفال/.test(r)) return /رياض/.test(r)?'kindergarten_teacher':'teacher';
+  return r;
+}
+function teachers(){
+  return state.staff.filter(x=>{
+    const r=canonicalRole(x.role);
+    // الاعتماد على الدور الوظيفي الصريح فقط؛ لا نعتبر الإداري أو المستخدم العام معلماً بسبب المسمى النصي.
+    return r==='teacher' || r==='kindergarten_teacher';
+  });
+}
 function administrativeEmployees(){
   // المصدر الوحيد للموظف الإداري هو الدور الصريح الناتج عن رابط التسجيل الإداري.
   // لا نعتمد على المسمى النصي، ولا على وجود خطة محلية، ولا على كون المستخدم عضوًا في المدرسة فقط.
@@ -170,11 +187,11 @@ function boot(){ensureDatalist('sicStudentsList');ensureDatalist('sicTeachersLis
 if(infoChannel)infoChannel.onmessage=e=>{if(e.data&&e.data.type==='updated'){state.loaded=false;load(true)}};new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)scan(n)}))).observe(document.documentElement,{childList:true,subtree:true});window.addEventListener('storage',e=>{if(/schoolInformationCenter|school_information_center|sic_students|users|school_users/i.test(e.key||''))load(true)});window.addEventListener('school-information-updated',()=>{state.loaded=false;load(true)});}
 window.SchoolInformationSource={
   load,
-  getStudents:async()=>{await load(false);return state.students.slice()},
-  getStaff:async()=>{await load(false);return state.staff.slice()},
-  getTeachers:async()=>{await load(false);return teachers().slice()},
-  getAdministrativeEmployees:async()=>{await load(false);return administrativeEmployees().slice()},
-  getSnapshot:async()=>{await load(false);return snapshot()},
+  getStudents:async(force=false)=>{await load(!!force);return state.students.slice()},
+  getStaff:async(force=false)=>{await load(!!force);return state.staff.slice()},
+  getTeachers:async(force=false)=>{await load(!!force);return teachers().slice()},
+  getAdministrativeEmployees:async(force=false)=>{await load(!!force);return administrativeEmployees().slice()},
+  getSnapshot:async(force=false)=>{await load(!!force);return snapshot()},
   findStudent:async q=>{await load(false);return findStudent(q)},
   findStaff:async q=>{await load(false);return findStaff(q)},
   getSchoolId:schoolId,
