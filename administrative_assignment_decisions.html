@@ -750,7 +750,17 @@ async function cloudSaveDecision(){
     if(decisionCloudEditingId)payload.replaceFileId=String(decisionCloudEditingId);
 
     const result=await CloudFileEngine.upload(payload);
-    decisionCloudEditingId=String(result?.file?.id||result?.fileId||decisionCloudEditingId||'');
+    decisionCloudEditingId=String(result?.file?.id||result?.fileId||result?.id||decisionCloudEditingId||'');
+    if(!decisionCloudEditingId){
+      const verifyRows=await decisionCloudList();
+      const verified=verifyRows.find(f=>String(f?.metadata?.assigneeName||'')===assignee && Number(f?.metadata?.duplicateNo||0)===duplicateNo);
+      if(verified)decisionCloudEditingId=String(verified.id);
+    }
+    if(!decisionCloudEditingId)throw new Error('تم إرسال الملف للحفظ لكن لم يتم الحصول على معرفه السحابي للتحقق.');
+
+    const verifyRowsAfter=await decisionCloudList();
+    const verifySaved=verifyRowsAfter.some(f=>String(f.id)===String(decisionCloudEditingId));
+    if(!verifySaved)throw new Error('لم ينجح التحقق من ظهور التكليف داخل مجلد القرارات والتكليفات.');
 
     const url=new URL(location.href);
     if(decisionCloudEditingId)url.searchParams.set('editFileId',decisionCloudEditingId);
@@ -844,8 +854,15 @@ window.renderDecisionArchive=renderDecisionCloudArchive;
 window.editDecisionArchive=loadDecisionCloudRecord;
 window.deleteDecisionArchive=deleteDecisionCloudRecord;
 
-setTimeout(async()=>{loadDecisionTeachers();ensureDecisionFolderVisible();await renderDecisionCloudArchive();if(decisionCloudEditingId)await loadDecisionCloudRecord(decisionCloudEditingId);},0);
 init();
+setTimeout(async()=>{
+  try{
+    loadDecisionTeachers();
+    ensureDecisionFolderVisible();
+    await renderDecisionCloudArchive();
+    if(decisionCloudEditingId)await loadDecisionCloudRecord(decisionCloudEditingId);
+  }catch(e){console.warn('[Decisions] archive initialization deferred',e);}
+},80);
 </script>
 </body>
 </html>
