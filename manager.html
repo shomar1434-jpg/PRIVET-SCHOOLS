@@ -3264,8 +3264,8 @@ html.manager-booting::before{content:'جاري تحميل قسم المدير…
                             <div style="color:#334155; font-weight:bold; font-size:13px;">📄 ${escapeManagerHTML(record.name)}</div>
                             <div style="color:#94a3b8; font-size:10px; margin-top:4px;">${new Date(record.createdAt).toLocaleString('ar-SA')} - ${formatManagerFileSize(record.size)}</div>
                         </div>
-                        <button onclick="previewManagerLocalPDF(${record.id})" class="manager-record-btn" style="background:#0ea5e9; color:white;">معاينة</button>
-                        <button onclick="removeManagerRecord(${record.id})" class="manager-record-btn" style="background:#ef4444; color:white;">حذف</button>
+                        <button type="button" onclick='previewManagerLocalPDF(${JSON.stringify(String(record.id))})' class="manager-record-btn" style="background:#0ea5e9; color:white;">معاينة</button>
+                        <button type="button" onclick='removeManagerRecord(${JSON.stringify(String(record.id))})' class="manager-record-btn" style="background:#ef4444; color:white;">حذف</button>
                     </div>
                 `).join('');
             } catch (error) {
@@ -4695,10 +4695,10 @@ document.addEventListener("click", function(e){
               <div style="color:#334155;font-weight:bold;font-size:13px;">${kindIcon(kind)} — ${escapeManagerOfficeHTML(record.name)}</div>
               <div style="color:#94a3b8;font-size:10px;margin-top:4px;">${new Date(record.createdAt).toLocaleString('ar-SA')} - ${formatManagerFileSize(record.size)}</div>
             </div>
-            <button onclick="previewManagerLocalPDF(${record.id})" class="manager-record-btn" style="background:#0ea5e9;color:white;">معاينة</button>
-            ${canEdit ? `<button onclick="previewManagerLocalPDF(${record.id})" class="manager-record-btn" style="background:#2563eb;color:white;">تعديل</button>` : ''}
+            <button type="button" onclick='previewManagerLocalPDF(${JSON.stringify(String(record.id))})' class="manager-record-btn" style="background:#0ea5e9;color:white;">معاينة</button>
+            ${canEdit ? `<button type="button" onclick='previewManagerLocalPDF(${JSON.stringify(String(record.id))})' class="manager-record-btn" style="background:#2563eb;color:white;">تعديل</button>` : ''}
             <button onclick="downloadManagerRecord(${record.id})" class="manager-record-btn" style="background:#7c3aed;color:white;">تحميل</button>
-            <button onclick="removeManagerRecord(${record.id})" class="manager-record-btn" style="background:#ef4444;color:white;">حذف</button>
+            <button type="button" onclick='removeManagerRecord(${JSON.stringify(String(record.id))})' class="manager-record-btn" style="background:#ef4444;color:white;">حذف</button>
           </div>
         `;
       }).join('');
@@ -5069,7 +5069,7 @@ function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
       const records=await getAllManagerLocalRecords();
       const rows=records.filter(r=>(r.folder||'عام')===activeFolder).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
       if(!rows.length){list.innerHTML='<div style="padding:18px;background:#fff8e1;border:1px solid #ffe08a;border-radius:18px;color:#777;text-align:center;font-size:12px;font-weight:bold;">لا توجد ملفات داخل مجلد '+esc(activeFolder)+'.</div>';return;}
-      list.innerHTML=rows.map(record=>{const k=record.kind||kind(record); return '<div class="manager-record-item"><div style="flex:1;min-width:200px;"><div style="color:#334155;font-weight:bold;font-size:13px;">'+icon(k)+' — '+esc(record.name)+'</div><div style="color:#94a3b8;font-size:10px;margin-top:4px;">'+new Date(record.createdAt).toLocaleString('ar-SA')+' - '+fmt(record.size)+' - مجلد: '+esc(record.folder||'عام')+'</div></div><button onclick="editManagerRecordSafe('+record.id+')" class="manager-record-btn" style="background:#2563eb;color:white;">تعديل</button><button onclick="previewManagerLocalPDF('+record.id+')" class="manager-record-btn" style="background:#0ea5e9;color:white;">معاينة</button><button onclick="printManagerRecordSafe('+record.id+')" class="manager-record-btn" style="background:#7c3aed;color:white;">طباعة</button><button onclick="removeManagerRecord('+record.id+')" class="manager-record-btn" style="background:#ef4444;color:white;">حذف</button></div>';}).join('');
+      list.innerHTML=rows.map(record=>{const k=record.kind||kind(record), q=JSON.stringify(String(record.id)); return '<div class="manager-record-item"><div style="flex:1;min-width:200px;"><div style="color:#334155;font-weight:bold;font-size:13px;">'+icon(k)+' — '+esc(record.name)+'</div><div style="color:#94a3b8;font-size:10px;margin-top:4px;">'+new Date(record.createdAt).toLocaleString('ar-SA')+' - '+fmt(record.size)+' - مجلد: '+esc(record.folder||'عام')+'</div></div><button type="button" onclick=\'editManagerRecordSafe('+q+')\' class="manager-record-btn" style="background:#2563eb;color:white;">تعديل</button><button type="button" onclick=\'previewManagerLocalPDF('+q+')\' class="manager-record-btn" style="background:#0ea5e9;color:white;">معاينة</button><button type="button" onclick=\'printManagerRecordSafe('+q+')\' class="manager-record-btn" style="background:#7c3aed;color:white;">طباعة</button><button type="button" onclick=\'removeManagerRecord('+q+')\' class="manager-record-btn" style="background:#ef4444;color:white;">حذف</button></div>';}).join('');
     }catch(error){list.innerHTML='<div style="padding:15px;color:#dc2626;text-align:center;font-size:12px;">'+esc(error)+'</div>';}
   };
 
@@ -5113,6 +5113,10 @@ function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
   }
   window.editManagerRecordSafe=async function(id){
     const record=await getManagerLocalRecord(id); if(!record){showToast('تعذر العثور على الملف');return;}
+    if(record.metadata&&record.metadata.source==='administrative_assignment_decisions'){
+      window.location.href='administrative_assignment_decisions.html?editFileId='+encodeURIComponent(String(record.id));
+      return;
+    }
     const k=record.kind||kind(record);
     if(['word','excel'].includes(k)){ return previewManagerLocalPDF(id); }
     const newName=prompt('تعديل اسم الملف:', record.name||'');
@@ -5127,7 +5131,7 @@ function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
     const record=await getManagerLocalRecord(id); if(!record){showToast('تعذر العثور على الملف');return;} const k=record.kind||kind(record); const w=window.open('','_blank'); if(!w){showToast('يرجى السماح بالنوافذ المنبثقة للطباعة');return;}
     const title=esc(record.name); let html='';
     try{
-      if(k==='pdf'||k==='image'){const url=URL.createObjectURL(record.file); html=k==='pdf'?'<iframe src="'+url+'" style="width:100%;height:100vh;border:0"></iframe>':'<img src="'+url+'" style="max-width:100%;height:auto;display:block;margin:auto">';}
+      if(k==='pdf'||k==='image'||k==='html'){const url=URL.createObjectURL(record.file); html=k==='image'?'<img src="'+url+'" style="max-width:100%;height:auto;display:block;margin:auto">':'<iframe src="'+url+'" style="width:100%;height:100vh;border:0"></iframe>';}
       else if(k==='word'&&record.editedHtml){html='<div style="padding:20px">'+record.editedHtml+'</div>';}
       else if(k==='excel'&&window.XLSX){const wb=record.editedWorkbookBase64?XLSX.read(record.editedWorkbookBase64,{type:'base64'}):XLSX.read(await record.file.arrayBuffer(),{type:'array'}); const sh=wb.SheetNames[0]; const rows=XLSX.utils.sheet_to_json(wb.Sheets[sh],{header:1,defval:''}); html='<table style="width:100%;border-collapse:collapse">'+rows.map(row=>'<tr>'+row.map(c=>'<td style="border:1px solid #333;padding:6px">'+esc(c)+'</td>').join('')+'</tr>').join('')+'</table>';}
       else {html='<div style="font-family:Arial;text-align:center;padding:50px"><h2>'+title+'</h2><p>هذا النوع محفوظ داخل المكتبة، وقد لا يدعم المتصفح طباعته مباشرة. استخدم المعاينة أو افتحه من الجهاز للطباعة.</p></div>';}

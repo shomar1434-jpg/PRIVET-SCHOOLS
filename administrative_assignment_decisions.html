@@ -110,6 +110,12 @@ button{border:0;border-radius:9px;padding:10px 13px;font:700 12px 'Alyamama';cur
 
 <script src="school-base-settings-source.js"></script>
 <script src="school-information-source.js?v=20260824-decisions-1"></script>
+<script src="private-auth-storage.js"></script>
+<script src="private-edition-bootstrap.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-bridge.js"></script>
+<script src="platform-cloud-session.js?v=20260818-session-v12"></script>
+<script src="cloud-file-engine.js"></script>
 <style>
 .platform-backbar{position:fixed;top:14px;right:14px;z-index:9999}
 .platform-backbtn{display:inline-flex;align-items:center;gap:7px;border:1px solid #c9d7d9;background:rgba(255,255,255,.97);color:#0a7978;padding:9px 14px;border-radius:12px;font:800 12px 'Alyamama',Tahoma,Arial,sans-serif;box-shadow:0 8px 24px rgba(15,23,42,.12);cursor:pointer}
@@ -190,7 +196,7 @@ button{border:0;border-radius:9px;padding:10px 13px;font:700 12px 'Alyamama';cur
   <button class="secondary" id="saveDecisionBtn" onclick="saveData()">حفظ في أرشيف السجلات</button>
   <button class="ghost" onclick="clearData()">مسح النموذج</button>
  </div>
- <div class="archive-save-note">مكان الحفظ: أرشيف سجلات المدير ← مجلد «القرارات والتكليفات». لا يتم إنشاء نسخة مكررة في مكتبة القسم.</div>
+ <div class="archive-save-note">مكان الحفظ: أرشيف سجلات المدير ← مجلد «القرارات والتكليفات» (حفظ سحابي مرتبط بالمدرسة). لا يتم إنشاء نسخة مكررة في مكتبة القسم.</div>
  <div class="decision-archive">
    <div class="decision-archive-head"><h3>📁 القرارات والتكليفات المحفوظة</h3><button type="button" class="mini" onclick="renderDecisionArchive()">تحديث</button></div>
    <div id="decisionArchiveList" class="decision-archive-list"></div>
@@ -642,7 +648,203 @@ function preparePrint(){
  render();document.documentElement.scrollTop=0;document.body.scrollTop=0;
  requestAnimationFrame(()=>requestAnimationFrame(()=>window.print()));
 }
-setTimeout(()=>{loadDecisionTeachers();renderDecisionArchive();},0);
+
+// ===== DECISIONS CLOUD ARCHIVE V2 =====
+const DECISION_CLOUD_MODULE='manager_records_archive';
+const DECISION_CLOUD_TYPE='pdf_archive';
+const DECISION_CLOUD_FOLDER='القرارات والتكليفات';
+const DECISION_MANAGER_FOLDERS_KEY='ManagerRecordsLocalDB_manager_library_folders_v1';
+let decisionCloudEditingId=new URLSearchParams(location.search).get('editFileId')||'';
+
+function ensureDecisionFolderVisible(){
+  try{
+    let arr=JSON.parse(localStorage.getItem(DECISION_MANAGER_FOLDERS_KEY)||'[]');
+    if(!Array.isArray(arr))arr=[];
+    if(!arr.includes('عام'))arr.unshift('عام');
+    if(!arr.includes(DECISION_CLOUD_FOLDER))arr.push(DECISION_CLOUD_FOLDER);
+    localStorage.setItem(DECISION_MANAGER_FOLDERS_KEY,JSON.stringify(arr));
+  }catch(e){}
+}
+async function waitDecisionCloudEngine(timeout=9000){
+  const started=Date.now();
+  while(!window.CloudFileEngine){
+    if(Date.now()-started>timeout)throw new Error('تعذر تهيئة الحفظ السحابي. أعد فتح القسم بعد التأكد من جلسة المدرسة.');
+    await new Promise(r=>setTimeout(r,120));
+  }
+}
+async function decisionCloudList(){
+  await waitDecisionCloudEngine();
+  const r=await CloudFileEngine.list({moduleKey:DECISION_CLOUD_MODULE,recordType:DECISION_CLOUD_TYPE,limit:1000});
+  return (r.files||[]).filter(f=>
+    String(f?.metadata?.folder||'')===DECISION_CLOUD_FOLDER &&
+    String(f?.metadata?.source||'')==='administrative_assignment_decisions'
+  );
+}
+function decisionSafeFileBase(name){
+  return String(name||'مكلف').trim().replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').slice(0,90)||'مكلف';
+}
+function decisionExportHtml(){
+  const clone=document.documentElement.cloneNode(true);
+  clone.querySelectorAll('.platform-backbar,.decision-archive,.archive-save-note,.actions,.no-print').forEach(n=>n.remove());
+  clone.querySelectorAll('script').forEach(n=>n.remove());
+  clone.querySelectorAll('input,textarea,select').forEach(el=>{
+    const span=document.createElement(el.tagName==='TEXTAREA'?'div':'span');
+    span.textContent=el.tagName==='SELECT'?(el.options[el.selectedIndex]?.text||el.value||''):(el.value||'');
+    span.style.cssText='display:block;min-height:18px;padding:4px 6px;white-space:pre-wrap;';
+    el.replaceWith(span);
+  });
+  return '<!DOCTYPE html>\n'+clone.outerHTML;
+}
+async function nextDecisionCloudCounter(name,currentId){
+  const rows=await decisionCloudList();
+  const same=rows.filter(f=>
+    String(f?.metadata?.assigneeName||'').trim()===String(name||'').trim() &&
+    String(f.id)!==String(currentId||'')
+  );
+  return same.reduce((m,f)=>Math.max(m,Number(f?.metadata?.duplicateNo||0)),0)+1;
+}
+async function cloudSaveDecision(){
+  try{
+    applyUnifiedOfficialData();
+    await waitDecisionCloudEngine();
+    ensureDecisionFolderVisible();
+    const values=collectDecisionValues();
+    const assignee=String(values.name||'').trim();
+    if(!assignee){alert('اختر اسم المكلف أولاً.');return}
+    const decision=getDecision();
+    const title=String(values.customTitle||decision.title||'قرار تكليف').trim();
+
+    let duplicateNo=1;
+    if(decisionCloudEditingId){
+      const rows=await decisionCloudList();
+      const current=rows.find(f=>String(f.id)===String(decisionCloudEditingId));
+      duplicateNo=Number(current?.metadata?.duplicateNo||1);
+    }else{
+      duplicateNo=await nextDecisionCloudCounter(assignee,'');
+    }
+
+    const displayName=decisionSafeFileBase(assignee)+' - '+duplicateNo+'.html';
+    const file=new File([decisionExportHtml()],displayName,{type:'text/html;charset=utf-8'});
+    const metadata={
+      folder:DECISION_CLOUD_FOLDER,
+      kind:'html',
+      source:'administrative_assignment_decisions',
+      assigneeName:assignee,
+      decisionTitle:title,
+      duplicateNo,
+      decisionNumber:String(values.no||''),
+      decisionDate:String(values.date||''),
+      startDate:String(values.start||''),
+      values
+    };
+    const payload={
+      file,
+      ownershipScope:'user',
+      moduleKey:DECISION_CLOUD_MODULE,
+      recordType:DECISION_CLOUD_TYPE,
+      recordId:'manager',
+      relationType:'archive_file',
+      displayName,
+      metadata
+    };
+    if(decisionCloudEditingId)payload.replaceFileId=String(decisionCloudEditingId);
+
+    const result=await CloudFileEngine.upload(payload);
+    decisionCloudEditingId=String(result?.file?.id||result?.fileId||decisionCloudEditingId||'');
+
+    const url=new URL(location.href);
+    if(decisionCloudEditingId)url.searchParams.set('editFileId',decisionCloudEditingId);
+    history.replaceState({},'',url);
+
+    if($('saveDecisionBtn'))$('saveDecisionBtn').textContent='حفظ التعديل في الأرشيف';
+    await renderDecisionCloudArchive();
+    alert('تم حفظ التكليف داخل أرشيف سجلات المدير ← القرارات والتكليفات باسم «'+displayName+'».');
+  }catch(e){
+    console.error(e);
+    alert('تعذر حفظ التكليف في أرشيف السجلات: '+(e?.message||e));
+  }
+}
+async function loadDecisionCloudRecord(id){
+  try{
+    const rows=await decisionCloudList();
+    const f=rows.find(x=>String(x.id)===String(id));
+    if(!f)return false;
+    const v=f.metadata?.values||{};
+    fields.forEach(k=>{if($(k)&&v[k]!=null)$(k).value=v[k]});
+    decisionCloudEditingId=String(f.id);
+    if($('saveDecisionBtn'))$('saveDecisionBtn').textContent='حفظ التعديل في الأرشيف';
+    render();
+    window.scrollTo({top:0,behavior:'smooth'});
+    return true;
+  }catch(e){
+    alert('تعذر فتح التكليف للتعديل: '+(e?.message||e));
+    return false;
+  }
+}
+async function deleteDecisionCloudRecord(id){
+  if(!confirm('هل تريد حذف هذا التكليف من أرشيف السجلات؟'))return;
+  try{
+    await waitDecisionCloudEngine();
+    await CloudFileEngine.trash(String(id));
+    if(String(decisionCloudEditingId)===String(id)){
+      decisionCloudEditingId='';
+      const u=new URL(location.href);
+      u.searchParams.delete('editFileId');
+      history.replaceState({},'',u);
+      if($('saveDecisionBtn'))$('saveDecisionBtn').textContent='حفظ في أرشيف السجلات';
+    }
+    await renderDecisionCloudArchive();
+  }catch(e){
+    alert('تعذر حذف التكليف: '+(e?.message||e));
+  }
+}
+async function previewDecisionCloudRecord(id){
+  try{
+    await waitDecisionCloudEngine();
+    const blob=await CloudFileEngine.getBlob(String(id));
+    const u=URL.createObjectURL(blob);
+    const w=window.open(u,'_blank');
+    if(!w)alert('يرجى السماح بالنوافذ المنبثقة للمعاينة.');
+    setTimeout(()=>URL.revokeObjectURL(u),60000);
+  }catch(e){
+    alert('تعذر معاينة التكليف: '+(e?.message||e));
+  }
+}
+async function renderDecisionCloudArchive(){
+  const box=$('decisionArchiveList');
+  if(!box)return;
+  try{
+    const rows=(await decisionCloudList()).sort(
+      (a,b)=>String(b.updated_at||b.created_at||'').localeCompare(String(a.updated_at||a.created_at||''))
+    );
+    if(!rows.length){
+      box.innerHTML='<div class="custom-help">لا توجد قرارات محفوظة في المجلد السحابي حتى الآن.</div>';
+      return;
+    }
+    box.innerHTML=rows.map(f=>{
+      const id=JSON.stringify(String(f.id));
+      const name=f.display_name||f.original_name||'قرار تكليف';
+      const meta=f.metadata||{};
+      return `<div class="decision-archive-item">
+        <div class="decision-archive-name">${escHtml(name)}</div>
+        <div class="decision-archive-meta">${escHtml(meta.decisionTitle||'قرار تكليف')} — ${escHtml(meta.assigneeName||'')}</div>
+        <div class="decision-archive-actions">
+          <button type="button" class="mini" onclick='loadDecisionCloudRecord(${id})'>تعديل</button>
+          <button type="button" class="mini" onclick='previewDecisionCloudRecord(${id})'>معاينة</button>
+          <button type="button" class="mini" onclick='deleteDecisionCloudRecord(${id})'>حذف</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    box.innerHTML='<div class="custom-help" style="color:#b91c1c">'+escHtml(e?.message||e)+'</div>';
+  }
+}
+window.saveData=cloudSaveDecision;
+window.renderDecisionArchive=renderDecisionCloudArchive;
+window.editDecisionArchive=loadDecisionCloudRecord;
+window.deleteDecisionArchive=deleteDecisionCloudRecord;
+
+setTimeout(async()=>{loadDecisionTeachers();ensureDecisionFolderVisible();await renderDecisionCloudArchive();if(decisionCloudEditingId)await loadDecisionCloudRecord(decisionCloudEditingId);},0);
 init();
 </script>
 </body>
