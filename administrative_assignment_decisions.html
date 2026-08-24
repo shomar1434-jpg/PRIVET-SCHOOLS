@@ -117,9 +117,10 @@ button{border:0;border-radius:9px;padding:10px 13px;font:700 12px 'Alyamama';cur
 <script src="platform-cloud-session.js?v=20260818-session-v12"></script>
 <script src="cloud-file-engine.js"></script>
 <style>
-.platform-backbar{position:fixed;top:14px;right:14px;z-index:9999}
-.platform-backbtn{display:inline-flex;align-items:center;gap:7px;border:1px solid #c9d7d9;background:rgba(255,255,255,.97);color:#0a7978;padding:9px 14px;border-radius:12px;font:800 12px 'Alyamama',Tahoma,Arial,sans-serif;box-shadow:0 8px 24px rgba(15,23,42,.12);cursor:pointer}
-.platform-backbtn:hover{background:#eef8f7}
+.platform-backbar{display:flex;justify-content:flex-start;align-items:center;margin:0 0 10px;position:static;z-index:auto}
+.platform-backbtn{width:38px;height:38px;display:inline-grid;place-items:center;border:1px solid #c9d7d9;background:#fff;color:#0a7978;padding:0;border-radius:11px;font:900 20px 'Alyamama',Tahoma,Arial,sans-serif;box-shadow:0 5px 14px rgba(15,23,42,.08);cursor:pointer;line-height:1}
+.platform-backbtn:hover{background:#eef8f7;transform:translateX(1px)}
+.platform-backbtn span{display:block;line-height:1}
 .official-linked{background:#f4fbfa!important;border-color:#9ccbc8!important;color:#264b4a!important}
 .official-note{font-size:10px;color:#0a7978;font-weight:700;margin:-4px 0 8px}
 @media print{.platform-backbar,.official-note{display:none!important}}
@@ -141,13 +142,13 @@ button{border:0;border-radius:9px;padding:10px 13px;font:700 12px 'Alyamama';cur
 
 </head>
 <body>
-<div class="platform-backbar no-print">
-  <button type="button" class="platform-backbtn" onclick="returnToManager()" aria-label="العودة إلى قسم المدير">
-    <span aria-hidden="true">↩</span><span>العودة إلى قسم المدير</span>
-  </button>
-</div>
 <div class="app">
 <aside class="panel">
+ <div class="platform-backbar no-print">
+  <button type="button" class="platform-backbtn" onclick="returnToManager()" aria-label="العودة إلى الأقسام الرئيسية للمدير" title="العودة إلى الأقسام الرئيسية">
+    <span aria-hidden="true">←</span>
+  </button>
+ </div>
  <h1>قرارات التكليف الإدارية</h1>
  <div class="sub">التصميم مطابق للنموذج البصري المعتمد — صفحتان A4</div>
 
@@ -194,6 +195,7 @@ button{border:0;border-radius:9px;padding:10px 13px;font:700 12px 'Alyamama';cur
  <div class="actions">
   <button class="primary" onclick="preparePrint()">إصدار PDF / طباعة</button>
   <button class="secondary" id="saveDecisionBtn" onclick="saveData()">حفظ في أرشيف السجلات</button>
+  <button class="secondary" id="newDecisionBtn" type="button" onclick="startNewDecision()">＋ تكليف جديد</button>
   <button class="ghost" onclick="clearData()">مسح النموذج</button>
  </div>
  <div class="archive-save-note">مكان الحفظ: أرشيف سجلات المدير ← مجلد «القرارات والتكليفات» (حفظ سحابي مرتبط بالمدرسة). لا يتم إنشاء نسخة مكررة في مكتبة القسم.</div>
@@ -396,11 +398,48 @@ function render(){
 }
 
 function returnToManager(){
+  try{ sessionStorage.setItem('manager_return_to_sections','1'); }catch(e){}
+  const target='manager.html?view=sections';
   try{
-    if(window.top && window.top !== window) window.top.location.href='manager.html';
-    else window.location.href='manager.html';
-  }catch(e){ window.location.href='manager.html'; }
+    if(window.top && window.top !== window) window.top.location.href=target;
+    else window.location.href=target;
+  }catch(e){ window.location.href=target; }
 }
+
+function startNewDecision(){
+  // لا يمس الأرشيف ولا بيانات المدرسة الرسمية؛ يبدأ نموذج تكليف جديد فقط.
+  try{
+    editingDecisionArchiveId=null;
+    if(typeof decisionCloudEditingId!=='undefined') decisionCloudEditingId='';
+  }catch(e){}
+  try{
+    const u=new URL(location.href);
+    u.searchParams.delete('editFileId');
+    history.replaceState({},'',u);
+  }catch(e){}
+
+  const keepOfficial=new Set(['school','edu','manager']);
+  fields.forEach(id=>{
+    if(keepOfficial.has(id))return;
+    const el=$(id);
+    if(!el)return;
+    if(el.tagName==='SELECT') el.selectedIndex=0;
+    else el.value='';
+  });
+
+  // إعادة التكليف إلى أول خيار افتراضي وإخفاء نموذج «أخرى».
+  if($('type')) $('type').selectedIndex=0;
+  if($('customAssignmentBox')) $('customAssignmentBox').style.display='none';
+  if($('saveDecisionBtn')) $('saveDecisionBtn').textContent='حفظ في أرشيف السجلات';
+
+  // إعادة تحميل البيانات الرسمية من المصدر الموحد ثم تحديث المعاينة.
+  applyUnifiedOfficialData();
+  render();
+  const first=$('type');
+  if(first) first.focus();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 function getUnifiedOfficialProfile(){
   try{
     if(window.UnifiedSchoolOfficialProfile && typeof window.UnifiedSchoolOfficialProfile.snapshot==='function'){

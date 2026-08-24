@@ -5714,6 +5714,52 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
 
 <script src="platform-page-navigation.js?v=20260818-nav1"></script>
 
+<script id="MANAGER_RETURN_TO_SECTIONS_V1">
+(function(){
+  function shouldOpenSections(){
+    try{
+      const q=new URLSearchParams(location.search);
+      if(q.get('view')==='sections')return true;
+      if(sessionStorage.getItem('manager_return_to_sections')==='1')return true;
+    }catch(e){}
+    return false;
+  }
+  function openSections(){
+    if(!shouldOpenSections())return false;
+    try{sessionStorage.removeItem('manager_return_to_sections')}catch(e){}
+    const ids=['activation-overlay','welcome-gate','main-report-app','archive-view','stats-view','portfolio-view','manager-records-view','manager-records-archive-view','self-evaluation-archive-view','school-performance-dashboard-view'];
+    ids.forEach(function(id){
+      const el=document.getElementById(id);
+      if(!el)return;
+      el.style.display='none';
+      if(el.classList)el.classList.add('hidden');
+    });
+    const dash=document.getElementById('welcome-dashboard');
+    if(dash){
+      dash.style.display='block';
+      if(dash.classList)dash.classList.remove('hidden');
+    }
+    try{
+      const u=new URL(location.href);
+      u.searchParams.delete('view');
+      history.replaceState({},'',u.pathname+u.search+u.hash);
+    }catch(e){}
+    return true;
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',openSections,{once:true});
+  }else openSections();
+  // يعاد التطبيق بعد window.onload القديم لأنه كان يعيد إظهار welcome-gate.
+  window.addEventListener('load',function(){
+    if(shouldOpenSections())openSections();
+  });
+  // حماية من أي تهيئة متأخرة في الصفحة.
+  setTimeout(openSections,80);
+  setTimeout(openSections,260);
+})();
+</script>
+
+
 <!-- PRIVATE_EDITION_BUILD_RUNTIME -->
 <script src="private-school-runtime.js"></script>
 <script src="private-manager-enhancements.js?v=20260820-governance2"></script>
