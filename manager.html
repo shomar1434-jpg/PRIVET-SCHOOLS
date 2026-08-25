@@ -4011,9 +4011,12 @@ html.manager-booting::before{content:'جاري تحميل قسم المدير…
   }
 
   function walletArchiveFolders(){
-    if (typeof CATEGORY_DATA !== 'undefined' && CATEGORY_DATA) return Object.entries(CATEGORY_DATA).map(function(pair){return {id:pair[0], name:(pair[1]&&pair[1].name)||pair[0]};});
-    if (typeof ALL_CATEGORIES !== 'undefined' && ALL_CATEGORIES) return ALL_CATEGORIES.map(function(c){return {id:c.id, name:c.name};});
-    return [{id:'meeting-minutes', name:'محاضر الاجتماعات'}];
+    var rows=[];
+    if (typeof CATEGORY_DATA !== 'undefined' && CATEGORY_DATA) rows=Object.entries(CATEGORY_DATA).map(function(pair){return {id:pair[0], name:(pair[1]&&pair[1].name)||pair[0]};});
+    else if (typeof ALL_CATEGORIES !== 'undefined' && ALL_CATEGORIES) rows=ALL_CATEGORIES.map(function(c){return {id:c.id, name:c.name};});
+    else rows=[{id:'meeting-minutes', name:'محاضر الاجتماعات'}];
+    if(ROLE==='manager'&&!rows.some(function(x){return x.id==='selfEval_55'})) rows.unshift({id:'selfEval_55',name:'أرشيف التقويم الذاتي — اجتماعات اللجان والفرق'});
+    return rows;
   }
   function walletArchiveStoreKey(){
     return (typeof ALL_CATEGORIES !== 'undefined' && (typeof CATEGORY_DATA === 'undefined')) ? 'reports_archive' : 'school_reports';
@@ -4072,23 +4075,30 @@ html.manager-booting::before{content:'جاري تحميل قسم المدير…
     if(!m){ alert('تعذر العثور على محضر الاجتماع المحدد.'); return; }
     var folders=walletArchiveFolders();
     var cat=(document.getElementById('walletArchiveFolder')||{}).value || (folders[0]&&folders[0].id) || 'meeting-minutes';
-    var key=walletArchiveStoreKey();
+    var key=(ROLE==='manager'&&String(cat).indexOf('selfEval_')===0)?'manager_self_evaluation_archive_v1':walletArchiveStoreKey();
     var reports=JSON.parse(localStorage.getItem(key)||'[]');
-    var createdAt=new Date().toLocaleDateString('ar-SA-u-ca-islamic-uma');
+    var createdAt=new Date().toISOString();
     reports.push({
-      id: Date.now(),
+      id: 'meeting_archive_'+Date.now(),
       title: 'محضر اجتماع - '+(m.title||'بدون عنوان'),
+      displayName: 'محضر اجتماع - '+(m.title||'بدون عنوان'),
       category: cat,
+      folderId: cat,
+      folderName: (cat==='selfEval_55'?'اجتماعات اللجان والفرق':'محاضر الاجتماعات'),
+      recordName: (cat==='selfEval_55'?'اجتماعات اللجان والفرق':'محاضر الاجتماعات'),
       createdAt: createdAt,
       date: createdAt,
       isComplete: true,
       archiveType: 'meetingMinutes',
-      readOnly: true,
+      readOnly: false,
       source: 'meeting_wallet',
+      sourceMeetingId:m.id||'',
+      notes:m.minutes||m.summary||'',
+      minutes:m.minutes||m.summary||'',
       content: walletHtml(m), pdfHtml: walletHtml(m), officialHtml: walletHtml(m)
     });
     localStorage.setItem(key, JSON.stringify(reports));
-    alert('تم إرسال نسخة محضر الاجتماع إلى الأرشيف كملف معاينة فقط.');
+    alert(cat==='selfEval_55'?'تم حفظ محضر الاجتماع في أرشيف التقويم الذاتي — اجتماعات اللجان والفرق.':'تم إرسال نسخة محضر الاجتماع إلى الأرشيف.');
     close();
   }
   function previewArchivedReadOnly(id){
@@ -4139,6 +4149,31 @@ html.manager-booting::before{content:'جاري تحميل قسم المدير…
   function previewWalletPdf(){var s=selectedWalletItem(); if(!s)return; var w=window.open('','_blank'); if(!w){alert('اسمح بفتح النوافذ المنبثقة.');return;} w.document.write(walletHtml(s.item)); w.document.close(); w.focus();}
   function ensureHtml2Pdf(cb){if(window.html2pdf)return cb(); var sc=document.createElement('script'); sc.src='https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js'; sc.onload=cb; sc.onerror=function(){previewWalletPdf();}; document.head.appendChild(sc);}
   function downloadWalletPdf(){var s=selectedWalletItem(); if(!s)return; var html=walletHtml(s.item); ensureHtml2Pdf(function(){var wrap=document.createElement('div');wrap.style.position='fixed';wrap.style.left='-10000px';wrap.style.top='0';wrap.innerHTML=html;document.body.appendChild(wrap);var node=wrap.querySelector('body')||wrap;var name=(s.item.title||'محضر اجتماع').replace(/[\\/:*?"<>|]/g,'_')+'.pdf';html2pdf().set({filename:name,margin:0,image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true,scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}}).from(node).save().then(function(){wrap.remove();}).catch(function(){wrap.remove();previewWalletPdf();});});}
+
+  function editWalletMeeting(){
+    var s=selectedWalletItem(); if(!s)return;
+    var m=s.item;
+    panel('تعديل محضر الاجتماع',
+      '<div class="ss-field"><label>عنوان الاجتماع</label><input id="editWalletTitle" value="'+esc(m.title||'')+'"></div>'+
+      '<div class="ss-field"><label>رابط Teams</label><input id="editWalletLink" value="'+esc(m.teamsLink||'')+'"></div>'+
+      '<div class="ss-field"><label>نص المحضر</label><textarea id="editWalletMinutes" style="min-height:180px">'+esc(m.minutes||m.summary||'')+'</textarea></div>'+
+      '<div class="ss-actions"><button class="ss-action" id="saveWalletEdit">حفظ التعديل</button></div>');
+    var btn=document.getElementById('saveWalletEdit');
+    if(btn)btn.onclick=function(){
+      var a=minutes(ROLE), old=a[s.index]; if(!old){alert('تعذر العثور على المحضر.');return;}
+      a[s.index]=Object.assign({},old,{
+        title:val('editWalletTitle')||old.title,
+        teamsLink:val('editWalletLink')||'',
+        minutes:val('editWalletMinutes')||'',
+        summary:val('editWalletMinutes')||'',
+        updatedAt:new Date().toISOString()
+      });
+      write(NS+'_minutes_'+ROLE,a);
+      alert('تم حفظ تعديل محضر الاجتماع.');
+      showWallet(); updateBadges();
+    };
+  }
+
   function deleteWalletMeeting(){var s=selectedWalletItem(); if(!s)return; if(!confirm('هل تريد حذف محضر الاجتماع من المحفظة؟'))return; var a=minutes(ROLE); a.splice(s.index,1); write(NS+'_minutes_'+ROLE,a); showWallet(); updateBadges();}
 
 
@@ -4147,10 +4182,11 @@ html.manager-booting::before{content:'جاري تحميل قسم المدير…
     var a=minutes(ROLE);
     var body='';
     if(a.length){
-      body+='<div class="ss-actions" style="margin-bottom:12px"><button class="ss-action blue" id="walletPreviewBtn">معاينة</button><button class="ss-action secondary" id="walletDownloadBtn">تنزيل PDF</button><button class="ss-action gold" id="walletArchiveBtn">إرسال للأرشيف</button><button class="ss-action danger" id="walletDeleteBtn">حذف</button></div>';
+      body+='<div class="ss-actions" style="margin-bottom:12px"><button class="ss-action" id="walletEditBtn">تعديل</button><button class="ss-action blue" id="walletPreviewBtn">معاينة</button><button class="ss-action secondary" id="walletDownloadBtn">تنزيل PDF</button><button class="ss-action gold" id="walletArchiveBtn">إرسال للأرشيف</button><button class="ss-action danger" id="walletDeleteBtn">حذف</button></div>';
       body+=a.map(function(m,i){return '<label class="ss-card" style="display:block;cursor:pointer"><div style="display:flex;gap:10px;align-items:flex-start"><input type="checkbox" name="walletMeetingSelect" value="'+i+'" onchange="document.querySelectorAll(\'input[name=walletMeetingSelect]\').forEach(function(x){if(x!==this)x.checked=false;},this)"><div style="flex:1"><b>'+esc(m.title||'محضر اجتماع')+'</b><div class="ss-muted">'+fmt(m.createdAt)+' — '+esc(m.sender||'')+'</div><div style="white-space:pre-wrap;max-height:90px;overflow:hidden">'+esc(m.minutes||m.summary||'')+'</div>'+(m.teamsLink?'<div><a target="_blank" href="'+esc(m.teamsLink)+'">رابط Teams</a></div>':'')+'</div></div></label>'}).join('');
     } else { body='<div class="ss-empty">لا توجد محاضر محفوظة.</div>'; }
     panel('محفظة الاجتماعات', body);
+    var ed=document.getElementById('walletEditBtn'); if(ed)ed.onclick=editWalletMeeting;
     var p=document.getElementById('walletPreviewBtn'); if(p)p.onclick=previewWalletPdf;
     var d=document.getElementById('walletDownloadBtn'); if(d)d.onclick=downloadWalletPdf;
     var ar=document.getElementById('walletArchiveBtn'); if(ar)ar.onclick=showWalletArchivePicker;
@@ -5646,9 +5682,10 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
         var id=esc(r.id||r.createdAt||r.title||Math.random());
         return '<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex justify-between items-center gap-3 flex-wrap">'
           +'<div><h4 class="font-bold text-slate-800">'+esc(r.displayName||r.title||r.recordName||folder.name)+'</h4><p class="text-[10px] text-slate-400 font-bold mt-1">'+esc(r.createdAt||r.uploadedAt||r.savedAt||'')+'</p></div>'
-          +'<div class="flex gap-2 flex-wrap"><button data-preview-kind="'+kind+'" data-item-id="'+id+'" class="bg-teal-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">عرض</button><button data-print-kind="'+kind+'" data-item-id="'+id+'" class="bg-slate-700 text-white px-4 py-2 rounded-xl text-[10px] font-bold">طباعة</button><button data-delete-kind="'+kind+'" data-item-id="'+id+'" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] font-bold">حذف</button></div></div>';
+          +'<div class="flex gap-2 flex-wrap"><button data-edit-kind="'+kind+'" data-item-id="'+id+'" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">تعديل</button><button data-preview-kind="'+kind+'" data-item-id="'+id+'" class="bg-teal-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">عرض</button><button data-print-kind="'+kind+'" data-item-id="'+id+'" class="bg-slate-700 text-white px-4 py-2 rounded-xl text-[10px] font-bold">طباعة</button><button data-delete-kind="'+kind+'" data-item-id="'+id+'" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] font-bold">حذف</button></div></div>';
       }).join(''):'<div class="bg-white border border-dashed border-slate-200 rounded-[30px] p-10 text-center text-slate-400 font-bold">لا توجد سجلات محفوظة داخل هذا المجلد.</div>')+'</section>';
     var back=c.querySelector('[data-back-kind]'); if(back) back.onclick=function(){renderFolders(this.getAttribute('data-back-kind'));};
+    c.querySelectorAll('[data-edit-kind]').forEach(function(x){x.onclick=function(){editArchiveItem(this.getAttribute('data-edit-kind'),this.getAttribute('data-item-id'));};});
     c.querySelectorAll('[data-preview-kind]').forEach(function(x){x.onclick=function(){previewItem(this.getAttribute('data-preview-kind'),this.getAttribute('data-item-id'),false);};});
     c.querySelectorAll('[data-print-kind]').forEach(function(x){x.onclick=function(){previewItem(this.getAttribute('data-print-kind'),this.getAttribute('data-item-id'),true);};});
     c.querySelectorAll('[data-delete-kind]').forEach(function(x){x.onclick=function(){deleteItem(this.getAttribute('data-delete-kind'),this.getAttribute('data-item-id'));};});
@@ -5662,7 +5699,79 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
     return html;
   }
   function previewItem(kind,id,autoPrint){var r=findItem(kind,id); if(!r){alert('تعذر العثور على السجل.');return;} var w=window.open('','_blank'); if(!w){alert('يرجى السماح بالنوافذ المنبثقة.');return;} w.document.open(); w.document.write(safeDoc(r,autoPrint)); w.document.close();}
-  function deleteItem(kind,id){if(!confirm('هل تريد حذف هذا السجل؟'))return; var key=primaryKey(kind); var arr=readArray([key]).filter(function(r){return String(r.id||r.createdAt||r.title)!==String(id);}); writeArray(key,arr); if(currentArchiveFolder&&currentArchiveFolder.kind===kind) openFolder(kind,currentArchiveFolder.id); else renderFolders(kind);}
+  function editArchiveItem(kind,id){
+    var r=findItem(kind,id); if(!r){alert('تعذر العثور على السجل.');return;}
+    var key=primaryKey(kind), list=listFor(kind), fid=itemFolderId(kind,r), folder=folderById(list,fid);
+    var currentHtml=(r.htmlContent||r.pdfHtml||r.officialHtml||r.templateHtml||r.content||'');
+    var plain=(r.notes||r.summary||r.minutes||'');
+    var box=document.createElement('div');
+    box.id='managerArchiveEditModal';
+    box.dir='rtl';
+    box.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:18px';
+    box.innerHTML='<div style="width:min(1000px,96vw);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:20px;font-family:Tajawal,Cairo,Arial">'
+      +'<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><h3 style="margin:0;color:#0f766e">تعديل السجل</h3><small style="color:#64748b">'+esc(folder.name)+'</small></div><button id="archiveEditClose" type="button" style="border:0;background:#f1f5f9;border-radius:10px;padding:8px 12px;cursor:pointer">إغلاق</button></div>'
+      +'<label style="display:block;font-weight:800;margin-top:15px">العنوان</label><input id="archiveEditTitle" value="'+esc(r.displayName||r.title||r.recordName||'')+'" style="width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px">'
+      +'<label style="display:block;font-weight:800;margin-top:12px">المحتوى النصي / الملاحظات</label><textarea id="archiveEditText" style="width:100%;min-height:110px;padding:10px;border:1px solid #cbd5e1;border-radius:10px">'+esc(plain)+'</textarea>'
+      +(currentHtml?'<label style="display:block;font-weight:800;margin-top:12px">المحتوى المحفوظ</label><div id="archiveEditHtml" contenteditable="true" style="min-height:220px;border:1px solid #cbd5e1;border-radius:12px;padding:14px;overflow:auto;background:#fff">'+currentHtml+'</div>':'')
+      +'<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:15px"><button id="archiveEditSave" type="button" style="border:0;background:#0f766e;color:#fff;border-radius:10px;padding:10px 16px;font-weight:800;cursor:pointer">حفظ التعديل</button></div></div>';
+    document.body.appendChild(box);
+    box.querySelector('#archiveEditClose').onclick=function(){box.remove()};
+    box.querySelector('#archiveEditSave').onclick=function(){
+      var rows=readArray([key]), idx=rows.findIndex(function(x){return String(x.id||x.createdAt||x.title)===String(id)});
+      if(idx<0){alert('تعذر العثور على السجل أثناء الحفظ.');return;}
+      var titleInput=box.querySelector('#archiveEditTitle'), textInput=box.querySelector('#archiveEditText'), htmlEdit=box.querySelector('#archiveEditHtml');
+      var old=rows[idx], updated=Object.assign({},old,{
+        title:titleInput.value||old.title,
+        displayName:titleInput.value||old.displayName,
+        notes:textInput.value,
+        summary:(old.summary!==undefined?textInput.value:old.summary),
+        minutes:(old.minutes!==undefined?textInput.value:old.minutes),
+        updatedAt:new Date().toISOString()
+      });
+      if(htmlEdit){
+        var h=htmlEdit.innerHTML;
+        if(old.htmlContent!==undefined)updated.htmlContent=h;
+        else if(old.pdfHtml!==undefined)updated.pdfHtml=h;
+        else if(old.officialHtml!==undefined)updated.officialHtml=h;
+        else if(old.templateHtml!==undefined)updated.templateHtml=h;
+        else if(old.content!==undefined)updated.content=h;
+        else updated.htmlContent=h;
+      }
+      rows[idx]=updated; writeArray(key,rows);
+      box.remove();
+      if(currentArchiveFolder&&currentArchiveFolder.kind===kind)openFolder(kind,currentArchiveFolder.id);else renderFolders(kind);
+    };
+  }
+  function deleteItem(kind,id){
+    if(!confirm('هل تريد حذف هذا السجل؟ سيتم الاحتفاظ بنسخة استرجاع آمنة قبل الحذف.'))return;
+    var key=primaryKey(kind), rows=readArray([key]);
+    var target=rows.find(function(r){return String(r.id||r.createdAt||r.title)===String(id);});
+    if(target){
+      try{
+        var dk='ISP_SAFE_V1:deleted-records:'+kind;
+        var deleted=JSON.parse(localStorage.getItem(dk)||'[]'); if(!Array.isArray(deleted))deleted=[];
+        deleted.unshift({deletedAt:new Date().toISOString(),record:target});
+        localStorage.setItem(dk,JSON.stringify(deleted.slice(0,100)));
+      }catch(e){}
+    }
+    var arr=rows.filter(function(r){return String(r.id||r.createdAt||r.title)!==String(id);});
+    writeArray(key,arr);
+    if(currentArchiveFolder&&currentArchiveFolder.kind===kind) openFolder(kind,currentArchiveFolder.id); else renderFolders(kind);
+  }
+
+  window.saveIndependentManagerArchiveRecord=function(kind,folderId,record){
+    kind=kind==='self'?'self':'manager';
+    var key=primaryKey(kind), rows=readArray([key]), list=listFor(kind), folder=folderById(list,folderId);
+    var r=Object.assign({},record||{});
+    r.id=r.id||('rec_'+Date.now()+'_'+Math.random().toString(36).slice(2,7));
+    r.folderId=folder.id; r.folderName=folder.name; r.recordName=r.recordName||folder.name;
+    r.createdAt=r.createdAt||new Date().toISOString(); r.updatedAt=new Date().toISOString();
+    var idx=rows.findIndex(function(x){return String(x.id||'')===String(r.id)});
+    if(idx>=0)rows[idx]=Object.assign({},rows[idx],r); else rows.unshift(r);
+    writeArray(key,rows);
+    return r;
+  };
+
   window.openManagerRecordsArchiveView=function(){showArchive('manager');};
   window.closeManagerRecordsArchiveView=function(){var v=document.getElementById('manager-records-archive-view'); if(v){v.style.display='none'; if(v.classList)v.classList.add('hidden');} showDashboard();};
   window.renderManagerRecordsArchiveFolders=function(){renderFolders('manager');};
@@ -5688,6 +5797,7 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
 <script src="cloud-task-engine.js?v=20260818-task-v9"></script>
 <script src="multi_school_switcher.js"></script>
 <script src="cloud-file-engine.js"></script>
+<script src="independent-school-persistence-core.js?v=20260825-persistence-v1"></script>
 <script src="cloud-file-bootstrap.js"></script>
 <script src="cloud-upload-hub.js"></script>
 <script src="cloud-file-auto-sync.js"></script>

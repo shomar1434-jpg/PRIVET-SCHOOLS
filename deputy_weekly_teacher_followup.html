@@ -59,7 +59,8 @@
 <script src="platform-persistence-guard.js"></script>
 <script defer src="school-base-settings-source.js"></script>
 <link rel="stylesheet" href="responsive-layout.css?v=20260818-responsive-1">
-<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
+<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"><script src="independent-school-persistence-core.js?v=20260825-persistence-v1"></script>
+</head>
 <body>
   <div class="page">
     <section class="hero noPrint">
@@ -222,25 +223,44 @@
     const local=loadTeacherPayload(); if(local&&Array.isArray(local.teachers))rows.push(...local.teachers);
     return rows
   }
+  let teacherRefreshPromise=null;
+  let teacherRefreshTimer=null;
+  let teacherRefreshToken=0;
+  function scheduleTeacherRefresh(delay=180){
+    clearTimeout(teacherRefreshTimer);
+    teacherRefreshTimer=setTimeout(()=>refreshTeachers({silent:true,sourceEvent:true}),delay);
+  }
   async function refreshTeachers(opts={}){
+    // يمنع تكرار المزامنة عندما يطلق SchoolInformationSource حدث ready/updated أثناء نفس القراءة.
+    if(teacherRefreshPromise)return teacherRefreshPromise;
     const silent=!!opts.silent;
-    if($('sourceInfo'))$('sourceInfo').textContent='جارٍ قراءة المعلمين مباشرة من مركز المعلومات للمدرسة النشطة...';
-    let central=[];
-    try{
-      if(window.SchoolInformationSource&&typeof SchoolInformationSource.getTeachers==='function') central=await SchoolInformationSource.getTeachers(true)||[];
-    }catch(e){console.warn('SchoolInformationSource teachers',e)}
-    const details=await readTeacherCloudDetails();
-    teachers=mergeTeacherRows(central,details);
-    if(!teachers.length){
-      if($('sourceInfo'))$('sourceInfo').textContent='لا توجد حسابات معلمين مفعّلة في مركز المعلومات لهذه المدرسة. فعّل المعلمين في مركز المعلومات أولًا.';
-      renderAll(); if(!silent)toast('لا توجد حسابات معلمين مفعّلة لهذه المدرسة'); return false;
-    }
-    const payload={source:'school_information_center_direct',school_id:schoolId(),updated_at:new Date().toISOString(),teachers:teachers};
-    try{localStorage.setItem('deputyWeeklyFollowupTeachers:'+schoolId(),JSON.stringify(payload));localStorage.setItem('deputyWeeklyFollowupTeachers:lastExport',JSON.stringify(payload))}catch(e){}
-    ensureWeekTeacherStatuses();
-    saveWeeks();
-    if($('sourceInfo'))$('sourceInfo').textContent='المصدر المباشر: مركز المعلومات المدرسية — '+teachers.length+' معلم/معلمة مفعّلين — آخر مزامنة '+new Date().toLocaleString('ar-SA');
-    renderAll(); if(!silent)toast('تمت مزامنة '+teachers.length+' معلم/معلمة من مركز المعلومات'); return true
+    const token=++teacherRefreshToken;
+    teacherRefreshPromise=(async()=>{
+      if($('sourceInfo'))$('sourceInfo').textContent='جارٍ قراءة المعلمين مباشرة من مركز المعلومات للمدرسة النشطة...';
+      let central=[];
+      try{
+        if(window.SchoolInformationSource&&typeof SchoolInformationSource.getTeachers==='function') central=await SchoolInformationSource.getTeachers(true)||[];
+      }catch(e){console.warn('SchoolInformationSource teachers',e)}
+      const details=await readTeacherCloudDetails();
+      if(token!==teacherRefreshToken)return false;
+      const merged=mergeTeacherRows(central,details);
+      // لا نستبدل القائمة إلا مرة واحدة بعد اكتمال كل المصادر.
+      teachers=merged;
+      if(!teachers.length){
+        if($('sourceInfo'))$('sourceInfo').textContent='لا توجد حسابات معلمين مفعّلة في مركز المعلومات لهذه المدرسة. فعّل المعلمين في مركز المعلومات أولًا.';
+        renderAll(); if(!silent)toast('لا توجد حسابات معلمين مفعّلة لهذه المدرسة'); return false;
+      }
+      const payload={source:'school_information_center_direct',school_id:schoolId(),updated_at:new Date().toISOString(),teachers:teachers};
+      try{localStorage.setItem('deputyWeeklyFollowupTeachers:'+schoolId(),JSON.stringify(payload));localStorage.setItem('deputyWeeklyFollowupTeachers:lastExport',JSON.stringify(payload))}catch(e){}
+      ensureWeekTeacherStatuses();
+      saveWeeks();
+      if($('sourceInfo'))$('sourceInfo').textContent='المصدر المباشر: مركز المعلومات المدرسية — '+teachers.length+' معلم/معلمة مفعّلين — آخر مزامنة '+new Date().toLocaleString('ar-SA');
+      renderAll();
+      if(!silent)toast('تمت مزامنة '+teachers.length+' معلم/معلمة من مركز المعلومات');
+      return true;
+    })();
+    try{return await teacherRefreshPromise}
+    finally{teacherRefreshPromise=null}
   }
   function loadWeeks(){try{weeks=JSON.parse(localStorage.getItem(weeksKey())||'[]')}catch(e){weeks=[]} try{archives=JSON.parse(localStorage.getItem(archiveKey())||'[]')}catch(e){archives=[]} activeWeekId=localStorage.getItem(activeKey())||(weeks.find(w=>w.status==='نشط')||weeks[0]||{}).id||''}
   function saveWeeks(){localStorage.setItem(weeksKey(),JSON.stringify(weeks)); localStorage.setItem(archiveKey(),JSON.stringify(archives)); localStorage.setItem(activeKey(),activeWeekId||'')}
@@ -257,9 +277,7 @@
       Object.keys(localStorage).filter(k=>k.startsWith('teacherWeeklyTasksPreview:')).forEach(k=>localStorage.removeItem(k));
     }catch(e){}
     weeks=[]; archives=[]; activeWeekId='';
-    refreshTeachers();
-    renderAll();
-    toast('تمت تهيئة متابعة أعمال المعلمين وإزالة بيانات الإعداد المؤقتة');
+    refreshTeachers().finally(()=>toast('تمت تهيئة متابعة أعمال المعلمين وإزالة بيانات الإعداد المؤقتة'));
   }
   function ymd(d){return d.toISOString().slice(0,10)} function dateLabel(s){if(!s)return '—'; try{return new Date(s+'T12:00:00').toLocaleDateString('ar-SA',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}catch(e){return s}}
   function weekEndThursday(d){let x=new Date(d); x.setHours(12,0,0,0); let diff=(4-x.getDay()+7)%7; x.setDate(x.getDate()+diff); return x}
@@ -273,8 +291,19 @@
   function assignmentLabel(x){if(typeof x==='string')return x; return [x?.stage,x?.grade,x?.track,x?.section,x?.subject,x?.title].filter(Boolean).join(' / ')||'تكليف تدريسي'}
   function assBadges(t){let a=t.assignments||[]; if(!a.length)return '<span class="badge gray">لم تستكمل</span>'; return a.map(x=>'<span class="badge blue">'+esc(assignmentLabel(x))+'</span>').join(' ')}
   function sourceBadge(src){return src?'<span class="badge '+(src==='إدخال الوكيل'?'gold':'')+'">'+esc(src)+'</span>':''}
-  function openTeacherProfileCompletion(id){const t=teachers.find(x=>x.user_id===id);if(!t)return; const subjectLocked=!!(t.subject&&t.subject_source!=='إدخال الوكيل'),lessonsLocked=!!(t.weekly_lessons&&t.lessons_source!=='إدخال الوكيل'),assignLocked=!!((t.assignments||[]).length&&t.assignments_source!=='إدخال الوكيل'); const ass=(t.assignments||[]).map(assignmentLabel).join('\n'); openDrawer(`<div class="drawerHead"><div><h2>استكمال بيانات ${esc(t.name)}</h2><div class="muted">تُستخدم هذه البيانات داخل متابعة أعمال المعلمين فقط. بيانات مركز المعلومات لها الأولوية متى توفرت.</div></div><button class="btn secondary" onclick="closeDrawer()">إغلاق</button></div><div class="row"><div class="field"><label>المادة ${sourceBadge(t.subject_source)}</label><input id="mpSubject" value="${esc(t.subject||'')}" ${subjectLocked?'readonly':''} placeholder="أدخل المادة عند عدم توفرها"></div><div class="field"><label>عدد الحصص الأسبوعية ${sourceBadge(t.lessons_source)}</label><input id="mpLessons" type="number" min="0" value="${esc(t.weekly_lessons||'')}" ${lessonsLocked?'readonly':''} placeholder="عدد الحصص"></div></div><div class="field"><label>التكليفات التدريسية ${sourceBadge(t.assignments_source)}</label><textarea id="mpAssignments" ${assignLocked?'readonly':''} placeholder="كل تكليف في سطر مستقل">${esc(ass)}</textarea></div><div class="empty">الحقول القادمة من مركز المعلومات تظهر للقراءة فقط. الحقول الناقصة يمكن للوكيل استكمالها يدويًا، وتُستبدل تلقائيًا بالمصدر الرسمي إذا أُضيفت لاحقًا إلى مركز المعلومات.</div><button class="btn" onclick="saveTeacherProfileCompletion('${esc(id)}')">حفظ البيانات المكملة</button>`)}
+  function openTeacherProfileCompletion(id){const t=teachers.find(x=>x.user_id===id);if(!t)return; const subjectLocked=!!(t.subject&&t.subject_source!=='إدخال الوكيل'),lessonsLocked=!!(t.weekly_lessons&&t.lessons_source!=='إدخال الوكيل'),assignLocked=!!((t.assignments||[]).length&&t.assignments_source!=='إدخال الوكيل'); const ass=(t.assignments||[]).map(assignmentLabel).join('\n'); openDrawer(`<div class="drawerHead"><div><h2>استكمال بيانات ${esc(t.name)}</h2><div class="muted">تُستخدم هذه البيانات داخل متابعة أعمال المعلمين فقط. بيانات مركز المعلومات لها الأولوية متى توفرت.</div></div><button class="btn secondary" onclick="closeDrawer()">إغلاق</button></div><div class="row"><div class="field"><label>المادة ${sourceBadge(t.subject_source)}</label><input id="mpSubject" value="${esc(t.subject||'')}" ${subjectLocked?'readonly':''} placeholder="أدخل المادة عند عدم توفرها"></div><div class="field"><label>عدد الحصص الأسبوعية ${sourceBadge(t.lessons_source)}</label><input id="mpLessons" type="number" min="0" value="${esc(t.weekly_lessons||'')}" ${lessonsLocked?'readonly':''} placeholder="عدد الحصص"></div></div><div class="field"><label>التكليفات التدريسية ${sourceBadge(t.assignments_source)}</label><textarea id="mpAssignments" ${assignLocked?'readonly':''} placeholder="كل تكليف في سطر مستقل">${esc(ass)}</textarea></div><div class="empty">الحقول القادمة من مركز المعلومات تظهر للقراءة فقط. أما البيانات التي أدخلها الوكيل فيمكن تعديلها وحذفها وإعادة حفظها في أي وقت، وتُستبدل بالمصدر الرسمي فقط إذا أُضيفت لاحقًا إلى مركز المعلومات.</div><div class="actions"><button class="btn" onclick="saveTeacherProfileCompletion('${esc(id)}')">حفظ / تحديث البيانات</button><button class="btn secondary" onclick="deleteTeacherProfileCompletion('${esc(id)}')">حذف البيانات المدخلة يدويًا</button></div>`)}
   function saveTeacherProfileCompletion(id){const t=teachers.find(x=>x.user_id===id);if(!t)return; const m=readManualTeacherProfiles(),old=m[id]||{}; const canSubject=!(t.subject&&t.subject_source!=='إدخال الوكيل'),canLessons=!(t.weekly_lessons&&t.lessons_source!=='إدخال الوكيل'),canAssign=!((t.assignments||[]).length&&t.assignments_source!=='إدخال الوكيل'); if(canSubject)old.subject=($('mpSubject').value||'').trim(); if(canLessons)old.weekly_lessons=($('mpLessons').value||'').trim(); if(canAssign)old.assignments=($('mpAssignments').value||'').split(/\n|،|,/).map(x=>x.trim()).filter(Boolean); old.updated_at=new Date().toISOString();m[id]=old;saveManualTeacherProfiles(m);closeDrawer();refreshTeachers();toast('تم حفظ البيانات المكملة للمعلم')}
+  function deleteTeacherProfileCompletion(id){
+    const m=readManualTeacherProfiles();
+    if(!Object.prototype.hasOwnProperty.call(m,id)){toast('لا توجد بيانات يدوية محفوظة لهذا المعلم');return}
+    if(!confirm('هل تريد حذف البيانات التي أدخلها الوكيل لهذا المعلم؟ لن يتم حذف أي بيانات قادمة من مركز المعلومات.'))return;
+    const old=m[id];
+    try{
+      const bk='deputyWeeklyTeacherManualProfilesDeleted:'+schoolId();
+      const a=JSON.parse(localStorage.getItem(bk)||'[]');a.unshift({teacherId:id,deletedAt:new Date().toISOString(),data:old});localStorage.setItem(bk,JSON.stringify(a.slice(0,100)));
+    }catch(e){}
+    delete m[id];saveManualTeacherProfiles(m);closeDrawer();refreshTeachers();toast('تم حذف البيانات اليدوية ويمكن إدخالها من جديد لاحقًا');
+  }
   function scoreStatus(v){
     v=String(v||'').trim();
     if(['حاضر','حضر','مكتمل','تم التنفيذ','مكلف وتم التنفيذ','منجز','تم','مرسل للوكيل'].includes(v))return 100;
@@ -605,9 +634,9 @@
     const rows=(a.teachers||[]).map((t,idx)=>{const pt=(prev.teachers||[]).find(x=>x.user_id===t.user_id)||{}; const dd=(t.discipline||0)-(pt.discipline||0), ed=(t.score||0)-(pt.score||0); return `<tr><td>${idx+1}</td><td><b>${esc(t.name)}</b></td><td>${esc(t.subject||'')}</td><td>${esc(pt.discipline||0)}% → <b>${esc(t.discipline||0)}%</b> ${c4DeltaBadge(dd,'%')}</td><td>${esc(pt.score||0)}% → <b>${esc(t.score||0)}%</b> ${c4DeltaBadge(ed,'%')}</td><td><span class="badge ${t.class_cls==='risk'?'red':t.class_cls==='follow'?'gold':t.class_cls==='good'?'blue':''}">${esc(t.classification||'—')}</span></td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">لا توجد بيانات مقارنة.</div></td></tr>';
     openDrawer(`<div class="drawerHead"><h2>📊 مقارنة الأسبوع ${esc(a.week_number)} مع الأسبوع ${esc(prev.week_number)}</h2><button class="btn secondary" onclick="closeDrawer()">إغلاق</button></div><div class="tablewrap"><table><thead><tr><th>م</th><th>المعلم</th><th>المادة</th><th>الانضباط</th><th>الإنجاز التنفيذي</th><th>التصنيف الحالي</th></tr></thead><tbody>${rows}</tbody></table></div>`);
   }
-  document.addEventListener('DOMContentLoaded',async()=>{loadWeeks();renderAll();await refreshTeachers({silent:true});renderAll()});
-  window.addEventListener('school-information-updated',()=>refreshTeachers({silent:true}));
-  window.addEventListener('school-information-ready',()=>{if(!teachers.length)refreshTeachers({silent:true})});
+  document.addEventListener('DOMContentLoaded',async()=>{loadWeeks();await refreshTeachers({silent:true});});
+  window.addEventListener('school-information-updated',()=>scheduleTeacherRefresh(220));
+  window.addEventListener('school-information-ready',()=>{if(!teachers.length)scheduleTeacherRefresh(120)});
   </script>
 
 <script src="platform-record-catalog.js"></script>

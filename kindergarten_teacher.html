@@ -2217,7 +2217,7 @@ body{overflow-x:hidden}
 </div>
 
 
-<div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-teal-400 cursor-pointer transition-all flex flex-col items-center gap-4 group min-h-[190px]" onclick="window.top.location.href='semester_plan.html?role=kindergarten_teacher&planType=%D8%B1%D9%8A%D8%A7%D8%B6%20%D8%A7%D9%84%D8%A3%D8%B7%D9%81%D8%A7%D9%84'">
+<div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-teal-400 cursor-pointer transition-all flex flex-col items-center gap-4 group min-h-[190px]" onclick="window.top.location.href='semester_plan.html'">
 <div class="w-16 h-16 bg-gradient-to-br from-teal-600 to-emerald-700 text-white rounded-[24px] flex items-center justify-center shadow-xl text-3xl">🗓️</div>
 <div class="text-center">
 <h3 class="font-black text-lg text-slate-800">الخطة الفصلية</h3>
@@ -4968,6 +4968,28 @@ function showFinalApproval(){var t=val('meetTitle')||'محضر اجتماع', li
   window.addEventListener('load',boot);
 })();
 </script>
+
+<script id="PERFORMANCE_REPORT_PRESERVE_VALUES_V4">
+(function(){
+'use strict';
+if(window.__PerformanceReportPreserveValuesV4)return;window.__PerformanceReportPreserveValuesV4=true;
+function root(){return document.getElementById('report-content-container')}
+function goals(){return Array.from(document.querySelectorAll('#report-content-container [id^="subGoal-"]'))}
+document.addEventListener('input',function(e){const g=e.target?.closest?.('[id^="subGoal-"]');if(g&&root()?.contains(g))g.dataset.userGoal='1'},true);
+function sync(){
+ const r=root();if(!r)return;
+ r.querySelectorAll('select').forEach(s=>Array.from(s.options).forEach(o=>o.toggleAttribute('selected',o.value===s.value)));
+ r.querySelectorAll('input').forEach(i=>{if(i.type==='checkbox'||i.type==='radio')i.toggleAttribute('checked',i.checked);else i.setAttribute('value',i.value||'')});
+ r.querySelectorAll('textarea').forEach(t=>t.textContent=t.value||'');
+}
+if(typeof window.updateRelatedElements==='function'&&!window.updateRelatedElements.__preserveV4){
+ const old=window.updateRelatedElements;window.updateRelatedElements=function(){const keep=goals().map(g=>g.dataset.userGoal==='1'?g.innerHTML:null);const r=old.apply(this,arguments);goals().forEach((g,i)=>{if(keep[i]!=null){g.innerHTML=keep[i];g.dataset.userGoal='1'}});return r};window.updateRelatedElements.__preserveV4=true;
+}
+if(typeof window.saveReportToArchive==='function'&&!window.saveReportToArchive.__preserveV4){
+ const old=window.saveReportToArchive;window.saveReportToArchive=function(){sync();return old.apply(this,arguments)};window.saveReportToArchive.__preserveV4=true;
+}
+})();
+</script>
 <script src="performance-file-engine.js"></script>
 <script src="section-dashboard-safe-fix.js"></script>
 <script id="current-visible-report-print-fix-v132">
@@ -5186,6 +5208,7 @@ function showFinalApproval(){var t=val('meetTitle')||'محضر اجتماع', li
 <script src="platform-cloud-session.js?v=20260818-session-v12"></script>
 <script src="multi_school_switcher.js"></script>
 <script src="cloud-file-engine.js"></script>
+<script src="independent-school-persistence-core.js?v=20260825-persistence-v1"></script>
 <script src="cloud-file-bootstrap.js"></script>
 <script src="cloud-upload-hub.js"></script>
 <script src="cloud-file-auto-sync.js"></script>
