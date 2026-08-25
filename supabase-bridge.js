@@ -627,7 +627,16 @@
   async function listExternalVisitUsers(token){
     const sb=getClient(); if(!sb) throw new Error('Supabase غير جاهز');
     const {data,error}=await sb.rpc('list_external_visit_users',{p_token:String(token||'')});
-    if(error) throw explainSupabaseError(error); return data||[];
+    if(error) throw explainSupabaseError(error);
+    return (data||[]).map(function(u){
+      return Object.assign({},u,{
+        name:u.name||u.full_name||u.fullName||'',
+        full_name:u.full_name||u.name||u.fullName||'',
+        role:dbRoleToApp(u.role||'')||u.role||'',
+        status:u.status||'active',
+        isActive:String(u.status||'active').toLowerCase()==='active'
+      });
+    });
   }
   window.SmartSchoolSupabase = {
     getClient,

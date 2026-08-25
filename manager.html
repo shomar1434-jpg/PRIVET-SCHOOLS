@@ -4967,7 +4967,7 @@ document.addEventListener("click", function(e){
 <div dir="rtl" id="supervisorVisitLinkModal" style="display:none;position:fixed;inset:0;z-index:2147483641;background:rgba(15,23,42,.62);align-items:center;justify-content:center;padding:18px;">
 <div style="width:min(720px,94vw);background:white;border-radius:30px;padding:24px;font-family:Cairo,Tajawal,Arial,sans-serif;box-shadow:0 25px 70px rgba(15,23,42,.3)">
 <h3 style="margin:0 0 12px;color:#7c3aed;font-weight:900;font-size:22px;">رابط الزيارة الإشرافية</h3>
-<p style="font-size:12px;color:#64748b;font-weight:700">رابط ثابت مرتبط بهذه المدرسة، يسمح بالمشاهدة فقط للأقسام الأربعة.</p>
+<p style="font-size:12px;color:#64748b;font-weight:700">رابط آمن مرتبط بهذه المدرسة، يسمح بالمشاهدة الإشرافية فقط لجميع أقسام وأدوار المدرسة المفعلة.</p>
 <input id="supervisorVisitGeneratedLink" readonly="" style="width:100%;direction:ltr;text-align:left;border:2px solid #ddd6fe;border-radius:16px;padding:12px;font-weight:800;margin:10px 0;"/>
 <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
 <button onclick="copySupervisorVisitLink()" style="border:0;border-radius:12px;padding:10px 16px;background:#7c3aed;color:white;font-weight:900">نسخ الرابط</button>
@@ -4978,34 +4978,169 @@ document.addEventListener("click", function(e){
 </div>
 <script id="SUPERVISOR_VISIT_MANAGER_LINK_ENGINE">
 (function(){
- if(window.__SUPERVISOR_VISIT_MANAGER_LINK_ENGINE__) return;
- window.__SUPERVISOR_VISIT_MANAGER_LINK_ENGINE__=true;
- function schoolId(){return localStorage.getItem('current_school_id')||localStorage.getItem('school_id')||new URLSearchParams(location.search).get('school_id')||'school_'+location.hostname.replace(/\W/g,'_')}
- function schoolName(){return localStorage.getItem('school_name')||localStorage.getItem('persist_school')||new URLSearchParams(location.search).get('school_name')||'المدرسة'}
- function tokenKey(){return 'supervisor_visit_token_'+schoolId()}
- function token(){let t=localStorage.getItem(tokenKey()); if(!t){t='sv_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8); localStorage.setItem(tokenKey(),t)} return t}
- function base(){return location.origin + location.pathname.replace(/manager\.html.*$/,'')}
- function link(){return base() + 'supervisor_visit.html?school_id=' + encodeURIComponent(schoolId()) + '&school_name=' + encodeURIComponent(schoolName()) + '&token=' + encodeURIComponent(token())}
- function currentManagerId(){try{var u=JSON.parse(localStorage.getItem('currentSchoolUser')||localStorage.getItem('currentUser')||'{}');return u.id||u.user_id||null}catch(e){return null}}
- async function syncSupervisorToken(){
-   if(!window.SmartSchoolSupabase||!SmartSchoolSupabase.registerExternalAccess) throw new Error('محرك الروابط السحابية غير جاهز');
-   var uid=currentManagerId(); if(!uid) throw new Error('تعذر تحديد حساب مدير المدرسة');
-   return await SmartSchoolSupabase.registerExternalAccess({token:token(),school_id:schoolId(),access_type:'supervisor_visit',created_by:uid,visit_number:'SUP-'+new Date().getFullYear(),permissions:{manager:true,agent:true,teacher:true,student_advisor:true},metadata:{school_name:schoolName(),read_only:true}});
+ if(window.__SUPERVISOR_VISIT_MANAGER_LINK_ENGINE_V2__) return;
+ window.__SUPERVISOR_VISIT_MANAGER_LINK_ENGINE_V2__=true;
+
+ function parse(s,f={}){try{return JSON.parse(s)||f}catch(e){return f}}
+ function clean(v){return String(v==null?'':v).trim()}
+ function privateCtx(){try{return window.PrivateSchoolBridge?.privateContext?.()||null}catch(e){return null}}
+
+ function schoolId(){
+   const q=new URLSearchParams(location.search||'');
+   const ctx=privateCtx()||{};
+   const s=parse(localStorage.getItem('smartSchool.currentSchool')||localStorage.getItem('activeSchool')||'{}',{});
+   return clean(
+     ctx.schoolId ||
+     window.PlatformCloudSession?.currentSchoolId?.() ||
+     sessionStorage.getItem('platform_tab_session_school_v1') ||
+     localStorage.getItem('active_school_id') ||
+     localStorage.getItem('current_school_id') ||
+     localStorage.getItem('school_id') ||
+     localStorage.getItem('smart_school_id') ||
+     q.get('schoolId') || q.get('school_id') ||
+     s.id || s.school_id || s.schoolId
+   );
  }
+ function schoolName(){
+   const q=new URLSearchParams(location.search||'');
+   const ctx=privateCtx()||{};
+   const s=parse(localStorage.getItem('smartSchool.currentSchool')||localStorage.getItem('activeSchool')||'{}',{});
+   return clean(
+     ctx.schoolName ||
+     localStorage.getItem('active_school_name') ||
+     localStorage.getItem('current_school_name') ||
+     localStorage.getItem('school_name') ||
+     localStorage.getItem('persist_school') ||
+     q.get('schoolName') || q.get('school_name') ||
+     s.schoolName || s.school_name || 'المدرسة'
+   );
+ }
+ function tokenKey(){return 'supervisor_visit_token_'+schoolId()}
+ function makeToken(){
+   try{
+     const a=new Uint8Array(24); crypto.getRandomValues(a);
+     return 'sv_'+Array.from(a,b=>b.toString(16).padStart(2,'0')).join('');
+   }catch(e){
+     return 'sv_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);
+   }
+ }
+ function token(){
+   let t=clean(localStorage.getItem(tokenKey()));
+   if(t.length<24){t=makeToken();localStorage.setItem(tokenKey(),t)}
+   return t;
+ }
+ function base(){return location.origin + location.pathname.replace(/manager\.html.*$/,'')}
+ function link(t=token()){
+   return base()+'supervisor_visit.html?school_id='+encodeURIComponent(schoolId())+
+     '&school_name='+encodeURIComponent(schoolName())+'&token='+encodeURIComponent(t);
+ }
+
+ async function resolveManagerId(){
+   const sid=schoolId();
+   const ctx=privateCtx()||{};
+   const candidates=[
+     ctx.userId,
+     window.PlatformCloudSession?.userId?.(),
+     sessionStorage.getItem('platform_tab_session_user_v1'),
+     localStorage.getItem('current_user_id'),
+     localStorage.getItem('currentUserId'),
+     localStorage.getItem('platform_file_session_user_id')
+   ].map(clean).filter(Boolean);
+   for(const id of candidates) if(id) return id;
+
+   for(const key of ['smart_school_current_session','currentSchoolUser','currentUser']){
+     const u=parse(localStorage.getItem(key)||'{}',{});
+     const id=clean(u.id||u.user_id||u.userId);
+     if(id)return id;
+   }
+
+   if(window.SmartSchoolSupabase?.listUsersBySchool && sid){
+     const rows=await SmartSchoolSupabase.listUsersBySchool(sid);
+     const m=(rows||[]).find(u=>{
+       const r=clean(u.role||u.dbRole||u.user_role).toLowerCase();
+       return (r==='manager'||r==='leadership') && clean(u.status||'active').toLowerCase()==='active';
+     });
+     if(m?.id)return clean(m.id);
+   }
+   throw new Error('تعذر تحديد حساب مدير المدرسة النشط');
+ }
+
+ const permissions={
+   manager:true,agent:true,teacher:true,student_advisor:true,
+   activity_leader:true,health_advisor:true,
+   administrative_employee:true,kindergarten_teacher:true
+ };
+
+ async function registerAndVerify(t){
+   if(!schoolId()) throw new Error('تعذر تحديد المدرسة النشطة');
+   if(!window.SmartSchoolSupabase?.registerExternalAccess) throw new Error('محرك الروابط السحابية غير جاهز');
+   const uid=await resolveManagerId();
+   await SmartSchoolSupabase.registerExternalAccess({
+     token:t,school_id:schoolId(),access_type:'supervisor_visit',created_by:uid,
+     visit_number:'SUP-'+new Date().getFullYear(),
+     permissions,
+     metadata:{school_name:schoolName(),read_only:true,all_school_roles:true}
+   });
+   if(!SmartSchoolSupabase.validateExternalAccess) return true;
+   const row=await SmartSchoolSupabase.validateExternalAccess(t,'supervisor_visit');
+   if(!row || String(row.status)!=='active') throw new Error('فشل التحقق من تفعيل رابط الزيارة');
+   if(String(row.school_id||'')!==String(schoolId())) throw new Error('تم إنشاء الرابط لمدرسة مختلفة عن المدرسة النشطة');
+   return row;
+ }
+
+ async function syncSupervisorToken(){
+   let t=token();
+   try{
+     await registerAndVerify(t);
+     return t;
+   }catch(first){
+     // رمز مخزن قديم/تالف: نصنع رمزا جديدا مرة واحدة ونتحقق منه فعليا.
+     t=makeToken();
+     localStorage.setItem(tokenKey(),t);
+     await registerAndVerify(t);
+     return t;
+   }
+ }
+
  async function revokeSupervisorToken(t){
-   if(!t||!window.SmartSchoolSupabase||!SmartSchoolSupabase.revokeExternalAccess)return false;
-   var uid=currentManagerId(); if(!uid)return false;
+   if(!t||!window.SmartSchoolSupabase?.revokeExternalAccess)return false;
+   const uid=await resolveManagerId();
    return await SmartSchoolSupabase.revokeExternalAccess({token:t,school_id:schoolId(),revoked_by:uid});
  }
+
  window.openSupervisorVisitLinkModal=async function(){
-   document.getElementById('supervisorVisitLinkModal').style.display='flex';
-   document.getElementById('supervisorVisitGeneratedLink').value='جارٍ تفعيل الرابط سحابيًا...';
-   try{await syncSupervisorToken();document.getElementById('supervisorVisitGeneratedLink').value=link();}
-   catch(e){document.getElementById('supervisorVisitGeneratedLink').value='';alert('تعذر تفعيل رابط الزيارة الإشرافية: '+(e.message||e));}
- }
- window.closeSupervisorVisitLinkModal=function(){document.getElementById('supervisorVisitLinkModal').style.display='none'}
- window.copySupervisorVisitLink=function(){const v=document.getElementById('supervisorVisitGeneratedLink').value;if(!/^https?:/i.test(v))return alert('الرابط غير جاهز بعد');navigator.clipboard&&navigator.clipboard.writeText(v);alert('تم نسخ رابط الزيارة الإشرافية')}
- window.regenerateSupervisorVisitToken=async function(){var old=token();try{await revokeSupervisorToken(old);localStorage.setItem(tokenKey(),'sv_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8));await syncSupervisorToken();document.getElementById('supervisorVisitGeneratedLink').value=link();alert('تم تجديد رمز الزيارة وسحب صلاحية الرمز السابق');}catch(e){localStorage.setItem(tokenKey(),old);alert('تعذر تجديد الرمز سحابيًا: '+(e.message||e));}}
+   const modal=document.getElementById('supervisorVisitLinkModal');
+   const input=document.getElementById('supervisorVisitGeneratedLink');
+   modal.style.display='flex';
+   input.value='جارٍ إنشاء الرابط والتحقق منه سحابيًا...';
+   try{
+     const activeToken=await syncSupervisorToken();
+     input.value=link(activeToken);
+   }catch(e){
+     input.value='';
+     alert('تعذر تفعيل رابط الزيارة الإشرافية: '+(e.message||e));
+   }
+ };
+ window.closeSupervisorVisitLinkModal=function(){document.getElementById('supervisorVisitLinkModal').style.display='none'};
+ window.copySupervisorVisitLink=function(){
+   const v=document.getElementById('supervisorVisitGeneratedLink').value;
+   if(!/^https?:/i.test(v))return alert('الرابط غير جاهز بعد');
+   navigator.clipboard&&navigator.clipboard.writeText(v);
+   alert('تم نسخ رابط الزيارة الإشرافية');
+ };
+ window.regenerateSupervisorVisitToken=async function(){
+   const old=token();
+   try{
+     await revokeSupervisorToken(old);
+     const fresh=makeToken();localStorage.setItem(tokenKey(),fresh);
+     await registerAndVerify(fresh);
+     document.getElementById('supervisorVisitGeneratedLink').value=link(fresh);
+     alert('تم تجديد رمز الزيارة وسحب صلاحية الرمز السابق');
+   }catch(e){
+     localStorage.setItem(tokenKey(),old);
+     alert('تعذر تجديد الرمز سحابيًا: '+(e.message||e));
+   }
+ };
 })();
 </script>
 <script id="safe-activation-bypass-tail">
