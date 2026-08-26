@@ -1227,7 +1227,7 @@ function recordTemporalBreach(d,phase,reason){
 }
 function refreshTemporalStatuses(){
  applyPhaseScheduleToTasks();
- SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i],info=phaseTemporalInfo(d.phase),closed=["verified","approved","na"].includes(d.status)||(d.execution?.result==="done"&&d.evidence?.length);
+ SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i],info=phaseTemporalInfo(d.phase),closed=["verified","approved","na"].includes(d.status)||(d.execution?.result==="done");
    if(d.incompleteArchive&&closed&&d.incompleteArchive.status!=="completed_late"){
     d.incompleteArchive.status="completed_late";d.incompleteArchive.completedLateAt=d.done||localDateValue();
    }
@@ -1244,7 +1244,7 @@ function refreshTemporalStatuses(){
    }
  }));
 }
-function canRolloverTask(d){return !!d&&d.rolloverEligible&&Number(d.phase)<PHASES.length-1&&!(d.execution?.result==="done"&&d.evidence?.length)}
+function canRolloverTask(d){return !!d&&d.rolloverEligible&&Number(d.phase)<PHASES.length-1&&!(d.execution?.result==="done")}
 function rolloverReadinessTask(sectionId,index){
  const d=state.tasks?.[sectionId]?.[index];if(!canRolloverTask(d))return alert("هذه المهمة غير مؤهلة للترحيل إلى المرحلة التالية.");
  const from=Number(d.phase),to=from+1,w=phaseWindow(to);
@@ -1262,15 +1262,15 @@ function messageIncompleteTask(sectionId,index,kind){
  const sct=SECTIONS.find(x=>x.id===sectionId),title=sct?.tasks?.[index]||"مهمة جاهزية";
  const warning=kind==="warning";
  const subject=`${warning?"إنذار":"تنبيه"} بتنفيذ مهمة جاهزية متأخرة: ${title}`;
- const body=`${warning?"إنذار":"تنبيه"} بشأن مهمة الجاهزية «${title}». انتهت الفترة الزمنية المحددة دون اكتمال التنفيذ، وقد سُجلت المهمة ضمن المهام غير المكتملة في وقتها. يلزم استكمال التنفيذ ورفع الشاهد، وسيبقى التأخير مثبتاً في سجل الجاهزية.`;
+ const body=`${warning?"إنذار":"تنبيه"} بشأن مهمة الجاهزية «${title}». انتهت الفترة الزمنية المحددة دون اكتمال التنفيذ، وقد سُجلت المهمة ضمن المهام غير المكتملة في وقتها. يلزم استكمال التنفيذ، وسيبقى التأخير مثبتاً في سجل الجاهزية.`;
  location.href=InternalMessaging.composeUrl({recipientId:member.cloudUserId||"",subject,body,linked:{module:"school_readiness",recordType:"readiness_task",recordId:d.cloudTaskId||taskKey(sectionId,index),title,url:`school_readiness.html?task=${encodeURIComponent(taskKey(sectionId,index))}`}});
 }
 function temporalCompliance(){
- let eligible=0,onTime=0;SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i],w=phaseWindow(d.phase);if(!w.end||d.status==="na")return;eligible++;if(d.execution?.result==="done"&&d.evidence?.length&&(!d.done||d.done<=w.end))onTime++;}));return eligible?Math.round(onTime/eligible*100):0;
+ let eligible=0,onTime=0;SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i],w=phaseWindow(d.phase);if(!w.end||d.status==="na")return;eligible++;if(d.execution?.result==="done"&&(!d.done||d.done<=w.end))onTime++;}));return eligible?Math.round(onTime/eligible*100):0;
 }
 function taskScore(d){
  if(d.status==="na")return 0;
- return d.execution?.result==="done"&&Array.isArray(d.evidence)&&d.evidence.length>0?100:0
+ return d.execution?.result==="done"?100:0
 }
 function sectionScore(s){const a=s.tasks.map((_,i)=>taskScore(state.tasks[s.id][i])).filter(v=>v!==null);return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):100}
 function overall(){const a=[];SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{let v=taskScore(state.tasks[s.id][i]);if(v!==null)a.push(v)}));return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):0}
@@ -1282,8 +1282,7 @@ function risks(){
   else if(d.due&&d.due<today&&!["verified","approved","na"].includes(d.status)){type="تأخر عن الموعد";level=d.priority==="critical"?"عالٍ":"متوسط"}
   else if(["urgent","warning"].includes(ti.state)&&!["verified","approved","na"].includes(d.status)){type=ti.state==="urgent"?"استحقاق عاجل — بقي 10% أو أقل من مدة المرحلة":"قرب انتهاء مدة التنفيذ";level=ti.state==="urgent"?"عالٍ":"متوسط"}
   else if(d.priority==="critical"&&!["verified","approved","na"].includes(d.status)){type="بند حرج غير مكتمل";level="عالٍ"}
-  else if(["completed","submitted"].includes(d.status)&&!d.evidence.length){type="اكتمال دون شاهد";level="متوسط"}
-  else if(d.review.status==="rejected"){type="شاهد مرفوض";level="متوسط"}
+
   if(type)out.push({section:s.title,task:t,type,level,d,sid:s.id,i})
  }));return out
 }
@@ -1373,7 +1372,7 @@ function initSectionPages(){
  document.getElementById("sectionPages").innerHTML=SECTIONS.map(s=>`<section class="page" id="page-${s.id}">
  <div class="hero" style="background:linear-gradient(135deg,var(--navy),${META[s.id][1]})"><div style="display:flex;gap:14px;align-items:center"><div class="icon-wrap" style="--section-color:${META[s.id][1]}">${ICONS[s.id]}</div><div><h3>${s.title}</h3><p>${META[s.id][0]}</p></div></div><img class="hero-logo" src="${LOGO}"></div>
  <div class="metrics" id="metrics-${s.id}"></div>
- <div class="toolbar no-print"><input class="field search" data-s="${s.id}" placeholder="البحث في المهام"><select class="select filter-status" data-s="${s.id}"><option value="">كل نتائج التنفيذ</option><option value="completed">نُفذ مع شاهد</option><option value="blocked">لم يُنفذ</option><option value="not_started">بانتظار التحديد</option></select><select class="select filter-phase" data-s="${s.id}"><option value="">كل مراحل العودة</option>${PHASES.map((p,i)=>`<option value="${i}">${p}</option>`).join("")}</select><button class="btn" onclick="printPage('${s.id}')">طباعة المجال</button></div>
+ <div class="toolbar no-print"><input class="field search" data-s="${s.id}" placeholder="البحث في المهام"><select class="select filter-status" data-s="${s.id}"><option value="">كل نتائج التنفيذ</option><option value="completed">نُفذ</option><option value="blocked">لم يُنفذ</option><option value="not_started">بانتظار التحديد</option></select><select class="select filter-phase" data-s="${s.id}"><option value="">كل مراحل العودة</option>${PHASES.map((p,i)=>`<option value="${i}">${p}</option>`).join("")}</select><button class="btn" onclick="printPage('${s.id}')">طباعة المجال</button></div>
  <div class="grid" id="tasks-${s.id}"></div></section>`).join("")
 }
 function showPage(id){
@@ -1384,18 +1383,16 @@ function showPage(id){
  if(id==="reports"&&typeof window.enhanceReports==="function")window.enhanceReports();
  window.scrollTo(0,0)
 }
-function evidenceRequired(d){return d.priority==="critical"?"قرار/محضر أو شاهد ميداني معتمد":"ملف أو صورة أو سجل مرتبط بالمهمة"}
 function taskHtml(s,i,t){
- const d=state.tasks[s.id][i],score=taskScore(d),ev=d.evidence.length;
- const execResult=d.execution?.result==="done"&&ev?"done":d.execution?.result==="not_done"?"not_done":"pending";
- const execText=execResult==="done"?"نُفذ مع شاهد":execResult==="not_done"?"لم يُنفذ":"بانتظار تحديد التنفيذ";
+ const d=state.tasks[s.id][i],score=taskScore(d);
+ const execResult=d.execution?.result==="done"?"done":d.execution?.result==="not_done"?"not_done":"pending";
+ const execText=execResult==="done"?"نُفذ":execResult==="not_done"?"لم يُنفذ":"بانتظار تحديد التنفيذ";
  return `<article class="task" data-i="${i}">
  <div class="task-summary">
   <div class="task-no">${i+1}</div>
   <div><div class="task-title">${t}</div><div class="task-meta">
    <span class="mini">${ICONS.user}${esc(d.responsible||"غير مسند")}</span><span class="assignment-status ${assignedMemberForTask(s.id,i)||d.responsible?"assigned":"unassigned"}">${assignedMemberForTask(s.id,i)||d.responsible?"مسند":"غير مسند"}</span>
    <span class="mini">${ICONS.calendar}${esc(d.due||"بلا موعد")}</span>
-   <span class="mini">${ICONS.evidence}${ev} شاهد</span>
    <span>${PHASES[Number(d.phase)]||PHASES[inferOperationalStage(s.title,t)]}</span>
    <span>${d.priority==="critical"?"حرج":"عادي"}</span>
    ${(d.temporalBreaches||[]).length?`<span style="color:#b45309;font-weight:900">⚠ لم تُنفذ في وقتها</span>`:""}
@@ -1412,9 +1409,9 @@ function taskHtml(s,i,t){
     <button type="button" class="execute-no no-print" data-exec-notdone="${s.id}" data-exec-index="${i}">✕ لم يُنفذ</button>
    </div>
    <div class="execution-result ${execResult==="done"?"done":execResult==="not_done"?"notdone":"pending"}">
-    ${execResult==="done"?`تم تنفيذ البند وإرفاق ${ev} شاهد.`:execResult==="not_done"?`تم تسجيل عدم التنفيذ: ${esc(d.execution.reason||"")}`:"اختر نتيجة تنفيذ البند للانتقال إلى الإجراء المناسب."}
+    ${execResult==="done"?"تم تسجيل تنفيذ البند بنجاح.":execResult==="not_done"?`تم تسجيل عدم التنفيذ: ${esc(d.execution.reason||"")}`:"اختر نتيجة تنفيذ البند: نُفذ أو لم يُنفذ."}
    </div>
-   <small class="execution-help">نُفذ: يظهر رفع الشاهد ثم التحقق. لم يُنفذ: يظهر سبب عدم التنفيذ والإجراء التصحيحي والموعد الجديد.</small>
+   <small class="execution-help">يعتمد قياس الجاهزية على حالة التنفيذ فقط: نُفذ أو لم يُنفذ.</small>
   </div>
 
   <div><label>الأولوية</label><select class="select bind" data-k="priority"><option value="normal" ${d.priority==="normal"?"selected":""}>عادي</option><option value="critical" ${d.priority==="critical"?"selected":""}>حرج</option></select></div>
@@ -1423,25 +1420,6 @@ function taskHtml(s,i,t){
   <div><label>تاريخ البدء</label><input class="field bind" data-k="start" type="date" value="${d.start}"></div>
   <div><label>الموعد المستهدف</label><input class="field bind" data-k="due" type="date" value="${d.due}"></div>
   <div class="wide"><label>الملاحظات العامة</label><textarea class="textarea bind" data-k="notes">${esc(d.notes)}</textarea></div>
-
-  <div class="conditional-block ${execResult==="done"?"show":""}" data-done-block="${s.id}-${i}">
-   <div class="execution-step-title">استكمال إثبات التنفيذ</div>
-   <div class="full evidence-zone" data-evidence-zone="${s.id}-${i}">
-    <strong>شاهد التنفيذ:</strong> ${evidenceRequired(d)}<br>
-    <input class="evidence-input no-print" data-evidence-library="off" data-evidence-section="${s.id}" data-evidence-index="${i}" type="file" multiple style="display:none" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg">
-    <div class="evidence-list">${d.evidence.map((e,x)=>`<div class="evidence-item"><div><strong>${esc(e.name)}</strong><br><small>${esc(e.type||"ملف")} · ${esc(e.date||"")} · ${e.storage==="cloud"?"سحابي":"محلي"}</small></div><div><button class="btn preview-evidence" data-x="${x}">معاينة</button><button class="btn danger remove-evidence" data-x="${x}">حذف</button></div></div>`).join("")||'<span class="empty">لم يُرفق شاهد تنفيذ بعد.</span>'}</div>
-   </div>
-   <div class="full review-box" style="margin-top:10px;display:${ev?"block":"none"}">
-    <strong>التحقق من الشاهد</strong>
-    <div class="task-body" style="margin-top:8px">
-     <div><label>مسؤول التحقق</label><select class="select bind" data-k="reviewer"><option value="">غير محدد</option>${state.team.map(x=>`<option ${d.reviewer===x.name?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div>
-     <div><label>حالة المراجعة</label><select class="select review-bind" data-k="status"><option value="pending" ${d.review.status==="pending"?"selected":""}>قيد المراجعة</option><option value="accepted" ${d.review.status==="accepted"?"selected":""}>مقبول</option><option value="rejected" ${d.review.status==="rejected"?"selected":""}>مرفوض</option></select></div>
-     <div><label>المراجع</label><input class="field review-bind" data-k="by" value="${esc(d.review.by)}"></div>
-     <div><label>التاريخ</label><input class="field review-bind" data-k="date" type="date" value="${d.review.date}"></div>
-     <div class="wide"><label>ملاحظة المراجعة</label><textarea class="textarea review-bind" data-k="comment">${esc(d.review.comment)}</textarea></div>
-    </div>
-   </div>
-  </div>
 
   <div class="conditional-block ${execResult==="not_done"?"show":""}" data-notdone-block="${s.id}-${i}">
    <div class="execution-step-title">معالجة عدم التنفيذ</div>
@@ -1626,7 +1604,7 @@ function renderSettings(){
     </div>
     <button type="button" class="readiness-clean-btn" onclick="cleanReadinessYearData()">تنظيف بيانات العام</button>
   </div>
-  <div class="settings-weights-block"><h4>أوزان احتساب الجاهزية</h4><div class="task-body">${Object.entries({execution:"التنفيذ",evidence:"الشواهد",quality:"جودة الشاهد",timing:"الالتزام الزمني",approval:"التحقق والاعتماد"}).map(([k,l])=>`<div><label>${l} %</label><input class="field weight" data-k="${k}" type="number" min="0" max="100" value="${state.weights[k]}"></div>`).join("")}</div></div>`;
+  <div class="settings-weights-block"><h4>آلية احتساب الجاهزية</h4><div class="callout"><strong>قياس ثنائي مباشر:</strong> المهمة المنفذة = 100%، والمهمة غير المنفذة أو غير المحددة = 0%. لا يتطلب المحرك رفع أي شاهد.</div></div>`;
  document.querySelectorAll(".setting").forEach(x=>x.onchange=()=>{state.settings[x.dataset.k]=x.value;state.settings.semester="الفصل الدراسي الأول";save()});
  document.querySelectorAll(".phase-date").forEach(x=>x.onchange=()=>{const i=+x.dataset.phase,side=x.dataset.side;state.settings.phaseSchedule[i][side]=x.value;const w=phaseWindow(i);if(w.start&&w.end&&w.end<w.start){alert("تاريخ نهاية المرحلة يجب أن يكون بعد تاريخ البداية.");state.settings.phaseSchedule[i][side]="";renderSettings();return}refreshTemporalStatuses();save()});
  document.querySelectorAll(".weight").forEach(x=>x.onchange=()=>{state.weights[x.dataset.k]=+x.value;save()});
@@ -1732,7 +1710,7 @@ async function reconcileReadinessCloudTasks(){
       const rr=await CloudTaskEngine.reassign({taskId:t.id,assignedTo:u.id,assigneeEmail:u.email||"",assigneeName:u.full_name||member.name,assigneeRole:u.role||member.role,reason:"تحديث مسؤول مهمة الجاهزية حسب فريق الاستعداد"});t=rr.task||t;byKey.set(key,t)
     }
     if(!t||["withdrawn","archived","closed","canceled","rejected"].includes(String(t.status||""))){
-      const cr=await CloudTaskEngine.create({moduleKey:"school_readiness",recordType:"readiness_task",recordId:cloudPlanId,title:`جاهزية | ${row.t}`,description:`مهمة من محرك جاهزية المدرسة — ${row.s.title} — ${PHASES[Number(d.phase||0)]||""}. يتطلب إكمالها إثبات التنفيذ برفع شاهد.`,assignmentType:"partial",sourceOwner:"school_readiness",recordKey:key,ownerLabel:"محرك جاهزية المدرسة",assignedTo:u.id,assigneeEmail:u.email||"",assigneeName:u.full_name||member.name,assigneeRole:u.role||member.role,priority:d.priority==="critical"?"urgent":"normal",startDate:d.start||null,dueDate:d.due||null,requiresApproval:true,metadata:meta});
+      const cr=await CloudTaskEngine.create({moduleKey:"school_readiness",recordType:"readiness_task",recordId:cloudPlanId,title:`جاهزية | ${row.t}`,description:`مهمة من محرك جاهزية المدرسة — ${row.s.title} — ${PHASES[Number(d.phase||0)]||""}. يعتمد إكمالها على تحديد حالة التنفيذ: نُفذ أو لم يُنفذ.`,assignmentType:"partial",sourceOwner:"school_readiness",recordKey:key,ownerLabel:"محرك جاهزية المدرسة",assignedTo:u.id,assigneeEmail:u.email||"",assigneeName:u.full_name||member.name,assigneeRole:u.role||member.role,priority:d.priority==="critical"?"urgent":"normal",startDate:d.start||null,dueDate:d.due||null,requiresApproval:true,metadata:meta});
       t=cr.task;byKey.set(key,t);d.cloudTaskId=t.id;d.cloudTaskStatus=t.status;changed=true;
     }else{
       if(String(t.start_date||"")!==String(d.start||"")||String(t.due_date||"")!==String(d.due||"")){try{const sr=await CloudTaskEngine.updateSchedule({taskId:t.id,startDate:d.start||null,dueDate:d.due||null});t=sr.task||t}catch(e){console.warn("readiness schedule sync",e)}}
@@ -1754,7 +1732,7 @@ function memberAssignedRows(member){
 }
 function memberCompletion(member){
  const rows=memberAssignedRows(member);if(!rows.length)return 0;
- const done=rows.filter(x=>x.d.execution?.result==="done"&&Array.isArray(x.d.evidence)&&x.d.evidence.length>0).length;
+ const done=rows.filter(x=>x.d.execution?.result==="done").length;
  return Math.round(done/rows.length*100)
 }
 function toggleMemberTask(memberIndex,key,checked){
@@ -1774,7 +1752,13 @@ let executionTarget=null,pendingExecutedTarget=null;
 function markTaskExecuted(sectionId,index){
  const d=state.tasks[sectionId][index];
  d.action="";d.followupDate="";
- openReadinessEvidenceModal(sectionId,index);
+ d.execution={result:"done",reason:"",by:d.responsible||"",date:new Date().toISOString()};
+ d.status="completed";d.done=new Date().toISOString().slice(0,10);
+ d.review={status:"pending",comment:"",by:"",date:""};
+ save();
+ showPage(sectionId);
+ const card=document.querySelector(`#tasks-${sectionId} .task[data-i="${index}"]`);
+ card?.classList.add("open");
 }
 
 let readinessEvidenceTarget=null;
@@ -1865,7 +1849,7 @@ function stageExecutionSummary(stageIndex){
  const rows=tasksByStage(stageIndex);
  let done=0,notDone=0,pending=0,unassigned=0;
  rows.forEach(x=>{
-  const r=x.data.execution?.result==="done"&&x.data.evidence?.length?"done":x.data.execution?.result==="not_done"?"not_done":"pending";
+  const r=x.data.execution?.result==="done"?"done":x.data.execution?.result==="not_done"?"not_done":"pending";
   if(r==="done")done++;else if(r==="not_done")notDone++;else pending++;
   if(!x.member&&!x.data.responsible)unassigned++;
  });
@@ -1890,11 +1874,11 @@ function renderOperationalStageContent(stageIndex){
  rows.forEach(x=>{(grouped[x.section.id]||(grouped[x.section.id]={section:x.section,items:[]})).items.push(x)});
  host.innerHTML=`<div class="manager-dashboard-grid">
   <div class="manager-kpi"><small>نسبة إنجاز المرحلة</small><strong>${summary.percent}%</strong></div>
-  <div class="manager-kpi"><small>نُفذ مع شاهد</small><strong>${summary.done}</strong></div>
+  <div class="manager-kpi"><small>نُفذ</small><strong>${summary.done}</strong></div>
   <div class="manager-kpi"><small>لم يُنفذ</small><strong>${summary.notDone}</strong></div>
   <div class="manager-kpi"><small>بانتظار التحديد</small><strong>${summary.pending}</strong></div>
  </div>
- ${Object.values(grouped).map(g=>`<div class="manager-section"><h4>${g.section.title}</h4><div class="manager-list">${g.items.map(x=>`<div class="manager-list-item"><div><strong>${x.task}</strong><br><small>${x.member?`المسؤول: ${esc(x.member.name||x.member.role)}`:x.data.responsible?`المسؤول: ${esc(x.data.responsible)}`:"غير مسند"} · ${x.data.execution?.result==="done"&&x.data.evidence?.length?"نُفذ مع شاهد":x.data.execution?.result==="not_done"?"لم يُنفذ":"بانتظار التحديد"}</small></div><button class="btn" data-open-operational="${g.section.id}" data-open-index="${x.index}">فتح المهمة</button></div>`).join("")}</div></div>`).join("")}`;
+ ${Object.values(grouped).map(g=>`<div class="manager-section"><h4>${g.section.title}</h4><div class="manager-list">${g.items.map(x=>`<div class="manager-list-item"><div><strong>${x.task}</strong><br><small>${x.member?`المسؤول: ${esc(x.member.name||x.member.role)}`:x.data.responsible?`المسؤول: ${esc(x.data.responsible)}`:"غير مسند"} · ${x.data.execution?.result==="done"?"نُفذ":x.data.execution?.result==="not_done"?"لم يُنفذ":"بانتظار التحديد"}</small></div><button class="btn" data-open-operational="${g.section.id}" data-open-index="${x.index}">فتح المهمة</button></div>`).join("")}</div></div>`).join("")}`;
  host.querySelectorAll("[data-open-operational]").forEach(b=>b.onclick=()=>openOperationalTask(b.dataset.openOperational,+b.dataset.openIndex))
 }
 
@@ -2006,14 +1990,14 @@ function renderAssignmentSummary(){
  const unassignedRows=all.filter(o=>!assignedKeys.has(o.key));
  const linked=displayTeam.filter(m=>m?.role==="مدير المدرسة"||m?.cloudUserId).length;
  const unlinked=displayTeam.filter(m=>m?.role!=="مدير المدرسة"&&!m?.cloudUserId).length;
- const completed=all.filter(o=>{const d=state?.tasks?.[o.sectionId]?.[o.index];return d?.execution?.result==="done"&&Array.isArray(d?.evidence)&&d.evidence.length>0}).length;
+ const completed=all.filter(o=>{const d=state?.tasks?.[o.sectionId]?.[o.index];return d?.execution?.result==="done"}).length;
  const memberOptions=platformUserOptionsHtml();
  host.innerHTML=`<div class="assignment-summary" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
    <div class="metric"><span>أعضاء الفريق</span><strong>${displayTeam.length}</strong></div>
    <div class="metric"><span>حسابات مرتبطة</span><strong>${linked}</strong></div>
    <div class="metric"><span>مهام مسندة</span><strong>${assigned}</strong></div>
    <div class="metric"><span>مهام غير مسندة</span><strong>${unassignedRows.length}</strong></div>
-   <div class="metric"><span>مهام مكتملة بالشاهد</span><strong>${completed}</strong></div>
+   <div class="metric"><span>مهام منفذة</span><strong>${completed}</strong></div>
    <div class="metric"><span>أعضاء بحاجة للربط</span><strong>${unlinked}</strong></div>
  </div>
  ${displayTeam.length?`<div class="manager-list" style="margin-top:12px">${displayTeam.map(m=>{let rows=[];try{rows=memberAssignedRows(m)}catch(_){rows=[]}return `<div class="manager-list-item"><div><strong>${esc(m?.name||"عضو")}</strong><br><small>${esc(m?.role==="أخرى"?(m?.customRole||"أخرى"):(m?.role||"غير مصنف"))}</small></div><strong>${rows.length} مهمة</strong></div>`}).join("")}</div>`:`<div class="stage-empty" style="margin-top:12px">يظهر الملخص بعد إضافة أعضاء فريق الاستعداد.</div>`}
@@ -2037,7 +2021,7 @@ function renderTeam(){
  const visibleTeam=state.team.filter(m=>!m.hiddenFromTeamEditor);
  editor.innerHTML=(visibleTeam.length?visibleTeam.map((m)=>{const mi=state.team.indexOf(m);
   const pct=memberCompletion(m),rows=memberAssignedRows(m);
-  const done=rows.filter(x=>x.d.execution?.result==="done"&&x.d.evidence?.length).length;
+  const done=rows.filter(x=>x.d.execution?.result==="done").length;
   const notDone=rows.filter(x=>x.d.execution?.result==="not_done"&&x.d.execution?.reason).length;
   const pending=Math.max(0,rows.length-done-notDone);
   const roleOpts=roleTaskOptions(m.role,m.customRole);
@@ -2107,7 +2091,7 @@ function renderOperationalStages(){
 function renderManagerDashboard(){
  const host=document.getElementById("managerDashboardContent");if(!host)return;
  const all=[];SECTIONS.forEach(s=>s.tasks.forEach((t,i)=>all.push({section:s,task:t,index:i,data:state.tasks[s.id][i],member:assignedMemberForTask(s.id,i)})));
- const total=all.length,done=all.filter(x=>x.data.execution?.result==="done"&&x.data.evidence?.length).length;
+ const total=all.length,done=all.filter(x=>x.data.execution?.result==="done").length;
  const notDone=all.filter(x=>x.data.execution?.result==="not_done").length;
  const pending=total-done-notDone;
  const unassigned=all.filter(x=>!x.member&&!x.data.responsible).length;
@@ -2286,17 +2270,6 @@ window.save=save;
 try{Object.defineProperty(window,'state',{get:()=>state,set:v=>{state=v},configurable:true})}catch(_){window.state=state}
 </script>
 
-<div class="exec-modal-backdrop" id="readinessEvidenceModal">
- <div class="exec-modal" role="dialog" aria-modal="true" aria-labelledby="readinessEvidenceTaskTitle">
-  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><h3 style="margin:0">إضافة شاهد التنفيذ</h3><small id="readinessEvidenceTaskTitle"></small></div><button type="button" class="btn" id="readinessEvidenceClose">إغلاق</button></div>
-  <div class="callout" style="margin-top:12px">اختر شاهدًا من الجهاز أو من مكتبة القسم. ستبقى هذه النافذة مفتوحة حتى يتم حفظ الشاهد سحابيًا بنجاح.</div>
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:14px 0"><button type="button" class="btn" id="readinessEvidenceFromDevice">📎 اختيار من الجهاز</button><button type="button" class="btn" id="readinessEvidenceFromLibrary">📚 اختيار من مكتبة القسم</button></div>
-  <input id="readinessEvidenceDeviceInput" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" style="display:none">
-  <div class="evidence-list" id="readinessEvidenceSelection"><span class="empty">لم يتم اختيار شاهد بعد.</span></div>
-  <div id="readinessEvidenceStatus" style="margin-top:12px;font-weight:700;color:#526a6d">اختر مصدر الشاهد، ثم اضغط حفظ الشاهد.</div>
-  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button type="button" class="btn" id="readinessEvidenceCancel">إلغاء</button><button type="button" class="btn execute-yes" id="readinessEvidenceSave" disabled>حفظ الشاهد سحابيًا</button></div>
- </div>
-</div>
 
 <div class="exec-modal-backdrop" id="notExecutedModal">
  <div class="exec-modal">
@@ -2322,10 +2295,10 @@ try{Object.defineProperty(window,'state',{get:()=>state,set:v=>{state=v},configu
 <script src="evidence-library-source.js"></script>
 <script>
 document.getElementById("readinessEvidenceFromDevice")?.addEventListener("click",()=>document.getElementById("readinessEvidenceDeviceInput")?.click());
-document.getElementById("readinessEvidenceDeviceInput")?.addEventListener("change",e=>{readinessDeviceFiles=[...(e.target.files||[])];renderReadinessEvidenceSelection()});
+
 document.getElementById("readinessEvidenceFromLibrary")?.addEventListener("click",()=>{if(!window.EvidenceLibrarySource)return alert("مكتبة القسم غير متاحة حاليًا");window.EvidenceLibrarySource.open("readiness-select",{onSelect:async files=>{readinessLibraryFiles=files||[];renderReadinessEvidenceSelection()}})});
-document.getElementById("readinessEvidenceSave")?.addEventListener("click",commitReadinessEvidenceModal);
-document.getElementById("readinessEvidenceCancel")?.addEventListener("click",()=>{evidenceModalEl()?.classList.remove("show");readinessEvidenceTarget=null;readinessDeviceFiles=[];readinessLibraryFiles=[];renderReadinessEvidenceSelection()});
+
+
 document.getElementById("readinessEvidenceClose")?.addEventListener("click",()=>{evidenceModalEl()?.classList.remove("show");readinessEvidenceTarget=null;readinessDeviceFiles=[];readinessLibraryFiles=[];renderReadinessEvidenceSelection()});
 </script>
 
