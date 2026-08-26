@@ -743,6 +743,49 @@ async function nextDecisionCloudCounter(name,currentId){
   );
   return same.reduce((m,f)=>Math.max(m,Number(f?.metadata?.duplicateNo||0)),0)+1;
 }
+
+function normalizeDecisionPerson(v){return String(v||'').trim().replace(/\s+/g,' ').toLowerCase()}
+async function resolveDecisionAssignee(name){
+  const wanted=normalizeDecisionPerson(name);
+  let rows=[];
+  try{
+    if(window.SchoolInformationSource&&typeof SchoolInformationSource.getStaff==='function')rows=await SchoolInformationSource.getStaff(true)||[];
+    else if(window.SchoolInformationSource&&typeof SchoolInformationSource.getTeachers==='function')rows=await SchoolInformationSource.getTeachers(true)||[];
+  }catch(e){console.warn('[Decisions] assignee lookup',e)}
+  const exact=rows.find(x=>normalizeDecisionPerson(x.name||x.full_name||x.teacher_name)===wanted);
+  if(!exact)return null;
+  return {id:String(exact.user_id||exact.id||''),name:exact.name||exact.full_name||exact.teacher_name||name,role:exact.role||exact.user_role||'',email:exact.email||''};
+}
+function decisionMessageUrl(file,account){
+  const meta=file?.metadata||{},id=String(file?.id||''),assignee=meta.assigneeName||account?.name||'',title=meta.decisionTitle||'قرار تكليف';
+  const q=new URLSearchParams({
+    privateEdition:'1',compose:'1',return_to:'administrative_assignment_decisions.html',
+    recipient:String(account?.id||meta.assigneeUserId||''),
+    subject:'قرار تكليف: '+title,
+    body:'السلام عليكم ورحمة الله وبركاته،\nتم إصدار قرار تكليف باسم '+assignee+'.\nيرجى الاطلاع على قرار التكليف والمرفق المرتبط به عبر نظام المراسلات الداخلي.',
+    linkedModule:'administrative_assignment_decisions',
+    linkedType:'manager_assignment_decision',
+    linkedId:id,
+    linkedTitle:title,
+    linkedUrl:'administrative_assignment_decisions.html?editFileId='+encodeURIComponent(id),
+    attachmentFileId:id,
+    attachmentName:file?.display_name||file?.original_name||'قرار تكليف.html',
+    attachmentSource:'library'
+  });
+  return 'internal_messages.html?'+q.toString();
+}
+async function sendDecisionToAssignee(id){
+  try{
+    const rows=await decisionCloudList();
+    const file=rows.find(x=>String(x.id)===String(id));if(!file)throw new Error('تعذر العثور على قرار التكليف المحفوظ.');
+    const meta=file.metadata||{};
+    let account=meta.assigneeUserId?{id:String(meta.assigneeUserId),name:meta.assigneeName||'',role:meta.assigneeRole||'',email:meta.assigneeEmail||''}:null;
+    if(!account?.id)account=await resolveDecisionAssignee(meta.assigneeName||'');
+    if(!account?.id)throw new Error('تعذر مطابقة اسم المكلف بحساب مستخدم مفعل في المدرسة. حدّث بيانات المستخدمين ثم أعد المحاولة.');
+    location.href=decisionMessageUrl(file,account);
+  }catch(e){alert('تعذر تجهيز إرسال قرار التكليف: '+(e?.message||e))}
+}
+
 async function cloudSaveDecision(){
   try{
     applyUnifiedOfficialData();
@@ -765,11 +808,16 @@ async function cloudSaveDecision(){
 
     const displayName=decisionSafeFileBase(assignee)+' - '+duplicateNo+'.html';
     const file=new File([decisionExportHtml()],displayName,{type:'text/html;charset=utf-8'});
+    const assigneeAccount=await resolveDecisionAssignee(assignee);
     const metadata={
       folder:DECISION_CLOUD_FOLDER,
       kind:'html',
       source:'administrative_assignment_decisions',
       assigneeName:assignee,
+      assigneeUserId:assigneeAccount?.id||'',
+      assigneeRole:assigneeAccount?.role||'',
+      assigneeEmail:assigneeAccount?.email||'',
+
       decisionTitle:title,
       duplicateNo,
       decisionNumber:String(values.no||''),
@@ -881,6 +929,7 @@ async function renderDecisionCloudArchive(){
         <div class="decision-archive-actions">
           <button type="button" class="mini" onclick='loadDecisionCloudRecord(${id})'>تعديل</button>
           <button type="button" class="mini" onclick='previewDecisionCloudRecord(${id})'>معاينة</button>
+          <button type="button" class="mini" onclick='sendDecisionToAssignee(${id})'>إرسال للمكلف</button>
           <button type="button" class="mini" onclick='deleteDecisionCloudRecord(${id})'>حذف</button>
         </div>
       </div>`;
@@ -900,7 +949,13 @@ setTimeout(async()=>{
     loadDecisionTeachers();
     ensureDecisionFolderVisible();
     await renderDecisionCloudArchive();
-    if(decisionCloudEditingId)await loadDecisionCloudRecord(decisionCloudEditingId);
+    if(decisionCloudEditingId){
+      await loadDecisionCloudRecord(decisionCloudEditingId);
+      if(new URLSearchParams(location.search).get('sendToAssignee')==='1'){
+        const u=new URL(location.href);u.searchParams.delete('sendToAssignee');history.replaceState({},'',u);
+        await sendDecisionToAssignee(decisionCloudEditingId);
+      }
+    }
   }catch(e){console.warn('[Decisions] archive initialization deferred',e);}
 },80);
 </script>

@@ -2445,7 +2445,7 @@ h1{font-size:18px;margin:0;color:#0f3f75;font-weight:900}
 
     const { createApp } = Vue;
 
-    createApp({
+    const selfEvalApp = createApp({
         data() {
             return {
                 currentTab: 'actualReality',
@@ -2622,6 +2622,18 @@ h1{font-size:18px;margin:0;color:#0f3f75;font-weight:900}
                 localStorage.setItem('school_committees', JSON.stringify(this.committees));
                 localStorage.setItem('school_operational_plan', JSON.stringify(this.operationalPlan));
                 localStorage.setItem('school_indicators_data', JSON.stringify(this.indicatorsData));
+                try {
+                    window.parent &amp;&amp; window.parent.postMessage({
+                        type:'SELF_EVAL_STATE_SYNC',
+                        state:{
+                            school_info:this.schoolInfo,
+                            school_actual_reality:this.actualReality,
+                            school_committees:this.committees,
+                            school_operational_plan:this.operationalPlan,
+                            school_indicators_data:this.indicatorsData
+                        }
+                    },'*');
+                } catch(e) {}
 
                 const archiveKey = 'self_evaluation_archive_v1';
                 const now = new Date().toISOString();
@@ -2637,28 +2649,42 @@ h1{font-size:18px;margin:0;color:#0f3f75;font-weight:900}
                 };
                 const saveEntry = (folderName, title, type, payload) =&gt; {
                     const folder = ensureFolder(folderName);
-                    const id = `${type}-${Date.now()}`;
-                    folder.items.unshift({
+                    const contextId = (payload &amp;&amp; (payload.id || payload.committeeId || payload.key)) || (this.schoolInfo &amp;&amp; this.schoolInfo.hijriYear) || 'current';
+                    const id = `${type}:${contextId}`;
+                    const entry = {
                         id,
+                        archiveRecordId: id,
                         title,
                         type,
                         source: 'اللجان والفرق والخطة التشغيلية',
                         savedAt: now,
+                        updatedAt: now,
                         schoolName: this.schoolInfo &amp;&amp; this.schoolInfo.name ? this.schoolInfo.name : '',
                         academicYear: this.schoolInfo &amp;&amp; this.schoolInfo.hijriYear ? this.schoolInfo.hijriYear : '',
                         data: JSON.parse(JSON.stringify(payload || {}))
-                    });
+                    };
+                    const existingIndex = folder.items.findIndex(x =&gt; String(x.id || x.archiveRecordId || '') === String(id));
+                    if (existingIndex &gt;= 0) {
+                        entry.createdAt = folder.items[existingIndex].createdAt || folder.items[existingIndex].savedAt || now;
+                        folder.items.splice(existingIndex, 1, entry);
+                    } else {
+                        entry.createdAt = now;
+                        folder.items.unshift(entry);
+                    }
                     folder.updatedAt = now;
                     try {
                         window.parent &amp;&amp; window.parent.postMessage({
                             type: 'SELF_EVAL_ARCHIVE_SAVE',
+                            archiveRecordId: id,
                             folderName: folderName,
                             recordName: folderName,
                             title: title,
                             data: payload,
-                            createdAt: new Date().toLocaleString('ar-SA')
+                            createdAt: entry.createdAt,
+                            updatedAt: now
                         }, '*');
                     } catch(e) {}
+                    return id;
                 };
 
                 let savedFolder = 'أرشيف التقويم الذاتي';
@@ -2671,7 +2697,7 @@ h1{font-size:18px;margin:0;color:#0f3f75;font-weight:900}
                     savedFolder = 'قرارات اللجان والفرق';
                 } else if (this.currentTab === 'meetings') {
                     const committee = this.activeCommittee || {};
-                    saveEntry('اجتماعات اللجان والفرق', `اجتماعات ${committee.name || 'اللجان والفرق'}`, 'committee_meetings', { committeeName: committee.name, meetings: committee.meetings || [] });
+                    saveEntry('اجتماعات اللجان والفرق', `اجتماعات ${committee.name || 'اللجان والفرق'}`, 'committee_meetings', { id: committee.id || committee.name || 'committee', committeeName: committee.name, meetings: committee.meetings || [] });
                     savedFolder = 'اجتماعات اللجان والفرق';
                 } else if (this.currentTab === 'actualReality') {
                     saveEntry('واقع المدرسة الفعلي', `واقع المدرسة الفعلي - ${this.schoolInfo.hijriYear || ''}هـ`, 'school_reality', this.actualReality);
@@ -2685,7 +2711,7 @@ h1{font-size:18px;margin:0;color:#0f3f75;font-weight:900}
                 }
 
                 localStorage.setItem(archiveKey, JSON.stringify(archive));
-                this.showToast(`تم الحفظ في أرشيف التقويم الذاتي / ${savedFolder}`);
+                this.showToast(`تم حفظ البيانات محليًا، جارٍ التحقق من أرشيف التقويم الذاتي / ${savedFolder}...`);
             },
             resetToDefault() {
                 localStorage.removeItem('school_info');
@@ -3259,6 +3285,13 @@ h1{font-size:18px;margin:0;color:#0f3f75;font-weight:900}
             }
         }
     }).mount('#app');
+    window.__SELF_EVAL_APP__ = selfEvalApp;
+    window.addEventListener('message', (event) =&gt; {
+        const d = event.data || {};
+        if (d.type === 'SELF_EVAL_ARCHIVE_ACK') {
+            selfEvalApp.showToast(d.ok ? 'تم الحفظ والتحقق من أرشيف التقويم الذاتي بنجاح ✅' : ('تعذر التحقق من الأرشيف السحابي: ' + (d.error || 'خطأ غير معروف')));
+        }
+    });
 &lt;/script&gt;
 
 &lt;/body&gt;
@@ -4141,21 +4174,42 @@ activateSelfEvaluationModule('committeesFrame');
 <script>
 (function(){
   const MANAGER_ARCHIVE_KEY='manager_self_evaluation_archive_v1';
-  const EXTRA_FOLDERS=['الخطة التشغيلية','قرارات اللجان والفرق','اجتماعات اللجان والفرق'];
-  function saveToManagerArchive(payload){
+  const FOLDER_IDS={'الخطة التشغيلية':'selfEval_53','قرارات اللجان والفرق':'selfEval_54','اجتماعات اللجان والفرق':'selfEval_55'};
+  async function saveToManagerArchive(payload){
     try{
-      const target = (window.parent && window.parent !== window && window.parent.localStorage) ? window.parent.localStorage : window.localStorage;
-      let arr=[];
-      try{ arr=JSON.parse(target.getItem(MANAGER_ARCHIVE_KEY)||'[]')||[]; }catch(e){ arr=[]; }
+      const target=window.localStorage;
+      let arr=[];try{arr=JSON.parse(target.getItem(MANAGER_ARCHIVE_KEY)||'[]')||[]}catch(e){arr=[]}
+      if(!Array.isArray(arr))arr=[];
       const name=payload.recordName||payload.folderName||payload.title||'سجل التقويم الذاتي';
-      const item={id:Date.now(), folderId:payload.folderId||'', folderName:name, recordName:name, title:payload.title||name, displayName:payload.displayName||name, htmlContent:payload.htmlContent||'', createdAt:payload.createdAt||new Date().toLocaleString('ar-SA'), data:payload.data||null};
-      arr.push(item);
-      target.setItem(MANAGER_ARCHIVE_KEY, JSON.stringify(arr));
-    }catch(e){}
+      const stableId=String(payload.archiveRecordId||payload.id||('self-eval-'+Date.now()));
+      const item={id:stableId,archiveRecordId:stableId,folderId:payload.folderId||FOLDER_IDS[name]||'',folderName:name,recordName:name,title:payload.title||name,displayName:payload.displayName||payload.title||name,htmlContent:payload.htmlContent||'',createdAt:payload.createdAt||new Date().toISOString(),updatedAt:payload.updatedAt||new Date().toISOString(),data:payload.data||null};
+      const idx=arr.findIndex(x=>String(x.id||x.archiveRecordId||'')===stableId);
+      if(idx>=0)arr[idx]=Object.assign({},arr[idx],item,{createdAt:arr[idx].createdAt||item.createdAt});else arr.unshift(item);
+      target.setItem(MANAGER_ARCHIVE_KEY,JSON.stringify(arr));
+      if(window.ArchiveSaveIntegrity) await ArchiveSaveIntegrity.confirmArrayRecord(MANAGER_ARCHIVE_KEY,stableId);
+      return item;
+    }catch(e){console.error('[SelfEvalArchive] save failed',e);throw e}
   }
-  window.addEventListener('message',function(event){
+  async function syncState(state,source){
+    try{
+      Object.entries(state||{}).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));
+      if(window.PlatformPersistenceGuard?.flush)await PlatformPersistenceGuard.flush();
+      source?.postMessage({type:'SELF_EVAL_STATE_ACK',ok:true},'*');
+    }catch(e){
+      source?.postMessage({type:'SELF_EVAL_STATE_ACK',ok:false,error:String(e?.message||e)},'*');
+    }
+  }
+  window.addEventListener('message',async function(event){
     const d=event.data||{};
-    if(d && (d.type==='SELF_EVAL_RECORD_SAVED' || d.type==='SELF_EVAL_ARCHIVE_SAVE')) saveToManagerArchive(d);
+    if(d.type==='SELF_EVAL_STATE_SYNC'){syncState(d.state,event.source);return}
+    if(d.type==='SELF_EVAL_RECORD_SAVED'||d.type==='SELF_EVAL_ARCHIVE_SAVE'){
+      try{
+        const item=await saveToManagerArchive(d);
+        event.source?.postMessage({type:'SELF_EVAL_ARCHIVE_ACK',ok:true,archiveRecordId:item?.id||d.archiveRecordId||''},'*');
+      }catch(e){
+        try{event.source?.postMessage({type:'SELF_EVAL_ARCHIVE_ACK',ok:false,error:String(e?.message||e),archiveRecordId:d.archiveRecordId||''},'*')}catch(_){}
+      }
+    }
   });
 })();
 </script>
@@ -4163,6 +4217,7 @@ activateSelfEvaluationModule('committeesFrame');
 <!-- Unified Cloud File Engine v3 -->
 <script src="platform-cloud-session.js?v=20260818-session-v12"></script>
 <script src="cloud-file-engine.js"></script>
+<script src="archive-save-integrity.js?v=20260826-archive-integrity1"></script>
 <script src="cloud-file-bootstrap.js"></script>
 <script src="cloud-upload-hub.js"></script>
 

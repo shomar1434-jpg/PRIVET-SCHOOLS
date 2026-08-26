@@ -28,12 +28,60 @@ Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{head
    const members=await allMembers(),direct=(Array.isArray(b.recipientIds)?b.recipientIds:[]).map(String),groups=(Array.isArray(b.recipientRoles)?b.recipientRoles:[]).map(String),all=!!b.allSchool;
    if((groups.length||all)&&!groupAllowed(role))return json({error:'الإرسال الجماعي متاح للمدير والوكيل فقط'},403);if(all&&!allAllowed(role))return json({error:'الإرسال لجميع المستخدمين غير مسموح لهذا الدور'},403);
    let targets=members.filter((x:any)=>{if(x.id===user.id)return false;const targetRole=String(x.role),isDirect=direct.includes(String(x.id))&&allowedDirectTarget(role,targetRole),isGroup=groups.includes(targetRole)&&allowedBulkTarget(role,targetRole),isAll=all&&allowedBulkTarget(role,targetRole);return isDirect||isGroup||isAll});targets=[...new Map(targets.map((x:any)=>[String(x.id),x])).values()];
-   if(!targets.length)return json({error:'لم يتم العثور على مستلمين مسموح بهم داخل المدرسة'},400);const subject=clean(b.subject,300),body=clean(b.body,20000);if(!subject||!body)return json({error:'العنوان ونص الرسالة مطلوبان'},400);
+   if(!targets.length)return json({error:'لم يتم العثور على مستلمين مسموح بهم داخل المدرسة'},400);
+   const subject=clean(b.subject,300),body=clean(b.body,20000);if(!subject||!body)return json({error:'العنوان ونص الرسالة مطلوبان'},400);
+
+   // التحقق من المرفقات كاملاً قبل إنشاء الرسالة حتى لا توجد رسالة ناجحة بلا مرفقات.
+   const att=Array.isArray(b.attachments)?b.attachments.slice(0,15):[];
+   let verifiedFiles:any[]=[];
+   if(att.length){
+     const ids=[...new Set(att.map((a:any)=>clean(a.fileId,80)).filter(isUuid))];
+     if(ids.length!==att.length)return json({error:'يوجد مرفق غير صالح. أعد اختيار المرفقات ثم أرسل الرسالة.'},400);
+     const fs=await db.from('platform_files').select('id,school_id,user_id,ownership_scope,bucket,object_path,display_name,original_name,mime_type,file_size,status').eq('school_id',sid).in('id',ids);
+     if(fs.error)throw fs.error;
+     verifiedFiles=(fs.data||[]).filter((f:any)=>f.status==='active'&&(String(f.user_id||'')===String(user.id)||String(f.ownership_scope||'')==='school'||['manager','owner'].includes(role)));
+     if(verifiedFiles.length!==ids.length)return json({error:'تعذر التحقق من صلاحية أحد المرفقات. أعد اختياره من مكتبتك أو من جهازك.'},403);
+   }
+
    const mid=crypto.randomUUID(),thread=isUuid(b.threadId)?String(b.threadId):mid,type=['message','official','notice','action_request'].includes(String(b.messageType))?String(b.messageType):'message';let ack=['none','read_receipt','signature'].includes(String(b.acknowledgementMode))?String(b.acknowledgementMode):'none';if(type==='official'&&ack==='none')ack='signature';
-   const ins=await db.from('internal_messages').insert({id:mid,school_id:sid,sender_id:user.id,sender_user_id:user.id,sender_name:currentMember?.display_name||user.user_metadata?.full_name||user.email||'',sender_role:role,subject,body,priority:['important','urgent'].includes(String(b.priority))?String(b.priority):'normal',message_type:type,require_ack:ack==='signature',acknowledgement_mode:ack,due_at:b.dueAt||null,thread_id:thread,parent_message_id:isUuid(b.parentMessageId)?b.parentMessageId:null,linked_module:clean(b.linked?.module,120)||null,linked_record_type:clean(b.linked?.recordType,120)||null,linked_record_id:clean(b.linked?.recordId,240)||null,linked_title:clean(b.linked?.title,500)||null,linked_url:clean(b.linked?.url,1200)||null,metadata:b.metadata||{}});if(ins.error)throw ins.error;
-   const recs=targets.map((x:any)=>({school_id:sid,message_id:mid,recipient_id:x.id,recipient_user_id:x.id,recipient_email:x.email||null,recipient_name:x.full_name||x.email||'',recipient_role:x.role}));const rec=await db.from('internal_message_recipients').insert(recs);if(rec.error){await db.from('internal_messages').delete().eq('id',mid);throw rec.error}
-   const att=Array.isArray(b.attachments)?b.attachments.slice(0,15):[];if(att.length){const ids=att.map((a:any)=>clean(a.fileId,80)).filter(isUuid);if(ids.length){const fs=await db.from('platform_files').select('id,school_id,display_name,original_name,mime_type,file_size,status').eq('school_id',sid).in('id',ids);if(fs.error)throw fs.error;const fmap=new Map((fs.data||[]).filter((f:any)=>f.status==='active').map((f:any)=>[String(f.id),f]));const rows=[];for(const a of att){const f:any=fmap.get(String(a.fileId));if(!f)continue;rows.push({school_id:sid,message_id:mid,file_id:f.id,file_name:f.display_name||f.original_name||'مرفق',mime_type:f.mime_type||null,file_size:Number(f.file_size||0),source:a.source==='library'?'library':'device'})}if(rows.length){const ia=await db.from('internal_message_attachments').insert(rows);if(ia.error)throw ia.error}}}
-   return json({ok:true,messageId:mid,recipientCount:recs.length})
+   async function cleanupFailedSend(){
+     try{await db.from('internal_message_attachments').delete().eq('school_id',sid).eq('message_id',mid)}catch(_){}
+     try{await db.from('platform_file_links').delete().eq('school_id',sid).eq('record_type','internal_message').eq('record_id',mid).eq('relation_type','attachment')}catch(_){}
+     try{await db.from('internal_message_recipients').delete().eq('school_id',sid).eq('message_id',mid)}catch(_){}
+     try{await db.from('internal_messages').delete().eq('school_id',sid).eq('id',mid)}catch(_){}
+   }
+   try{
+     const ins=await db.from('internal_messages').insert({id:mid,school_id:sid,sender_id:user.id,sender_user_id:user.id,sender_name:currentMember?.display_name||user.user_metadata?.full_name||user.email||'',sender_role:role,subject,body,priority:['important','urgent'].includes(String(b.priority))?String(b.priority):'normal',message_type:type,require_ack:ack==='signature',acknowledgement_mode:ack,due_at:b.dueAt||null,thread_id:thread,parent_message_id:isUuid(b.parentMessageId)?b.parentMessageId:null,linked_module:clean(b.linked?.module,120)||null,linked_record_type:clean(b.linked?.recordType,120)||null,linked_record_id:clean(b.linked?.recordId,240)||null,linked_title:clean(b.linked?.title,500)||null,linked_url:clean(b.linked?.url,1200)||null,metadata:b.metadata||{}});
+     if(ins.error)throw ins.error;
+
+     const recs=targets.map((x:any)=>({school_id:sid,message_id:mid,recipient_id:x.id,recipient_user_id:x.id,recipient_email:x.email||null,recipient_name:x.full_name||x.email||'',recipient_role:x.role}));
+     const rec=await db.from('internal_message_recipients').insert(recs);if(rec.error)throw rec.error;
+
+     let attachmentCount=0,attachmentFileIds:string[]=[];
+     if(att.length){
+       const fmap=new Map(verifiedFiles.map((f:any)=>[String(f.id),f])),rows:any[]=[];
+       for(const a of att){
+         const f:any=fmap.get(String(a.fileId));if(!f)throw new Error('فقد التحقق من أحد المرفقات قبل الربط');
+         rows.push({school_id:sid,message_id:mid,file_id:f.id,file_name:f.display_name||f.original_name||a.name||'مرفق',mime_type:f.mime_type||null,file_size:Number(f.file_size||0),source:a.source==='library'?'library':'device'});
+         const exists=await db.from('platform_file_links').select('id').eq('school_id',sid).eq('file_id',f.id).eq('record_type','internal_message').eq('record_id',mid).eq('relation_type','attachment').maybeSingle();
+         if(exists.error)throw exists.error;
+         if(!exists.data){const link=await db.from('platform_file_links').insert({school_id:sid,file_id:f.id,record_type:'internal_message',record_id:mid,relation_type:'attachment',created_by:user.id});if(link.error)throw link.error}
+       }
+       const ia=await db.from('internal_message_attachments').insert(rows);if(ia.error)throw ia.error;
+       const verify=await db.from('internal_message_attachments').select('file_id').eq('school_id',sid).eq('message_id',mid);
+       if(verify.error)throw verify.error;
+       attachmentFileIds=(verify.data||[]).map((x:any)=>String(x.file_id)).sort();
+       const expected=rows.map((x:any)=>String(x.file_id)).sort();
+       if(attachmentFileIds.length!==expected.length||attachmentFileIds.some((x:string,i:number)=>x!==expected[i]))throw new Error('فشل التحقق النهائي من حفظ جميع المرفقات');
+       attachmentCount=attachmentFileIds.length;
+     }
+     const msgVerify=await db.from('internal_messages').select('id').eq('school_id',sid).eq('id',mid).maybeSingle();if(msgVerify.error)throw msgVerify.error;if(!msgVerify.data)throw new Error('فشل التحقق النهائي من حفظ الرسالة');
+     const recVerify=await db.from('internal_message_recipients').select('id').eq('school_id',sid).eq('message_id',mid);if(recVerify.error)throw recVerify.error;if((recVerify.data||[]).length!==recs.length)throw new Error('فشل التحقق النهائي من حفظ المستلمين');
+     return json({ok:true,messageId:mid,recipientCount:recs.length,attachmentCount,attachmentFileIds,attachmentsVerified:att.length?attachmentCount===att.length:true,verified:true})
+   }catch(sendError){
+     await cleanupFailedSend();
+     return json({error:'لم تكتمل عملية الإرسال ولم يتم اعتماد الرسالة: '+(sendError instanceof Error?sendError.message:String(sendError)),sendRolledBack:true},500);
+   }
  }
  if(['inbox','list','archive','pinned'].includes(action)){
    let q=db.from('internal_message_recipients').select('*,message:internal_messages(*)').eq('school_id',sid).eq('recipient_user_id',user.id);if(action==='archive'||b.box==='archive')q=q.not('archived_at','is',null);else q=q.is('archived_at',null);if(action==='pinned'||b.box==='pinned')q=q.not('pinned_at','is',null);const r=await q.order('pinned_at',{ascending:false,nullsFirst:false}).order('created_at',{ascending:false}).limit(150);if(r.error)throw r.error;const rows=r.data||[];return json({ok:true,messages:rows.map((x:any)=>({...x.message,read_at:x.read_at,acknowledged_at:x.acknowledged_at,action_status:x.action_status,pinned_at:x.pinned_at,recipient_archived_at:x.archived_at})),unread:rows.filter((x:any)=>!x.read_at).length})
@@ -46,6 +94,14 @@ Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{head
  }
  if(action==='read'){
    const id=clean(b.messageId,80);const {m,r}=await canReadMessage(id);if(!m||(!r&&String(m.sender_user_id)!==user.id))return json({error:'not_found'},404);let rr=r;if(rr&&!rr.read_at){const at=new Date().toISOString();const up=await db.from('internal_message_recipients').update({read_at:at}).eq('id',rr.id).select('*').single();if(up.error)throw up.error;rr=up.data}const rec=await db.from('internal_message_recipients').select('*').eq('school_id',sid).eq('message_id',id);if(rec.error)throw rec.error;const atts=await db.from('internal_message_attachments').select('*').eq('school_id',sid).eq('message_id',id).order('created_at');if(atts.error)throw atts.error;const thread=await db.from('internal_messages').select('*').eq('school_id',sid).eq('thread_id',m.thread_id||m.id).order('created_at');if(thread.error)throw thread.error;return json({ok:true,message:m,recipientState:rr,recipients:rec.data||[],attachments:atts.data||[],thread:thread.data||[]})
+ }
+ if(action==='attachment-url'){
+   const messageId=clean(b.messageId,80),fileId=clean(b.fileId,80);if(!isUuid(messageId)||!isUuid(fileId))return json({error:'معرف المرفق غير صالح'},400);
+   const {m,r}=await canReadMessage(messageId);if(!m||(!r&&String(m.sender_user_id)!==String(user.id)))return json({error:'لا توجد صلاحية لفتح هذا المرفق'},403);
+   const aq=await db.from('internal_message_attachments').select('*').eq('school_id',sid).eq('message_id',messageId).eq('file_id',fileId).maybeSingle();if(aq.error)throw aq.error;if(!aq.data)return json({error:'المرفق غير مرتبط بهذه الرسالة'},404);
+   const fq=await db.from('platform_files').select('id,school_id,bucket,object_path,display_name,original_name,mime_type,file_size,status').eq('school_id',sid).eq('id',fileId).maybeSingle();if(fq.error)throw fq.error;if(!fq.data||fq.data.status!=='active')return json({error:'المرفق غير متاح حاليًا'},404);
+   const su=await db.storage.from(fq.data.bucket||'private-school-files').createSignedUrl(fq.data.object_path,600);if(su.error)throw su.error;
+   return json({ok:true,signedUrl:su.data?.signedUrl||'',expiresIn:600,file:{id:fq.data.id,name:fq.data.display_name||fq.data.original_name||aq.data.file_name,mimeType:fq.data.mime_type||aq.data.mime_type,size:Number(fq.data.file_size||aq.data.file_size||0)}})
  }
  if(['archive-message','unarchive-message','pin','unpin','mark-unread','action-status','acknowledge'].includes(action)){
    const {m,r}=await canReadMessage(clean(b.messageId,80));if(!m||!r)return json({error:'الإجراء متاح للمستلم فقط'},403);const patch:any={};if(action==='archive-message')patch.archived_at=new Date().toISOString();if(action==='unarchive-message')patch.archived_at=null;if(action==='pin')patch.pinned_at=new Date().toISOString();if(action==='unpin')patch.pinned_at=null;if(action==='mark-unread')patch.read_at=null;if(action==='action-status'){patch.action_status=['accepted','in_progress','done','declined'].includes(String(b.status))?String(b.status):'none';patch.action_note=clean(b.note,1000)||null}if(action==='acknowledge'){const sig=decodeSignature(b.signatureData);const at=new Date().toISOString(),path=`internal-message-signatures/${sid}/${m.id}/${r.id}-${crypto.randomUUID()}.${sig.ext}`;const upSig=await db.storage.from('private-school-files').upload(path,sig.bytes,{contentType:sig.mime,upsert:false,cacheControl:'31536000'});if(upSig.error)throw upSig.error;patch.acknowledged_at=at;patch.signed_at=at;patch.read_at=r.read_at||at;patch.signature_storage_path=path;patch.signature_mime_type=sig.mime;patch.signature_hash=await shaBytes(sig.bytes);patch.acknowledgement_metadata={signed_via:'saved_digital_signature',signed_at:at}}const up=await db.from('internal_message_recipients').update(patch).eq('id',r.id).select('*').single();if(up.error)throw up.error;return json({ok:true,state:up.data})
