@@ -87,7 +87,7 @@ function sid(){
 }
 function localKey(form){return 'operational_followup:'+sid()+':'+form}
 function setCloud(text,error=false){const e=document.getElementById('cloudState');e.textContent=text;e.classList.toggle('error',!!error)}
-function returnToAgent(){try{sessionStorage.setItem('agent_return_to_sections','1')}catch(e){} location.href='agent.html?view=sections'}
+function returnToAgent(){location.href='agent.html'}
 function switchForm(name,btn){
  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
  document.getElementById('view-'+name).classList.add('active');
