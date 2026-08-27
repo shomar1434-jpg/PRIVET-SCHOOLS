@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>الفحص و المتابعة التشغيلية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<script src="private-auth-storage.js"></script>
+<script src="private-edition-bootstrap.js"></script>
+<script src="platform-cloud-session.js?v=20260818-session-v12"></script>
+<script src="platform-state-engine.js"></script>
+<script src="school-base-settings-source.js"></script>
+<script src="school_isolation_guard.js?v=nonblock20260614"></script>
+<style>
+:root{--teal:#0f766e;--teal2:#0d9488;--navy:#123d4a;--soft:#f4f8f8;--line:#d6e2e3;--muted:#64748b;--danger:#b91c1c;--amber:#b7791f}
+*{box-sizing:border-box}html{direction:rtl}body{margin:0;background:var(--soft);font-family:"Tajawal",Arial,sans-serif;color:#17252b}
+.topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:100;box-shadow:0 5px 18px rgba(15,23,42,.04)}
+.top-title{display:flex;align-items:center;gap:12px}.top-title h1{font-size:18px;color:var(--navy);margin:0;font-weight:900}.top-title small{display:block;color:var(--muted);font-weight:700;margin-top:2px}
+.back{width:40px;height:40px;border:1px solid #cbd5e1;background:#fff;color:var(--teal);border-radius:12px;display:grid;place-items:center;cursor:pointer;font-size:21px;font-weight:900}
+.layout{display:grid;grid-template-columns:245px minmax(0,1fr);min-height:calc(100vh - 64px)}
+.sidebar{background:linear-gradient(180deg,#0f5d61,#0f766e);padding:18px 13px;position:sticky;top:64px;height:calc(100vh - 64px);overflow:auto}
+.side-head{color:#fff;padding:8px 10px 17px;border-bottom:1px solid rgba(255,255,255,.18);margin-bottom:12px}.side-head b{font-size:14px}.side-head small{display:block;font-size:9px;opacity:.75;margin-top:4px;line-height:1.6}
+.navbtn{width:100%;border:0;background:transparent;color:#e6fffb;padding:12px 11px;border-radius:13px;text-align:right;font:800 12px inherit;cursor:pointer;margin-bottom:7px;display:flex;align-items:center;gap:10px;transition:.18s}
+.navbtn:hover{background:rgba(255,255,255,.11)}.navbtn.active{background:#fff;color:#0f5d61;box-shadow:0 8px 20px rgba(0,0,0,.12)}
+.navicon{width:31px;height:31px;border-radius:10px;background:rgba(255,255,255,.13);display:grid;place-items:center;font-size:17px}.navbtn.active .navicon{background:#e6fffb}
+.content{padding:18px;min-width:0}.view{display:none}.view.active{display:block}
+.form-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px}.btn{border:0;border-radius:10px;padding:9px 13px;font:800 11px inherit;cursor:pointer}.btn.primary{background:var(--teal);color:#fff}.btn.secondary{background:#fff;color:var(--navy);border:1px solid #cbd5e1}.btn.danger{background:#fff;color:var(--danger);border:1px solid #fecaca}
+.paper{background:#fff;border:1px solid #ccd8da;box-shadow:0 10px 28px rgba(15,23,42,.06);padding:14px;margin:0 auto;max-width:1050px}
+.head{display:grid;grid-template-columns:1fr 150px 1fr;align-items:center;gap:10px;border-bottom:2px solid var(--teal);padding-bottom:7px;margin-bottom:7px}
+.head .right{font-weight:800;font-size:10px;line-height:1.55}.head .logo{text-align:center;color:var(--teal);font-weight:900;font-size:12px}.head .logo strong{font-size:18px}.head .left{text-align:left;font-size:9px;color:var(--muted)}
+.title{text-align:center;font-size:18px;font-weight:900;margin:6px 0 9px;color:#0b4f4a}.subtitle{text-align:center;font-weight:800;margin:-3px 0 8px;color:#334155;font-size:11px}
+.section-title{background:#d9dddd;border:1px solid #65737a;text-align:center;font-weight:900;padding:4px;margin-top:7px;font-size:11px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.grid.two{grid-template-columns:repeat(2,1fr)}
+.field label{display:block;font-size:9px;font-weight:900;margin-bottom:2px;color:#334155}.field input,.field select,.field textarea{width:100%;border:1px solid #aab7bd;border-radius:5px;padding:5px 6px;font:700 10px inherit;background:#fff}.field textarea{min-height:52px;resize:vertical}
+table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{border:1px solid #65737a;padding:3px;text-align:center;vertical-align:middle;font-size:9px}th{background:#d9dddd;font-weight:900}td input,td select,td textarea{width:100%;border:0;outline:0;background:transparent;font:700 9px inherit;text-align:center;min-height:22px}td textarea{text-align:right;resize:vertical}
+.saved{max-width:1050px;margin:10px auto 0;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}.saved h3{font-size:11px;margin:0 0 8px;color:var(--teal)}.saved-list{display:grid;gap:6px}.saved-item{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid #e1e8ea;border-radius:9px;padding:7px;flex-wrap:wrap}.saved-item b{font-size:10px}.saved-item small{font-size:8px;color:var(--muted)}
+.mini{border:0;border-radius:7px;padding:5px 7px;font:800 9px inherit;cursor:pointer}.mini.edit{background:#dbeafe;color:#1d4ed8}.mini.delete{background:#fee2e2;color:#b91c1c}
+.cloud{font-size:9px;font-weight:800;color:#0f766e}.cloud.error{color:#b91c1c}.empty{padding:16px;text-align:center;color:#94a3b8;font-size:10px;font-weight:800}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;display:flex;gap:7px;overflow:auto;padding:10px}.side-head{display:none}.navbtn{min-width:190px;margin:0}.content{padding:10px}.grid{grid-template-columns:1fr 1fr}.head{grid-template-columns:1fr;text-align:center}.head .left,.head .right{text-align:center}}
+@page{size:A4 portrait;margin:5mm}
+@media print{body{background:#fff}.topbar,.sidebar,.form-actions,.saved{display:none!important}.layout{display:block}.content{padding:0}.view{display:none!important}.view.active{display:block!important}.paper{box-shadow:none;border:0;padding:0;max-width:none}.head{grid-template-columns:1fr 120px 1fr;margin-bottom:3mm;padding-bottom:2mm}.title{font-size:15px;margin:2mm 0 3mm}.section-title{margin-top:2.5mm;padding:2px}th,td{font-size:7.6px;padding:1.5px}.field input,.field select,.field textarea{border:0;padding:1px;font-size:8px}.field label{font-size:8px}.grid{gap:2px}.no-break,tr{break-inside:avoid;page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="top-title">
+    <button class="back" onclick="returnToAgent()" title="العودة إلى أقسام الوكيل" aria-label="العودة">←</button>
+    <div><h1>الفحص و المتابعة التشغيلية</h1><small>نماذج الفحص والتشغيل المدرسي في واجهة موحدة</small></div>
+  </div>
+  <div id="cloudState" class="cloud">جاري التحقق من الحفظ السحابي...</div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="side-head"><b>النماذج التشغيلية</b><small>اختر النموذج المطلوب، ثم احفظ السجل أو افتحه لاحقًا للتعديل والطباعة.</small></div>
+    <button class="navbtn active" data-view="bus" onclick="switchForm('bus',this)"><span class="navicon">🚌</span>فحص الحافلة للنقل المدرسي</button>
+    <button class="navbtn" data-view="canteen" onclick="switchForm('canteen',this)"><span class="navicon">🍽️</span>فحص المقصف المدرسي</button>
+    <button class="navbtn" data-view="maintenance" onclick="switchForm('maintenance',this)"><span class="navicon">🔧</span>الإنجاز الشهري للصيانة</button>
+    <button class="navbtn" data-view="cleaning" onclick="switchForm('cleaning',this)"><span class="navicon">🧹</span>إنجاز أعمال النظافة</button>
+  </aside>
+  <main class="content">
+    <div id="view-bus" class="view active"></div>
+    <div id="view-canteen" class="view"></div>
+    <div id="view-maintenance" class="view"></div>
+    <div id="view-cleaning" class="view"></div>
+  </main>
+</div>
+<script>
+const MODEL={"busItems": ["الأبواب — الأمامية", "الأبواب — الخلفية", "الأبواب — الجانبية", "أنوار المكابح", "إشارات الالتفاف", "إشارة الخطر (الفلاشر)", "أنوار التحذير للركوب أو نزول الطلاب", "أنوار التوقف", "الأضواء الداخلية العلوية والسفلية", "المكابح — الأمامية", "المكابح — الخلفية", "مساحات الزجاج الأمامية والخلفية", "البوق", "مرايا الرؤية الجانبية والخلفية", "مقعد السائق وحزام الأمان", "مقاعد الركاب", "أبواب ونوافذ وفتحات التهوية الخاصة بالطوارئ", "الزجاج — الأمامي", "الزجاج — النوافذ الجانبية", "الزجاج — النوافذ الخلفية", "عاكسات الأنوار", "العجلات والإطارات", "ذراع لوحة «قف» وذراع عبور الطلاب", "معدات الطوارئ — طفاية الحريق", "معدات الطوارئ — الإسعافات الأولية", "معدات الطوارئ — مثلثات التحذير"], "canteenWorkers": ["الشهادات الصحية سارية المفعول", "النظافة الشخصية", "الملابس النظامية", "استعمال القفازات", "استعمال أغطية الرأس", "استعمال الكمامات"], "canteenFoods": ["الأطعمة تحضر بنفس اليوم.", "الأغذية الجاهزة معبأة آليًا؟", "هل طريقة تحضير الطعام صحية؟", "هل طريقة حفظ الطعام صحية؟", "المقصف ملتزم بنوعية الأغذية المسموحة", "هل يحضر الطعام في المقصف؟", "هل يجلب الطعام من خارج المقصف؟", "هل مصدر هذا الطعام من جهات مرخصة؟", "هل طريقة نقل الطعام صحية؟", "هل الشطائر مغطاة بالبلاستيك؟", "هل الأغذية معبأة آليًا؟", "هل يوجد عبوات زجاجية؟", "هل يوجد أغذية بائتة؟", "هل الأغذية ضمن النصف الأول من فترة صلاحيتها؟", "وجود وجبات كاملة مغلفة.", "لا يوجد أي من المأكولات أو المشروبات الممنوعة حسب لائحة المقاصف"]};
+const MODULE_KEY='operational_inspection_followup';
+const FORMS={
+ bus:{title:'فحص الحافلة للنقل المدرسي'},
+ canteen:{title:'فحص المقصف المدرسي'},
+ maintenance:{title:'الإنجاز الشهري لأعمال الصيانة والتشغيل'},
+ cleaning:{title:'إنجاز أعمال النظافة'}
+};
+const states={bus:{editingId:'',records:[]},canteen:{editingId:'',records:[]},maintenance:{editingId:'',records:[]},cleaning:{editingId:'',records:[]}};
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function schoolProfile(){
+ try{if(window.SchoolBaseSettingsSource?.get)return window.SchoolBaseSettingsSource.get()||{}}catch(e){}
+ try{return JSON.parse(localStorage.getItem('smartSchool.currentSchool')||'{}')||{}}catch(e){return{}}
+}
+function sid(){
+ const s=schoolProfile();
+ return String(window.PlatformCloudSession?.currentSchoolId?.()||localStorage.getItem('current_school_id')||localStorage.getItem('active_school_id')||s.id||s.school_id||'school');
+}
+function localKey(form){return 'operational_followup:'+sid()+':'+form}
+function setCloud(text,error=false){const e=document.getElementById('cloudState');e.textContent=text;e.classList.toggle('error',!!error)}
+function returnToAgent(){try{sessionStorage.setItem('agent_return_to_sections','1')}catch(e){} location.href='agent.html?view=sections'}
+function switchForm(name,btn){
+ document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+ document.getElementById('view-'+name).classList.add('active');
+ document.querySelectorAll('.navbtn').forEach(x=>x.classList.remove('active'));btn?.classList.add('active');
+ history.replaceState({},'',location.pathname+'?role=agent&form='+encodeURIComponent(name));
+}
+function head(title){
+ const s=schoolProfile(),sn=s.schoolName||s.school_name||s.name||localStorage.getItem('current_school_name')||'اسم المدرسة';
+ const ea=s.educationAdministration||s.education_administration||s.directorate||'الإدارة التعليمية';
+ return `<div class="head"><div class="right">المملكة العربية السعودية<br>وزارة التعليم<br>${esc(ea)}<br>${esc(sn)}</div><div class="logo"><strong>✦</strong><br>وزارة التعليم<br><small>Ministry of Education</small></div><div class="left">نموذج إلكتروني تفاعلي<br>مرتبط بالمدرسة الحالية</div></div><div class="title">${title}</div>`;
+}
+function toolbar(form){return `<div class="form-actions"><button class="btn secondary" onclick="newRecord('${form}')">نموذج جديد</button><button class="btn primary" onclick="saveRecord('${form}')">حفظ / تحديث</button><button class="btn secondary" onclick="window.print()">طباعة / PDF</button></div>`}
+function savedBox(form){return `<div class="saved"><h3>السجلات المحفوظة — ${FORMS[form].title}</h3><div id="saved-${form}" class="saved-list"></div></div>`}
+function busView(){
+ const days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+ const h=days.map(d=>`<th>${d}</th>`).join('');
+ const info=[['التاريخ','date'],['عداد الحافلة','odometer'],['اسم السائق','driver'],['التوقيع','signature']].map(([l,k])=>`<tr><th>${l}</th>${days.map((_,i)=>`<td><input data-k="${k}_${i}"></td>`).join('')}</tr>`).join('');
+ const rows=MODEL.busItems.map((x,i)=>`<tr><td style="text-align:right;font-weight:800">${esc(x)}</td>${days.map((_,j)=>`<td><select data-k="check_${i}_${j}"><option></option><option>سليم</option><option>غير سليم</option><option>لم يفحص</option></select></td>`).join('')}</tr>`).join('');
+ return toolbar('bus')+`<div class="paper">${head('٤-١٥-١ نموذج الفحص اليومي للحافلات')}<div class="grid two"><div class="field"><label>الإدارة</label><input data-k="educationAdmin"></div><div class="field"><label>رقم الحافلة</label><input data-k="busNo"></div></div><div style="margin-top:6px"><table><thead><tr><th>البيان</th>${h}</tr></thead><tbody>${info}</tbody></table></div><div style="margin-top:6px"><table><thead><tr><th style="width:38%">نقاط الفحص</th>${h}</tr></thead><tbody>${rows}</tbody></table></div></div>`+savedBox('bus');
+}
+function canteenView(){
+ const wr=MODEL.canteenWorkers.map((x,i)=>`<tr><td>${i+1}</td><td style="text-align:right;font-weight:800">${esc(x)}</td><td><input type="radio" name="cw${i}" value="مطابق" data-k="worker_${i}"></td><td><input type="radio" name="cw${i}" value="غير مطابق" data-k="worker_${i}"></td></tr>`).join('');
+ const fr=MODEL.canteenFoods.map((x,i)=>`<tr><td>${i+1}</td><td style="text-align:right;font-weight:800">${esc(x)}</td><td><input type="radio" name="cf${i}" value="نعم" data-k="food_${i}"></td><td><input type="radio" name="cf${i}" value="لا" data-k="food_${i}"></td></tr>`).join('');
+ return toolbar('canteen')+`<div class="paper">${head('٤-٨-١ نموذج فحص المقصف المدرسي')}<div class="grid"><div class="field"><label>الإدارة</label><input data-k="educationAdmin"></div><div class="field"><label>المدرسة</label><input data-k="schoolName"></div><div class="field"><label>التاريخ</label><input type="date" data-k="date"></div><div class="field"><label>إعداد</label><input data-k="preparedBy"></div></div><div class="section-title">العاملون في المقصف</div><table><thead><tr><th style="width:7%">م</th><th>العاملون في المقصف</th><th style="width:14%">مطابق</th><th style="width:14%">غير مطابق</th></tr></thead><tbody>${wr}</tbody></table><div class="section-title">المواد الغذائية</div><table><thead><tr><th style="width:7%">م</th><th>المواد الغذائية</th><th style="width:14%">نعم</th><th style="width:14%">لا</th></tr></thead><tbody>${fr}</tbody></table><div class="grid two" style="margin-top:6px"><div class="field"><label>ملاحظات</label><textarea data-k="notes"></textarea></div><div class="field"><label>معد التقرير</label><input data-k="reporter"></div></div></div>`+savedBox('canteen');
+}
+function maintenanceView(){
+ const er=Array.from({length:6},(_,i)=>`<tr><td>${i+1}</td><td><input type="date" data-k="em_date_${i}"></td><td><input data-k="em_type_${i}"></td><td><input data-k="em_notes_${i}"></td></tr>`).join('');
+ const pr=Array.from({length:8},(_,i)=>`<tr><td>${i+1}</td><td><input data-k="part_name_${i}"></td><td><input type="number" data-k="part_count_${i}"></td><td><select data-k="part_type_${i}"><option></option><option>دوري</option><option>طارئ</option></select></td></tr>`).join('');
+ return toolbar('maintenance')+`<div class="paper">${head('مشهد إنجاز شهري لأعمال الصيانة والتشغيل')}<div class="subtitle">نموذج استرشادي</div><div class="section-title">بيانات المبنى</div><div class="grid"><div class="field"><label>شهر</label><input data-k="month"></div><div class="field"><label>عام</label><input data-k="year"></div><div class="field"><label>الوقت</label><input data-k="time"></div><div class="field"><label>اسم المدرسة</label><input data-k="schoolName"></div><div class="field"><label>نوع المبنى</label><input data-k="buildingType"></div><div class="field"><label>الموقع</label><input data-k="location"></div><div class="field"><label>الحي</label><input data-k="district"></div><div class="field"><label>الرقم الوزاري</label><input data-k="ministerialNo"></div><div class="field"><label>هاتف المدرسة</label><input data-k="schoolPhone"></div><div class="field"><label>فاكس المدرسة</label><input data-k="schoolFax"></div></div><div class="section-title">بيانات عقد التشغيل والصيانة</div><div class="grid"><div class="field"><label>اسم المقاول</label><input data-k="contractor"></div><div class="field"><label>رقم المجموعة</label><input data-k="groupNo"></div><div class="field"><label>رقم العقد</label><input data-k="contractNo"></div><div class="field"><label>تاريخ العقد</label><input type="date" data-k="contractDate"></div><div class="field"><label>بداية العقد</label><input type="date" data-k="startDate"></div><div class="field"><label>مدة العقد</label><input data-k="duration"></div><div class="field"><label>رقم التعميد</label><input data-k="approvalNo"></div><div class="field"><label>تاريخ التعميد</label><input type="date" data-k="approvalDate"></div></div><div class="section-title">أعمال الصيانة الدورية</div><div class="grid"><div class="field"><label>هل تم زيارة المبنى؟</label><select data-k="visited"><option></option><option>نعم</option><option>لا</option></select></div><div class="field"><label>عدد مرات الزيارة</label><input type="number" data-k="visitCount"></div><div class="field" style="grid-column:span 2"><label>في حالة لا، بسبب</label><input data-k="visitReason"></div></div><div class="section-title">أعمال الصيانة الطارئة</div><div class="field"><label>حالة الأعمال الطارئة</label><select data-k="emergencyExists"><option></option><option>يوجد أعمال صيانة طارئة</option><option>لا يوجد أعمال صيانة طارئة</option></select></div><table><thead><tr><th style="width:7%">م</th><th>تاريخ العمل</th><th>نوع العمل</th><th>ملاحظات</th></tr></thead><tbody>${er}</tbody></table><div class="section-title">قطع الغيار المستخدمة</div><table><thead><tr><th style="width:7%">م</th><th>اسم القطعة</th><th style="width:15%">العدد</th><th style="width:20%">نوع العمل</th></tr></thead><tbody>${pr}</tbody></table></div>`+savedBox('maintenance');
+}
+function cleaningView(){
+ const sr=Array.from({length:4},(_,i)=>`<tr><td><input type="number" data-k="workers_${i}"></td><td><input type="number" data-k="absence_${i}"></td><td><input data-k="materials_${i}"></td><td><input type="number" data-k="materials_count_${i}"></td><td><input data-k="tools_${i}"></td><td><input type="number" data-k="tools_days_${i}"></td></tr>`).join('');
+ const types=['نظافة يومية','نظافة أسبوعية','نظافة دورية'];
+ const cr=types.map((x,i)=>`<tr><td>${i+1}</td><td>${x}</td><td><input type="radio" name="cl${i}" value="جيد" data-k="clean_${i}"></td><td><input type="radio" name="cl${i}" value="مقبول" data-k="clean_${i}"></td><td><input type="radio" name="cl${i}" value="رديء" data-k="clean_${i}"></td><td><input type="radio" name="cl${i}" value="لم يتم تنفيذها" data-k="clean_${i}"></td><td><textarea data-k="shortcoming_${i}"></textarea></td></tr>`).join('');
+ return toolbar('cleaning')+`<div class="paper">${head('مشهد إنجاز أعمال النظافة')}<div class="subtitle">نموذج استرشادي</div><div class="grid"><div class="field"><label>عن شهر</label><input data-k="month"></div><div class="field"><label>لعام</label><input data-k="year"></div><div class="field"><label>الفترة من</label><input type="date" data-k="periodFrom"></div><div class="field"><label>إلى</label><input type="date" data-k="periodTo"></div></div><div class="section-title">أولاً: بيانات المدرسة</div><div class="grid"><div class="field"><label>اسم المدرسة</label><input data-k="schoolName"></div><div class="field"><label>موقع المدرسة</label><input data-k="location"></div><div class="field"><label>نوع المبنى</label><input data-k="buildingType"></div><div class="field"><label>هاتف المدرسة</label><input data-k="schoolPhone"></div><div class="field"><label>الرقم الوزاري</label><input data-k="ministerialNo"></div><div class="field"><label>فاكس المدرسة</label><input data-k="schoolFax"></div></div><div class="section-title">ثانياً: بيانات عقد النظافة</div><div class="grid"><div class="field"><label>اسم العملية</label><input data-k="operationName"></div><div class="field"><label>اسم المقاول</label><input data-k="contractor"></div><div class="field"><label>تاريخ بداية العقد</label><input type="date" data-k="startDate"></div><div class="field"><label>مدة العقد</label><input data-k="duration"></div><div class="field"><label>رقم المجموعة</label><input data-k="groupNo"></div></div><div class="section-title">ثالثاً: عمال ومواد وأدوات النظافة</div><table><thead><tr><th>عدد العمال</th><th>أيام الغياب</th><th>مواد لم تؤمن</th><th>عددها</th><th>أدوات لم تؤمن</th><th>أيام عدم التأمين</th></tr></thead><tbody>${sr}</tbody></table><div class="section-title">رابعاً: أعمال النظافة</div><table><thead><tr><th style="width:6%">م</th><th>العمل</th><th style="width:8%">جيد</th><th style="width:8%">مقبول</th><th style="width:8%">رديء</th><th style="width:11%">لم ينفذ</th><th>أوجه التقصير</th></tr></thead><tbody>${cr}</tbody></table><div class="section-title">خامساً: ملاحظات</div><div class="field"><textarea data-k="notes"></textarea></div></div>`+savedBox('cleaning');
+}
+function renderForms(){
+ document.getElementById('view-bus').innerHTML=busView();
+ document.getElementById('view-canteen').innerHTML=canteenView();
+ document.getElementById('view-maintenance').innerHTML=maintenanceView();
+ document.getElementById('view-cleaning').innerHTML=cleaningView();
+ applyOfficialAll();
+}
+function activeView(form){return document.getElementById('view-'+form)}
+function collect(form){
+ const root=activeView(form),data={};
+ root.querySelectorAll('[data-k]').forEach(el=>{
+   const k=el.dataset.k;
+   if(el.type==='radio'||el.type==='checkbox'){if(el.checked)data[k]=el.value||true}
+   else data[k]=el.value;
+ });
+ return data;
+}
+function restore(form,data){
+ const root=activeView(form);
+ root.querySelectorAll('[data-k]').forEach(el=>{
+   const v=data?.[el.dataset.k];
+   if(el.type==='radio'||el.type==='checkbox')el.checked=String(el.value||true)===String(v);
+   else if(v!=null)el.value=v;
+ });
+}
+function applyOfficial(form){
+ const root=activeView(form),s=schoolProfile(),values={
+   schoolName:s.schoolName||s.school_name||s.name||localStorage.getItem('current_school_name')||'',
+   educationAdmin:s.educationAdministration||s.education_administration||s.directorate||'',
+   ministerialNo:s.ministerialNumber||s.ministerial_no||s.schoolCode||s.school_code||'',
+   schoolPhone:s.phone||s.schoolPhone||'',schoolFax:s.fax||s.schoolFax||'',location:s.location||s.address||''
+ };
+ Object.entries(values).forEach(([k,v])=>root.querySelectorAll(`[data-k="${k}"]`).forEach(el=>{if(!el.value)el.value=v}));
+}
+function applyOfficialAll(){Object.keys(FORMS).forEach(applyOfficial)}
+function localLoad(form){try{return JSON.parse(localStorage.getItem(localKey(form))||'[]')||[]}catch(e){return[]}}
+function localSave(form,rows){localStorage.setItem(localKey(form),JSON.stringify(rows))}
+function stateKey(form,id){return form+':'+id}
+async function cloudLoad(){
+ if(!window.PlatformStateEngine){setCloud('الحفظ السحابي غير جاهز — يعمل الحفظ المحلي الاحتياطي',true);return}
+ try{
+   const res=await PlatformStateEngine.pull(MODULE_KEY,'school');
+   const grouped={bus:[],canteen:[],maintenance:[],cleaning:[]};
+   (res.items||[]).forEach(item=>{
+     if(item.deleted_at||!item.payload?.value)return;
+     try{
+       const r=JSON.parse(item.payload.value),form=r.form;
+       if(grouped[form])grouped[form].push(r);
+     }catch(e){}
+   });
+   Object.keys(grouped).forEach(form=>{
+     if(grouped[form].length){states[form].records=grouped[form].sort((a,b)=>String(b.updatedAt).localeCompare(String(a.updatedAt)));localSave(form,states[form].records)}
+   });
+   setCloud('الحفظ السحابي متصل — المدرسة معزولة بواسطة school_id');
+ }catch(e){setCloud('تعذر تحميل السحابة — تم تفعيل النسخة المحلية الاحتياطية',true)}
+ renderAllSaved();
+}
+async function cloudUpsert(record){
+ if(!window.PlatformStateEngine)return false;
+ try{
+   await PlatformStateEngine.bulkUpsert(MODULE_KEY,'school',[{key:stateKey(record.form,record.id),value:JSON.stringify(record)}]);
+   setCloud('تم الحفظ سحابيًا داخل المدرسة الحالية');
+   return true;
+ }catch(e){setCloud('تم الحفظ محليًا وتعذر المزامنة السحابية: '+(e.message||e),true);return false}
+}
+async function cloudDelete(form,id){
+ if(!window.PlatformStateEngine)return false;
+ try{await PlatformStateEngine.bulkUpsert(MODULE_KEY,'school',[{key:stateKey(form,id),deleted:true}]);setCloud('تم حذف السجل سحابيًا');return true}catch(e){setCloud('تم الحذف محليًا وتعذر مزامنة الحذف',true);return false}
+}
+async function saveRecord(form){
+ const st=states[form],now=new Date().toISOString(),data=collect(form);
+ let record;
+ if(st.editingId){
+   const i=st.records.findIndex(r=>String(r.id)===String(st.editingId));
+   if(i<0)return;
+   record={...st.records[i],data,updatedAt:now};
+   st.records[i]=record;
+ }else{
+   record={id:'rec_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),form,schoolId:sid(),createdAt:now,updatedAt:now,data};
+   st.records.unshift(record);st.editingId=record.id;
+ }
+ localSave(form,st.records);renderSaved(form);await cloudUpsert(record);
+}
+function newRecord(form){
+ states[form].editingId='';
+ activeView(form).querySelectorAll('[data-k]').forEach(el=>{if(el.type==='radio'||el.type==='checkbox')el.checked=false;else el.value=''});
+ applyOfficial(form);window.scrollTo({top:0,behavior:'smooth'});
+}
+function editRecord(form,id){
+ const st=states[form],r=st.records.find(x=>String(x.id)===String(id));if(!r)return;
+ st.editingId=String(id);restore(form,r.data);window.scrollTo({top:0,behavior:'smooth'});
+}
+async function deleteRecord(form,id){
+ if(!confirm('هل تريد حذف هذا السجل؟'))return;
+ const st=states[form],r=st.records.find(x=>String(x.id)===String(id));
+ try{const k=localKey(form)+':deleted';const a=JSON.parse(localStorage.getItem(k)||'[]');a.unshift({deletedAt:new Date().toISOString(),record:r});localStorage.setItem(k,JSON.stringify(a.slice(0,100)))}catch(e){}
+ st.records=st.records.filter(x=>String(x.id)!==String(id));if(st.editingId===String(id))st.editingId='';
+ localSave(form,st.records);renderSaved(form);await cloudDelete(form,id);
+}
+function renderSaved(form){
+ const host=document.getElementById('saved-'+form);if(!host)return;const rows=states[form].records;
+ if(!rows.length){host.innerHTML='<div class="empty">لا توجد سجلات محفوظة حتى الآن.</div>';return}
+ host.innerHTML=rows.slice(0,30).map(r=>`<div class="saved-item"><div><b>${esc(FORMS[form].title)}</b><br><small>${new Date(r.updatedAt||r.createdAt).toLocaleString('ar-SA')}</small></div><div><button class="mini edit" onclick="editRecord('${form}','${r.id}')">تعديل</button> <button class="mini delete" onclick="deleteRecord('${form}','${r.id}')">حذف</button></div></div>`).join('');
+}
+function renderAllSaved(){Object.keys(FORMS).forEach(renderSaved)}
+async function boot(){
+ renderForms();
+ Object.keys(FORMS).forEach(form=>{states[form].records=localLoad(form);renderSaved(form)});
+ const requested=new URLSearchParams(location.search).get('form');
+ if(requested&&FORMS[requested])switchForm(requested,document.querySelector(`[data-view="${requested}"]`));
+ await cloudLoad();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+</script>
+</body>
+</html>

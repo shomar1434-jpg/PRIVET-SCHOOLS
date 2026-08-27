@@ -1187,6 +1187,11 @@ body{overflow-x:hidden}
                         <div class="w-14 h-14 bg-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg">📈</div>
                         <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2">🏅 متابعة التقويم الذاتي</h3>
                     </div>
+                    <div onclick="openOperationalInspectionFollowup()" class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-cyan-400 cursor-pointer transition-all flex flex-col items-center gap-4 group">
+                        <div class="w-14 h-14 bg-cyan-700 text-white rounded-2xl flex items-center justify-center shadow-lg text-2xl">🛠️</div>
+                        <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2">الفحص و المتابعة التشغيلية</h3>
+                        <p class="text-[10px] text-slate-400 font-bold text-center">الحافلات • المقصف • الصيانة • النظافة</p>
+                    </div>
                 </div>
 <div class="w-full mt-12 bg-white/60 backdrop-blur rounded-[40px] p-8 border border-white shadow-xl">
                     <h4 class="text-center font-bold text-slate-800 mb-6 border-b border-white pb-4 flex items-center justify-center gap-2">🛠️ الإدارة الفنية والتواصل</h4>
@@ -3840,7 +3845,39 @@ document.addEventListener("click", function(e){
     if(doc.indexOf('<!DOCTYPE html') === -1){
       doc = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>' + esc(r.title || 'سجل') + '</title>'
         + '<style>@page{size:A4;margin:8mm}body{font-family:Tajawal,Arial;background:white;overflow-x:hidden}.safe-hidden-deactivate{display:none!important}</style>'
-        + '</head><body>' + doc + '</body></html>';
+        + '</head><body>' + doc + '
+<script id="AGENT_OPERATIONAL_INSPECTION_NAV_V1">
+(function(){
+  window.openOperationalInspectionFollowup=function(){
+    try{sessionStorage.setItem('agent_return_to_sections','1')}catch(e){}
+    window.location.href='operational_inspection_followup.html?role=agent';
+  };
+  function shouldOpenSections(){
+    try{
+      const q=new URLSearchParams(location.search||'');
+      return q.get('view')==='sections'||sessionStorage.getItem('agent_return_to_sections')==='1';
+    }catch(e){return false}
+  }
+  function forceSections(){
+    if(!shouldOpenSections())return;
+    try{sessionStorage.removeItem('agent_return_to_sections')}catch(e){}
+    ['activation-overlay','welcome-gate','archive-view','stats-view','portfolio-view','main-report-app','agent-records-view','records-archive-view'].forEach(id=>{
+      const el=document.getElementById(id);if(!el)return;el.style.display='none';el.classList?.add('hidden');
+    });
+    const dash=document.getElementById('welcome-dashboard');
+    if(dash){dash.style.display='block';dash.classList?.remove('hidden')}
+    try{
+      const u=new URL(location.href);u.searchParams.delete('view');history.replaceState({},'',u.pathname+u.search+u.hash);
+    }catch(e){}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',forceSections,{once:true});else forceSections();
+  window.addEventListener('load',forceSections);
+  setTimeout(forceSections,100);
+  setTimeout(forceSections,350);
+})();
+</script>
+
+</body></html>';
     }
     if(autoPrint && doc.indexOf('window.print') === -1){
       doc = doc.replace('</body>', '<script>window.onload=function(){setTimeout(function(){window.print()},500)}<\/script></body>');
