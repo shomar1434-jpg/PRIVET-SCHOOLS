@@ -847,8 +847,13 @@ async function cloudSaveDecision(){
     if(!decisionCloudEditingId)throw new Error('تم إرسال الملف للحفظ لكن لم يتم الحصول على معرفه السحابي للتحقق.');
 
     const verifyRowsAfter=await decisionCloudList();
-    const verifySaved=verifyRowsAfter.some(f=>String(f.id)===String(decisionCloudEditingId));
-    if(!verifySaved)throw new Error('لم ينجح التحقق من ظهور التكليف داخل مجلد القرارات والتكليفات.');
+    const verifySaved=verifyRowsAfter.find(f=>
+      String(f.id)===String(decisionCloudEditingId) &&
+      String(f?.metadata?.folder||'')===DECISION_CLOUD_FOLDER &&
+      String(f?.metadata?.source||'')==='administrative_assignment_decisions' &&
+      String(f?.metadata?.assigneeName||'').trim()===assignee
+    );
+    if(!verifySaved)throw new Error('لم ينجح التحقق الصارم من حفظ القرار داخل مجلد القرارات والتكليفات للمكلف المحدد.');
 
     const url=new URL(location.href);
     if(decisionCloudEditingId)url.searchParams.set('editFileId',decisionCloudEditingId);
@@ -929,7 +934,7 @@ async function renderDecisionCloudArchive(){
         <div class="decision-archive-actions">
           <button type="button" class="mini" onclick='loadDecisionCloudRecord(${id})'>تعديل</button>
           <button type="button" class="mini" onclick='previewDecisionCloudRecord(${id})'>معاينة</button>
-          <button type="button" class="mini" onclick='sendDecisionToAssignee(${id})'>إرسال للمكلف</button>
+          <button type="button" class="mini" onclick='sendDecisionToAssignee(${id})'>✉ إرسال القرار</button>
           <button type="button" class="mini" onclick='deleteDecisionCloudRecord(${id})'>حذف</button>
         </div>
       </div>`;

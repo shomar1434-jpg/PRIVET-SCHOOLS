@@ -5756,6 +5756,7 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
         +'<button data-decision-edit="'+id+'" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">تعديل</button>'
         +'<button data-decision-preview="'+id+'" class="bg-teal-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">معاينة</button>'
         +'<button data-decision-print="'+id+'" class="bg-slate-700 text-white px-4 py-2 rounded-xl text-[10px] font-bold">طباعة</button>'
+        +'<button data-decision-send="'+id+'" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">✉ إرسال القرار</button>'
         +'<button data-decision-delete="'+id+'" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] font-bold">حذف</button>'
         +'</div></div>';
     }).join('');
@@ -5768,9 +5769,47 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
     host.querySelectorAll('[data-decision-print]').forEach(function(x){
       x.onclick=function(){previewDecisionCloudArchiveItem(this.getAttribute('data-decision-print'),true);};
     });
+    host.querySelectorAll('[data-decision-send]').forEach(function(x){
+      x.onclick=function(){sendDecisionCloudArchiveItem(this.getAttribute('data-decision-send'));};
+    });
     host.querySelectorAll('[data-decision-delete]').forEach(function(x){
       x.onclick=function(){deleteDecisionCloudArchiveItem(this.getAttribute('data-decision-delete'));};
     });
+  }
+  function decisionArchiveMessagingUrl(file){
+    var m=(file&&file.metadata)||{};
+    var recipient=String(m.assigneeUserId||'').trim();
+    if(!recipient)return '';
+    var title=String(m.decisionTitle||'قرار تكليف');
+    var assignee=String(m.assigneeName||'المكلف');
+    var q=new URLSearchParams({
+      privateEdition:'1',compose:'1',return_to:'manager.html',
+      recipient:recipient,
+      subject:'قرار تكليف: '+title,
+      body:'السلام عليكم ورحمة الله وبركاته،\nتم إصدار قرار تكليف باسم '+assignee+'.\nيرجى الاطلاع على قرار التكليف المرفق عبر نظام المراسلات الداخلي.',
+      linkedModule:'administrative_assignment_decisions',
+      linkedType:'manager_assignment_decision',
+      linkedId:String(file.id||''),
+      linkedTitle:title,
+      linkedUrl:'administrative_assignment_decisions.html?editFileId='+encodeURIComponent(String(file.id||'')),
+      attachmentFileId:String(file.id||''),
+      attachmentName:String(file.display_name||file.original_name||'قرار تكليف.html'),
+      attachmentSource:'library'
+    });
+    return 'internal_messages.html?'+q.toString();
+  }
+  async function sendDecisionCloudArchiveItem(id){
+    try{
+      var rows=await decisionArchiveCloudRows();
+      var file=rows.find(function(x){return String(x.id)===String(id);});
+      if(!file)throw new Error('تعذر العثور على القرار داخل مجلد القرارات والتكليفات.');
+      var url=decisionArchiveMessagingUrl(file);
+      if(!url){
+        location.href='administrative_assignment_decisions.html?editFileId='+encodeURIComponent(String(id))+'&sendToAssignee=1';
+        return;
+      }
+      location.href=url;
+    }catch(e){alert('تعذر تجهيز إرسال القرار عبر المراسلات: '+(e&&e.message?e.message:e));}
   }
   async function previewDecisionCloudArchiveItem(id,autoPrint){
     try{
