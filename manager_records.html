@@ -724,7 +724,14 @@ td textarea,
 .uw-verified-title-back:hover{background:#e6fffb!important}
 @media print{.uw-verified-title-back{display:none!important}}
 </style><link rel="stylesheet" href="responsive-layout.css?v=20260818-responsive-1">
-<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
+<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-bridge.js"></script>
+<script src="platform-cloud-session.js?v=20260818-session-v12"></script>
+<script src="platform-state-engine.js"></script>
+<script src="platform-persistence-guard.js"></script>
+<script src="independent-school-persistence-core.js?v=20260825-persistence-v1"></script>
+<script src="records-archive-save-engine.js?v=20260827-records-v1"></script>
+</head>
 <body>
 <div class="app">
   <aside class="sidebar">
@@ -785,7 +792,7 @@ td textarea,
 
     <section id="archivePanel" class="archivePanel">
       <h3 style="margin:0 0 8px;color:var(--primary2)">الأرشيف المحلي</h3>
-      <div class="small">يعرض هذا الجزء نسخ النموذج، بينما يتم التحقق من الحفظ الموحد داخل أرشيف سجلات المدير.</div>
+      <div class="small">يتم الحفظ داخل متصفح الجهاز باستخدام LocalStorage.</div>
       <div id="archiveList"></div>
     </section>
 
@@ -1121,50 +1128,31 @@ function fill(data){
 }
 function autoDraft(){localStorage.setItem(key()+"_draft",JSON.stringify(collect()))}
 function loadDraft(){fill(JSON.parse(localStorage.getItem(key()+"_draft")||"{}"))}
+const MANAGER_RECORD_ARCHIVE_CATALOG=records.map(r=>({id:r.id,name:r.title}));
 async function saveArchive(){
  const data=collect();
- const localKey=key()+"_archive";
- const list=JSON.parse(localStorage.getItem(localKey)||"[]");
+ const list=JSON.parse(localStorage.getItem(key()+"_archive")||"[]");
  list.unshift(data);
- localStorage.setItem(localKey,JSON.stringify(list));
+ localStorage.setItem(key()+"_archive",JSON.stringify(list));
  localStorage.removeItem(key()+"_draft");
 
- // الحفظ الموحد داخل أرشيف سجلات المدير، مع معرف ثابت لهذه النسخة.
- const archiveKey="school_manager_records_archive_v1";
- let platformArchive=[];
- try{platformArchive=JSON.parse(localStorage.getItem(archiveKey)||"[]");}catch(e){platformArchive=[];}
- const folderId=current.id;
- const sameFolderCount=platformArchive.filter(x=>x.folderId===folderId).length+1;
- const displayName=current.title + " - نسخة " + sameFolderCount;
- const savedRecord={
-   id:'manager-record-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
-   folderId:folderId,
-   folderName:current.title,
+ const record={
+   folderId:current.id,
+   formId:current.id,
    recordId:current.id,
    title:current.title,
-   displayName:displayName,
-   duplicateNo:sameFolderCount,
    values:data.values,
    htmlContent:"<!DOCTYPE html>"+document.documentElement.outerHTML,
-   createdAt:new Date().toISOString(),
-   updatedAt:new Date().toISOString()
+   source:'manager_records',
+   sourceLocalKey:key()+"_archive"
  };
- platformArchive.push(savedRecord);
- localStorage.setItem(archiveKey,JSON.stringify(platformArchive));
-
- if(window.parent && window.parent!==window){
-   try{window.parent.postMessage({type:'MANAGER_RECORD_SAVED',payload:savedRecord},'*');}catch(e){}
- }
- renderArchive();
  try{
-   if(window.ArchiveSaveIntegrity){
-     await ArchiveSaveIntegrity.confirmArrayRecord(archiveKey,savedRecord.id);
-     alert("تم حفظ سجل المدير والتحقق من ظهوره في أرشيف السجلات بنجاح.");
-   }else{
-     alert("تم حفظ السجل محليًا، لكن محرك التحقق السحابي غير جاهز. أعد فتح الأرشيف للتأكد قبل الاعتماد.");
-   }
+   const result=await RecordsArchiveSaveEngine.save('manager',record,MANAGER_RECORD_ARCHIVE_CATALOG);
+   renderArchive();
+   alert("تم حفظ سجل المدير والتحقق من ظهوره داخل مجلد «"+result.record.folderName+"» في أرشيف السجلات"+(result.cloud?" والتحقق من المزامنة السحابية.":"."));
  }catch(e){
-   alert("تم حفظ السجل محليًا، لكن لم ينجح التحقق السحابي من أرشيف السجلات: "+(e?.message||e));
+   console.error('[ManagerRecords] archive save failed',e);
+   alert("تم حفظ بيانات النموذج محليًا، لكن لم يكتمل حفظه في أرشيف السجلات: "+(e?.message||e));
  }
 }
 function toggleArchive(){document.getElementById('archivePanel').classList.toggle('show');renderArchive()}
@@ -1274,7 +1262,6 @@ document.addEventListener("blur", function(e){
 <!-- Unified Cloud File Engine v3 -->
 <script src="platform-cloud-session.js?v=20260818-session-v12"></script>
 <script src="cloud-file-engine.js"></script>
-<script src="archive-save-integrity.js?v=20260826-archive-integrity1"></script>
 <script src="cloud-file-bootstrap.js"></script>
 <script src="cloud-upload-hub.js"></script>
 
