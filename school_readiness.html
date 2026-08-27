@@ -890,7 +890,7 @@ body{font-family:"Cairo",Tahoma,Arial,sans-serif!important}
    <div class="cockpit-copy">
      <span class="eyebrow">جاهزية العام الدراسي</span>
      <h3>مركز القيادة التنفيذي لجاهزية المدرسة</h3>
-     <p>قراءة فورية لمستوى الإنجاز، جودة الشواهد، المخاطر، ومسار الاعتماد في جميع مجالات الجاهزية.</p>
+     <p>قراءة فورية لمستوى الإنجاز، المهام غير المنفذة، المخاطر، ومسار المتابعة في جميع مجالات الجاهزية.</p>
      <div class="cockpit-chips">
        <span>✓ تنفيذ موثق</span><span>◈ تحقق واعتماد</span><span>⚠ معالجة استباقية</span>
      </div>
@@ -906,7 +906,7 @@ body{font-family:"Cairo",Tahoma,Arial,sans-serif!important}
    <div><span>الحالة التشغيلية</span><strong id="premiumOperationalState">قيد التهيئة</strong></div>
    <div><span>المهام الحرجة</span><strong id="premiumCriticalCount">0</strong></div>
    <div><span>المهام المتأخرة</span><strong id="premiumLateCount">0</strong></div>
-   <div><span>الشواهد المرفوعة</span><strong id="premiumEvidenceCount">0</strong></div>
+   <div><span>المهام غير المنفذة</span><strong id="premiumEvidenceCount">0</strong></div>
  </div>
  <div class="metrics premium-metrics" id="dashboardMetrics"></div>
  <div class="grid two" style="margin-top:14px">
@@ -939,7 +939,7 @@ body{font-family:"Cairo",Tahoma,Arial,sans-serif!important}
 </section>
 <section class="page" id="page-settings"><div class="hero"><div><h3>بيانات المدرسة وإعداد الخطة</h3><p>مصدر موحد للترويسات والمسؤوليات والتقارير.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div class="card" style="margin-top:14px"><div class="task-body" id="settingsForm"></div></div></section>
 <section class="page" id="page-assignments"><div class="hero"><div><h3>المسؤوليات والصلاحيات</h3><p>إدارة فريق الاستعداد وتوزيع الأدوار التنفيذية.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div class="grid two" style="margin-top:14px"><div class="card"><h4>فريق الاستعداد</h4><div id="teamEditor"></div></div><div class="card"><h4>ملخص الإسناد</h4><div id="assignmentSummary"></div></div></div></section>
-<section class="page" id="page-risks"><div class="hero"><div><h3>محرك المخاطر والمعالجة</h3><p>اكتشاف التعثر والتأخير ونقص الشواهد وتحديد المعالجة.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div class="table-wrap" style="margin-top:14px"><table class="table"><thead><tr><th>المجال</th><th>المهمة</th><th>الخطر</th><th>المستوى</th><th>المسؤول</th><th>الإجراء التصحيحي</th><th>إجراءات المدير</th></tr></thead><tbody id="riskBody"></tbody></table></div></section>
+<section class="page" id="page-risks"><div class="hero"><div><h3>محرك المخاطر والمعالجة</h3><p>اكتشاف التعثر والتأخير وعدم التنفيذ وتحديد المعالجة.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div class="table-wrap" style="margin-top:14px"><table class="table"><thead><tr><th>المجال</th><th>المهمة</th><th>الخطر</th><th>المستوى</th><th>المسؤول</th><th>الإجراء التصحيحي</th><th>إجراءات المدير</th></tr></thead><tbody id="riskBody"></tbody></table></div></section>
 <section class="page" id="page-analysis"><div class="hero"><div><h3>التحليل التنفيذي الذكي</h3><p>قراءة الفجوات والأولويات والقدرة على الإغلاق في الموعد.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div id="analysisContent"></div></section>
 <section class="page" id="page-reports"><div class="hero no-print"><div><h3>مركز التقارير والطباعة</h3><p>تقارير قيادية وتنفيذية وتقارير مجالات ومتأخرات.</p></div><img class="hero-logo" src="https://salogos.b-cdn.net/logos/svg/1774895141785-5zgexuf8.svg"></div><div class="tabs no-print" id="reportTabs"></div><div class="card" id="reportContent"></div></section>
 
@@ -992,7 +992,7 @@ admission:["استكمال قبول الطلاب والتسجيل والتحوي
 books:["استلام الكتب وفرزها وتوزيعها ومتابعة النواقص","#b47922"],maintenance:["الصيانة والنظافة والتعقيم وجاهزية المرافق","#8b6a3f"],
 transport:["إدارة الطلبات والمستفيدين وسلامة النقل المدرسي","#287fa8"],safety:["فحص السلامة وخطط المعالجة والتوثيق والاعتماد","#27805f"],
 environment:["تهيئة الفصول والساحات والهوية والبيئة التعليمية","#0d8f85"]};
-const STATUS={not_started:"لم يبدأ",in_progress:"جارٍ التنفيذ",submitted:"مرسل للمراجعة",revision:"معاد للمعالجة",completed:"مكتمل بالشواهد",verified:"تم التحقق",approved:"معتمد",blocked:"متعثر",na:"غير منطبق"};
+const STATUS={not_started:"لم يبدأ",in_progress:"جارٍ التنفيذ",submitted:"مرسل للمراجعة",revision:"معاد للمعالجة",completed:"منفذ",verified:"تم التحقق",approved:"معتمد",blocked:"متعثر",na:"غير منطبق"};
 const PHASES=["مرحلة العودة للإداريين","مرحلة العودة للمعلمين","مرحلة العودة للطلاب"];
 
 function suggestedRoleForTask(title){
@@ -1232,8 +1232,8 @@ function refreshTemporalStatuses(){
     d.incompleteArchive.status="completed_late";d.incompleteArchive.completedLateAt=d.done||localDateValue();
    }
    if(!closed&&info.state==="expired"){
-    recordTemporalBreach(d,d.phase,"انتهت مدة المرحلة دون اكتمال التنفيذ بالشاهد.");
-    d.status="blocked";d.execution={result:"not_done",reason:"تجاوزت المهمة نهاية الفترة الزمنية المحددة للمرحلة دون اكتمال التنفيذ بالشاهد.",by:"النظام",date:localDateValue()};d.autoTemporalBlocked=true;
+    recordTemporalBreach(d,d.phase,"انتهت مدة المرحلة دون اكتمال التنفيذ.");
+    d.status="blocked";d.execution={result:"not_done",reason:"تجاوزت المهمة نهاية الفترة الزمنية المحددة للمرحلة دون اكتمال التنفيذ.",by:"النظام",date:localDateValue()};d.autoTemporalBlocked=true;
     if(Number(d.phase)<PHASES.length-1){d.rolloverEligible=true;}
     else{
       d.rolloverEligible=false;
@@ -1445,66 +1445,7 @@ function renderSection(s){
   card.querySelectorAll(".bind").forEach(el=>el.onchange=()=>{d[el.dataset.k]=el.dataset.k==="phase"?+el.value:el.value;save()});
   const assigneeSelect=card.querySelector(".task-assignee");if(assigneeSelect)assigneeSelect.onchange=()=>assignTaskToMember(taskKey(s.id,i),assigneeSelect.value,{manual:true});
   card.querySelectorAll(".review-bind").forEach(el=>el.onchange=()=>{d.review[el.dataset.k]=el.value;if(el.dataset.k==="status"&&el.value==="rejected")d.status="revision";save()});
-  const input=card.querySelector(".evidence-input");
-  if(input)input.onchange=async e=>{
-   const files=[...e.target.files];
-   if(!files.length)return;
-   const committed=[];
-   try{
-    for(const f of files){
-     const uploaded=await dbPut(f,s.id,i,d.phase);
-     committed.push({file:f,uploaded});
-    }
-    const unifiedTaskKey=taskKey(s.id,i);
-    committed.forEach(({file:f,uploaded})=>d.evidence.push({
-     id:uploaded.id,
-     platformFileId:uploaded.platformFileId||"",
-     evidenceRecordId:uploaded.evidenceRecordId||"",
-     name:f.name,
-     type:f.type,
-     size:f.size,
-     date:new Date().toISOString().slice(0,10),
-     sectionKey:s.id,
-     taskKey:unifiedTaskKey,
-     storage:uploaded.storage||"cloud"
-    }));
-    d.execution={result:"done",reason:"",by:d.responsible||"",date:new Date().toISOString()};
-    d.status="completed";d.done=new Date().toISOString().slice(0,10);
-    save();
-   }catch(err){
-    for(const row of committed){try{if(row.uploaded?.platformFileId&&window.CloudFileEngine)await CloudFileEngine.trash(row.uploaded.platformFileId)}catch(_){}}
-    console.error("Readiness evidence transaction failed",err);
-    alert(err?.message||"تعذر حفظ شاهد التنفيذ سحابيًا.");
-   }finally{input.value=""}
-  };
-  card.querySelectorAll(".remove-evidence").forEach(b=>b.onclick=async e=>{
-   e.stopPropagation();
-   const x=+b.dataset.x;
-   const evRow=d.evidence[x];
-   if(evRow?.source==="section_library"&&evRow?.linkId&&window.CloudFileEngine){await CloudFileEngine.unlink(evRow.linkId)}else{await dbDelete(evRow.id)}
-   d.evidence.splice(x,1);
-   if(!d.evidence.length){
-    d.execution={result:"pending",reason:"",by:"",date:""};
-    d.status="not_started";d.done="";
-   }
-   save()
-  });
-  card.querySelectorAll(".preview-evidence").forEach(b=>b.onclick=async e=>{
-   e.stopPropagation();
-   const evidence=d.evidence[+b.dataset.x];
-   try{
-    if(String(evidence.id).startsWith("cloud:")&&window.CloudFileEngine){
-     await CloudFileEngine.open(String(evidence.id).slice(6));
-     return;
-    }
-    const f=await dbGet(evidence.id);
-    if(!f)return alert("تعذر العثور على ملف الشاهد.");
-    window.open(URL.createObjectURL(f),"_blank");
-   }catch(err){
-    console.error("Evidence preview failed",err);
-    alert("تعذر فتح شاهد التنفيذ.");
-   }
-  });
+  /* READINESS_NO_EVIDENCE_V2: لا توجد أي أحداث رفع/حذف/معاينة شواهد داخل مسار تنفيذ الجاهزية. تبقى بيانات الشواهد القديمة في التخزين للتوافق التاريخي فقط ولا تؤثر على حالة التنفيذ أو النسبة. */
  });
  const q=document.querySelector(`.search[data-s="${s.id}"]`);
  const fs=document.querySelector(`.filter-status[data-s="${s.id}"]`);
@@ -2112,7 +2053,7 @@ function renderManagerDashboard(){
 
 function renderDashboard(){
  let total=0,approved=0,blocked=0,evidence=0;SECTIONS.forEach(s=>s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i];total++;if(d.status==="approved")approved++;if(d.status==="blocked"||d.execution?.result==="not_done")blocked++;evidence+=d.evidence.length}));
- document.getElementById("dashboardMetrics").innerHTML=`<div class="metric"><span>الجاهزية العامة</span><strong>${overall()}%</strong><div class="progress"><i style="width:${overall()}%"></i></div></div><div class="metric"><span>إجمالي المهام</span><strong>${total}</strong></div><div class="metric"><span>المهام المعتمدة</span><strong>${approved}</strong></div><div class="metric"><span>المخاطر النشطة</span><strong>${risks().length}</strong></div><div class="metric"><span>الشواهد</span><strong>${evidence}</strong></div><div class="metric"><span>الالتزام الزمني</span><strong>${temporalCompliance()}%</strong></div>`;
+ document.getElementById("dashboardMetrics").innerHTML=`<div class="metric"><span>الجاهزية العامة</span><strong>${overall()}%</strong><div class="progress"><i style="width:${overall()}%"></i></div></div><div class="metric"><span>إجمالي المهام</span><strong>${total}</strong></div><div class="metric"><span>المهام المعتمدة</span><strong>${approved}</strong></div><div class="metric"><span>المخاطر النشطة</span><strong>${risks().length}</strong></div><div class="metric"><span>غير منفذة</span><strong>${blocked}</strong></div><div class="metric"><span>الالتزام الزمني</span><strong>${temporalCompliance()}%</strong></div>`;
  const cp=currentPhase();
  document.getElementById("timeline").innerHTML=PHASES.map((p,i)=>{
   const st=stageStats(i);
@@ -2121,7 +2062,7 @@ function renderDashboard(){
  }).join("");
  document.querySelectorAll("[data-timeline-stage]").forEach(card=>card.onclick=()=>renderStageProcedures(+card.dataset.timelineStage));
  renderStageProcedures(Number.isInteger(selectedTimelineStage)?selectedTimelineStage:cp);
- document.getElementById("sectionCards").innerHTML=SECTIONS.map(s=>{let ap=0,bl=0,ev=0;s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i];ap+=d.status==="approved";bl+=d.status==="blocked";ev+=d.evidence.length});const c=META[s.id][1];return `<div class="card section-card" data-open="${s.id}" style="--section-color:${c};--section-soft:${c}18"><div class="section-card-top"><div class="icon-wrap">${ICONS[s.id]}</div><div><h4>${s.title}</h4><p>${META[s.id][0]}</p></div></div><div class="progress"><i style="width:${sectionScore(s)}%;background:${c}"></i></div><div class="section-stats"><div class="section-stat"><strong>${ap}</strong><span>معتمد</span></div><div class="section-stat"><strong>${bl}</strong><span>متعثر</span></div><div class="section-stat"><strong>${ev}</strong><span>شواهد</span></div></div></div>`}).join("");
+ document.getElementById("sectionCards").innerHTML=SECTIONS.map(s=>{let ap=0,bl=0,ev=0;s.tasks.forEach((_,i)=>{const d=state.tasks[s.id][i];ap+=d.status==="approved";bl+=d.status==="blocked";ev+=d.evidence.length});const c=META[s.id][1];return `<div class="card section-card" data-open="${s.id}" style="--section-color:${c};--section-soft:${c}18"><div class="section-card-top"><div class="icon-wrap">${ICONS[s.id]}</div><div><h4>${s.title}</h4><p>${META[s.id][0]}</p></div></div><div class="progress"><i style="width:${sectionScore(s)}%;background:${c}"></i></div><div class="section-stats"><div class="section-stat"><strong>${ap}</strong><span>معتمد</span></div><div class="section-stat"><strong>${bl}</strong><span>متعثر</span></div><div class="section-stat"><strong>${s.tasks.length-ap-bl}</strong><span>بانتظار التحديد</span></div></div></div>`}).join("");
  document.querySelectorAll("[data-open]").forEach(x=>x.onclick=()=>showPage(x.dataset.open));
  document.getElementById("sectionScores").innerHTML=SECTIONS.map(s=>`<div class="score-line"><span>${s.title}</span><div class="progress"><i style="width:${sectionScore(s)}%"></i></div><strong>${sectionScore(s)}%</strong></div>`).join("");
  const rs=risks().slice(0,6);document.getElementById("alerts").innerHTML=rs.length?rs.map(r=>`<div class="callout ${r.level==="عالٍ"?"danger-callout":""}" style="margin-bottom:8px"><strong>${r.type}</strong><br>${r.task}</div>`).join(""):'<div class="empty">لا توجد تنبيهات حالية.</div>'
@@ -2138,9 +2079,9 @@ function renderAnalysis(){
 function reportHeader(title){const s=state.settings;return `<div class="report-header"><img src="${LOGO}"><h2>${title}</h2><div>${esc(s.education)} — ${esc(s.school)} — ${esc(s.stage)} — ${esc(s.year)}</div></div>`}
 function reportBody(type){
  if(type==="incomplete"){const rows=incompleteReadinessTasks();return reportHeader("تقرير المهام غير المكتملة بعد انتهاء مراحل الجاهزية")+`<div class="callout danger-callout"><strong>تنبيه إداري:</strong> هذه المهام لم تُنجز في الوقت المحدد. تبقى ظاهرة للمكلفين حتى استكمال التنفيذ، مع بقاء مخالفة التأخير محفوظة في السجل.</div><table class="table"><thead><tr><th>المجال</th><th>المهمة</th><th>المسؤول</th><th>المرحلة الأخيرة</th><th>تاريخ الأرشفة</th><th>الحالة الحالية</th><th>مرات التعثر الزمني</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${r.section}</td><td>${r.task}</td><td>${esc(r.d.responsible||"غير مسند")}</td><td>${esc(r.d.incompleteArchive?.phaseTitle||PHASES[2])}</td><td>${esc((r.d.incompleteArchive?.archivedAt||"").slice(0,10))}</td><td>${r.d.incompleteArchive?.status==="completed_late"?"اكتملت لاحقاً بعد الموعد":"غير مكتملة"}</td><td>${(r.d.temporalBreaches||[]).length}</td></tr>`).join("")||'<tr><td colspan="7" class="empty">لا توجد مهام مؤرشفة كغير مكتملة.</td></tr>'}</tbody></table>`}
- if(type==="executive")return reportHeader("التقرير التنفيذي الشامل")+`<div class="metrics"><div class="metric"><span>الجاهزية</span><strong>${overall()}%</strong></div><div class="metric"><span>المخاطر</span><strong>${risks().length}</strong></div></div>${SECTIONS.map(s=>`<h3>${s.title} — ${sectionScore(s)}%</h3><table class="table"><thead><tr><th>المهمة</th><th>الحالة</th><th>المسؤول</th><th>الشواهد</th><th>النتيجة</th></tr></thead><tbody>${s.tasks.map((t,i)=>{const d=state.tasks[s.id][i];return `<tr><td>${t}</td><td>${STATUS[d.status]}</td><td>${esc(d.responsible)}</td><td>${d.evidence.length}</td><td>${taskScore(d)}%</td></tr>`}).join("")}</tbody></table>`).join("")}`;
+ if(type==="executive")return reportHeader("التقرير التنفيذي الشامل")+`<div class="metrics"><div class="metric"><span>الجاهزية</span><strong>${overall()}%</strong></div><div class="metric"><span>المخاطر</span><strong>${risks().length}</strong></div></div>${SECTIONS.map(s=>`<h3>${s.title} — ${sectionScore(s)}%</h3><table class="table"><thead><tr><th>المهمة</th><th>الحالة</th><th>المسؤول</th><th>حالة التنفيذ</th><th>النتيجة</th></tr></thead><tbody>${s.tasks.map((t,i)=>{const d=state.tasks[s.id][i];return `<tr><td>${t}</td><td>${STATUS[d.status]}</td><td>${esc(d.responsible)}</td><td>${d.execution?.result==="done"?"نُفذ":d.execution?.result==="not_done"?"لم يُنفذ":"بانتظار التحديد"}</td><td>${taskScore(d)}%</td></tr>`}).join("")}</tbody></table>`).join("")}`;
  if(type==="overdue")return reportHeader("تقرير المتأخرات والمخاطر")+`<table class="table"><thead><tr><th>المجال</th><th>المهمة</th><th>الخطر</th><th>المسؤول</th><th>المعالجة</th></tr></thead><tbody>${risks().map(r=>`<tr><td>${r.section}</td><td>${r.task}</td><td>${r.type}</td><td>${esc(r.d.responsible)}</td><td>${esc(r.d.action)}</td></tr>`).join("")}</tbody></table>`;
- if(type.startsWith("section:")){const s=SECTIONS.find(x=>x.id===type.split(":")[1]);return reportHeader("تقرير مجال: "+s.title)+`<h3>نسبة الجاهزية: ${sectionScore(s)}%</h3><table class="table"><thead><tr><th>م</th><th>المهمة</th><th>الحالة</th><th>المسؤول</th><th>الموعد</th><th>الشواهد</th></tr></thead><tbody>${s.tasks.map((t,i)=>{const d=state.tasks[s.id][i];return `<tr><td>${i+1}</td><td>${t}</td><td>${STATUS[d.status]}</td><td>${esc(d.responsible)}</td><td>${esc(d.due)}</td><td>${d.evidence.length}</td></tr>`}).join("")}</tbody></table>`}
+ if(type.startsWith("section:")){const s=SECTIONS.find(x=>x.id===type.split(":")[1]);return reportHeader("تقرير مجال: "+s.title)+`<h3>نسبة الجاهزية: ${sectionScore(s)}%</h3><table class="table"><thead><tr><th>م</th><th>المهمة</th><th>الحالة</th><th>المسؤول</th><th>الموعد</th><th>حالة التنفيذ</th></tr></thead><tbody>${s.tasks.map((t,i)=>{const d=state.tasks[s.id][i];return `<tr><td>${i+1}</td><td>${t}</td><td>${STATUS[d.status]}</td><td>${esc(d.responsible)}</td><td>${esc(d.due)}</td><td>${d.execution?.result==="done"?"نُفذ":d.execution?.result==="not_done"?"لم يُنفذ":"بانتظار التحديد"}</td></tr>`}).join("")}</tbody></table>`}
  return reportHeader("التقرير القيادي المختصر")+`<div class="callout"><strong>الملخص التنفيذي:</strong> جاهزية المدرسة ${overall()}%، وعدد المخاطر النشطة ${risks().length}.</div><h3>المجالات</h3>${SECTIONS.map(s=>`<div class="score-line"><span>${s.title}</span><div class="progress"><i style="width:${sectionScore(s)}%"></i></div><strong>${sectionScore(s)}%</strong></div>`).join("")}<div class="signature-grid"><div>مدير المدرسة<br><br>____________</div><div>رئيس لجنة الاستعداد<br><br>____________</div><div>الختم<br><br>____________</div></div>`
 }
 function renderReports(){
@@ -2161,7 +2102,7 @@ function renderAll(){
    renderSection(sec);
    const ds=sec.tasks.map((_,i)=>state.tasks?.[sec.id]?.[i]).filter(Boolean);
    const metrics=document.getElementById("metrics-"+sec.id);
-   if(metrics)metrics.innerHTML=`<div class="metric"><span>نسبة المجال</span><strong>${sectionScore(sec)}%</strong><div class="progress"><i style="width:${sectionScore(sec)}%"></i></div></div><div class="metric"><span>المهام</span><strong>${sec.tasks.length}</strong></div><div class="metric"><span>معتمدة</span><strong>${ds.filter(d=>d.status==="approved").length}</strong></div><div class="metric"><span>حرجة غير مغلقة</span><strong>${ds.filter(d=>d.priority==="critical"&&!['verified','approved','na'].includes(d.status)).length}</strong></div><div class="metric"><span>الشواهد</span><strong>${ds.reduce((a,d)=>a+(Array.isArray(d.evidence)?d.evidence.length:0),0)}</strong></div>`;
+   if(metrics)metrics.innerHTML=`<div class="metric"><span>نسبة المجال</span><strong>${sectionScore(sec)}%</strong><div class="progress"><i style="width:${sectionScore(sec)}%"></i></div></div><div class="metric"><span>المهام</span><strong>${sec.tasks.length}</strong></div><div class="metric"><span>معتمدة</span><strong>${ds.filter(d=>d.status==="approved").length}</strong></div><div class="metric"><span>حرجة غير مغلقة</span><strong>${ds.filter(d=>d.priority==="critical"&&!['verified','approved','na'].includes(d.status)).length}</strong></div><div class="metric"><span>بانتظار التحديد</span><strong>${ds.filter(d=>!d.execution?.result||d.execution.result==="pending").length}</strong></div>`;
  }));
  safe("risks",()=>renderRisks());
  safe("analysis",()=>renderAnalysis());
@@ -2292,7 +2233,7 @@ try{Object.defineProperty(window,'state',{get:()=>state,set:v=>{state=v},configu
 <script src="delegated-access-guard.js"></script>
 <script src="school-activity-engine.js"></script>
 
-<script src="evidence-library-source.js"></script>
+<!-- evidence upload disabled: readiness is binary (نفذ / لم ينفذ) -->
 <script>
 document.getElementById("readinessEvidenceFromDevice")?.addEventListener("click",()=>document.getElementById("readinessEvidenceDeviceInput")?.click());
 

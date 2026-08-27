@@ -2310,7 +2310,7 @@ body{overflow-x:hidden}
 
             const elementTargets = getDashboardElementTargets();
             const elementsGridHtml = Object.entries(CATEGORY_DATA).map(([id, data]) => {
-                const count = reports.filter(r => r.category == id).length;
+                const count = reports.filter(r => performanceArchiveFolderId(r) === String(id)).length;
                 const target = elementTargets[id] || 10;
                 const percent = Math.min((count / target) * 100, 100).toFixed(0);
                 return `<div class="stat-card" onclick="showElementDetails('${id}')">
@@ -2340,7 +2340,7 @@ body{overflow-x:hidden}
         }
 
         function showElementDetails(id) {
-            const data = CATEGORY_DATA[id]; const reports = JSON.parse(localStorage.getItem('school_reports') || '[]'); const count = reports.filter(r => r.category == id).length;
+            const data = CATEGORY_DATA[id]; const reports = JSON.parse(localStorage.getItem('school_reports') || '[]'); const count = reports.filter(r => performanceArchiveFolderId(r) === String(id)).length;
             const modalBody = document.getElementById('detail-modal-body');
             modalBody.innerHTML = `<div class="detail-info-row"><p class="text-[10px] text-slate-400 mb-1">🏷️ المجال</p><p class="font-bold text-teal-800">${data.name}</p></div><div class="detail-info-row"><p class="text-[10px] text-slate-400 mb-1">🎯 الهدف العام</p><p class="text-xs font-bold text-slate-700">${data.genGoal}</p></div><div class="bg-teal-50 p-4 rounded-2xl flex justify-between items-center border border-teal-100"><div class="text-right"><p class="text-[10px] text-teal-600 font-bold mb-1">📊 إحصائية الإنجاز</p><p class="text-sm font-bold text-teal-800">المجموع: ${count} تقرير</p></div></div>`;
             document.getElementById('detail-modal-title').innerText = "🔎 " + data.name; document.getElementById('element-detail-modal').style.display = 'flex';
@@ -2636,7 +2636,7 @@ body{overflow-x:hidden}
             const container = document.getElementById('archive-content');
             const reports = JSON.parse(localStorage.getItem('school_reports') || '[]');
             const keyword = String(searchValue || '').trim().toLowerCase();
-            const counts = reports.reduce((acc, r) => { acc[r.category] = (acc[r.category] || 0) + 1; return acc; }, {});
+            const counts = reports.reduce((acc, r) => { const fid=performanceArchiveFolderId(r); acc[fid]=(acc[fid]||0)+1; return acc; }, {});
             const backBtn = document.getElementById('back-to-folders');
             if (backBtn) backBtn.classList.add('hidden');
 
@@ -2718,7 +2718,7 @@ body{overflow-x:hidden}
         }
 
         function openArchiveFolder(catId) {
-            const reports = JSON.parse(localStorage.getItem('school_reports') || '[]').filter(r => r.category == catId);
+            const reports = JSON.parse(localStorage.getItem('school_reports') || '[]').filter(r => performanceArchiveFolderId(r) === String(catId));
             const container = document.getElementById('archive-content');
             document.getElementById('back-to-folders').classList.remove('hidden');
             container.innerHTML = `<div class="relative z-10">` + (reports.map(r => `<div class="bg-white p-5 mb-4 rounded-3xl border flex justify-between items-center shadow-sm"><div class="flex items-center gap-3"><span class="text-2xl">📄</span><div><div class="text-xs font-bold">${escapeArchiveHTML(r.title || 'بدون عنوان')}</div><div class="text-[9px] text-slate-400 mt-1">🕒 ${escapeArchiveHTML(r.createdAt || '')}</div></div></div><div class="flex gap-2">${(r.readOnly || r.archiveType === 'meetingMinutes') ? `<button onclick="previewArchivedReadOnly(${Number(r.id)})" class="bg-teal-50 text-teal-600 px-3 py-1 rounded-lg text-[10px] font-bold">👁️ معاينة</button>` : `<button onclick="loadReport(${Number(r.id)})" class="bg-teal-50 text-teal-600 px-3 py-1 rounded-lg text-[10px] font-bold">👁️ عرض</button><button onclick="deleteReport(${Number(r.id)}, '${String(catId).replace(/'/g, "\'")}')" class="bg-red-50 text-red-500 px-3 py-1 rounded-lg text-[10px] font-bold">🗑️ حذف</button>`}</div></div>`).join('') || '<p class="text-center text-slate-400">📭 فارغ</p>') + `</div>`;
@@ -2729,7 +2729,7 @@ body{overflow-x:hidden}
         function openExitModal() { document.getElementById('exit-modal').style.display = 'flex'; }
         function closeExitModal() { document.getElementById('exit-modal').style.display = 'none'; }
         function exitAppConfirm(now) { if (!now) saveReportToArchive(); window.location.reload(); }
-        function deleteReport(id, catId) { if(confirm("حذف؟")) { let r = JSON.parse(localStorage.getItem('school_reports') || '[]'); r = r.filter(i => i.id != id); localStorage.setItem('school_reports', JSON.stringify(r)); openArchiveFolder(catId); } }
+        async function deleteReport(id, catId) { if(confirm("حذف؟")) { const before = JSON.parse(localStorage.getItem('school_reports') || '[]'); const r = before.filter(i => i.id != id); localStorage.setItem('school_reports', JSON.stringify(r)); try{await verifyReportArchiveCloud('school_reports');showToast('تم حذف التقرير سحابيًا والتحقق من الحذف 🗑️');openArchiveFolder(catId);}catch(e){localStorage.setItem('school_reports',JSON.stringify(before));try{await verifyReportArchiveCloud('school_reports')}catch(_){}showToast('تعذر التحقق من الحذف السحابي؛ تم إبقاء التقرير حفاظًا على بيانات المدرسة');} } }
         function loadReport(id) { 
             const reports = JSON.parse(localStorage.getItem('school_reports') || '[]'); 
             const r = reports.find(i => i.id == id); 
@@ -2783,13 +2783,24 @@ body{overflow-x:hidden}
             return clone.innerHTML;
         }
 
-        function saveReportToArchive() {
+        function performanceArchiveFolderId(report){ return String((report && (report.archiveFolderId || report.category)) || ''); }
+        function performanceArchiveFolderName(catId){
+            const data=(typeof CATEGORY_DATA!=='undefined' && CATEGORY_DATA)?CATEGORY_DATA[String(catId)]:null;
+            if(data && data.name) return String(data.name);
+            const sel=document.getElementById('categorySelect');
+            const opt=sel && sel.options && sel.selectedIndex>=0 ? sel.options[sel.selectedIndex] : null;
+            return String((opt && (opt.textContent||opt.innerText)) || catId || '').trim();
+        }
+        async function saveReportToArchive() {
             if (typeof window.__forceFillReportCategoryData === 'function') window.__forceFillReportCategoryData();
-            const reports = JSON.parse(localStorage.getItem('school_reports') || '[]'); const cat = document.getElementById('categorySelect').value; if(!cat) { showToast("اختر المجال"); return; }
-            const categoryName = CATEGORY_DATA[cat] ? CATEGORY_DATA[cat].name : (document.getElementById('categorySelect').selectedOptions[0]?.textContent || cat);
-            const data = { id: currentEditingId || Date.now(), title: document.getElementById('field_prog_name').innerText || "بدون عنوان", category: cat, categoryName: categoryName, content: getSerializedReportContentForArchive(), createdAt: getSelectedReportDateDisplay() };
-            if(currentEditingId) { const idx = reports.findIndex(r => r.id == currentEditingId); if (idx !== -1) reports[idx] = data; } else { reports.push(data); currentEditingId = data.id; }
-            localStorage.setItem('school_reports', JSON.stringify(reports)); showToast("تم الحفظ ✅");
+            const archiveKey='school_reports',beforeRaw=localStorage.getItem(archiveKey)||'[]',previousEditingId=currentEditingId;
+            let reports=[];try{reports=JSON.parse(beforeRaw);if(!Array.isArray(reports))reports=[]}catch(e){reports=[]}
+            const cat=String(document.getElementById('categorySelect')?.value||'');if(!cat){showToast('اختر المجال');return false}
+            const folderName=performanceArchiveFolderName(cat),old=previousEditingId?reports.find(r=>String(r.id)===String(previousEditingId)):null;
+            const data={id:previousEditingId||Date.now(),title:document.getElementById('field_prog_name')?.innerText||'بدون عنوان',category:cat,categoryName:folderName,archiveFolderId:cat,archiveFolderName:folderName,archiveRole:'agent',content:typeof getSerializedReportContentForArchive==='function'?getSerializedReportContentForArchive():document.getElementById('report-content-container').innerHTML,createdAt:old?.createdAt||(typeof getSelectedReportDateDisplay==='function'?getSelectedReportDateDisplay():new Date().toLocaleDateString('ar-SA')),updatedAt:new Date().toISOString()};
+            const idx=reports.findIndex(r=>String(r.id)===String(data.id));if(idx>=0)reports[idx]=data;else reports.push(data);
+            currentEditingId=data.id;localStorage.setItem(archiveKey,JSON.stringify(reports));
+            try{if(!window.PlatformPersistenceGuard||typeof PlatformPersistenceGuard.commit!=='function')throw new Error('محرك التحقق السحابي غير متاح');const cloud=await PlatformPersistenceGuard.commit([archiveKey]);if(!cloud||cloud.ok===false)throw new Error(cloud?.error||'تعذر تأكيد الحفظ السحابي');const saved=JSON.parse(localStorage.getItem(archiveKey)||'[]').find(r=>String(r.id)===String(data.id));if(!saved||performanceArchiveFolderId(saved)!==cat)throw new Error('لم يظهر التقرير داخل مجلد المجال المحدد');showToast('تم الحفظ في أرشيف تقارير الأداء الوظيفي / '+folderName+' ✅');return true}catch(e){localStorage.setItem(archiveKey,beforeRaw);currentEditingId=previousEditingId;showToast('تعذر تأكيد حفظ التقرير داخل مجلد المجال؛ تمت استعادة الأرشيف السابق.');console.error('[performance folder save]',e);return false}
         }
 
         function openSelectionModal(id) { boxId = id; document.getElementById('selection-modal').style.display='flex'; }
@@ -5672,6 +5683,29 @@ bWw+
   function folderById(id){
     return RECORD_FOLDERS.find(function(f){ return f.id === id; }) || RECORD_FOLDERS[0] || {id:'other',name:'سجل'};
   }
+  function canonicalRecordFolderId(r){
+    if(!r)return '';
+    const byForm=String(r.formId||'');
+    if(byForm&&RECORD_FOLDERS.some(function(f){return String(f.id)===byForm;}))return byForm;
+    const byFolder=String(r.folderId||'');
+    if(byFolder&&RECORD_FOLDERS.some(function(f){return String(f.id)===byFolder;}))return byFolder;
+    const name=String(r.folderName||r.recordName||r.title||'').trim();
+    const found=RECORD_FOLDERS.find(function(f){return String(f.name||'').trim()===name;});
+    return found?String(found.id):(byForm||byFolder);
+  }
+  async function saveArchiveVerified(items){
+    const before=localStorage.getItem(RECORDS_KEY);
+    localStorage.setItem(RECORDS_KEY,JSON.stringify(items||[]));
+    try{
+      if(!window.PlatformPersistenceGuard||typeof PlatformPersistenceGuard.commit!=='function')throw new Error('طبقة الاستمرارية السحابية غير متاحة');
+      const r=await PlatformPersistenceGuard.commit([RECORDS_KEY]);
+      if(!r||r.ok===false)throw new Error(r?.error||'تعذر تأكيد الحفظ السحابي');
+      return true;
+    }catch(e){
+      if(before===null)localStorage.removeItem(RECORDS_KEY);else localStorage.setItem(RECORDS_KEY,before);
+      throw e;
+    }
+  }
 
   function hideMainViews(){
     ['welcome-dashboard','main-report-app','archive-view','stats-view','portfolio-view','agent-records-view'].forEach(function(id){
@@ -5721,12 +5755,8 @@ bWw+
     const archive = getArchive();
     const counts = {};
     archive.forEach(function(r){
-      const fid = r.folderId || r.formId || r.category || r.folderName || '';
-      counts[fid] = (counts[fid] || 0) + 1;
-      if(r.folderName){
-        const folder = RECORD_FOLDERS.find(function(f){ return f.name === r.folderName; });
-        if(folder) counts[folder.id] = (counts[folder.id] || 0) + 1;
-      }
+      const fid=canonicalRecordFolderId(r);
+      if(fid)counts[fid]=(counts[fid]||0)+1;
     });
 
     c.innerHTML = WAKIL_RECORD_CATEGORY_ORDER.map(function(cat){
@@ -5763,7 +5793,7 @@ bWw+
     const folder = folderById(folderId);
     if(window.PrivateAgentScope && !window.PrivateAgentScope.allowed(folder.category || 'shared')){alert('هذا السجل خارج نطاق الوكالة المحددة لهذا الحساب.');renderRecordsArchiveFolders();return;}
     const rows = getArchive().filter(function(r){
-      return r.folderId === folderId || r.formId === folderId || r.category === folderId || r.folderName === folder.name;
+      return String(canonicalRecordFolderId(r))===String(folderId);
     });
 
     c.innerHTML =
@@ -5797,8 +5827,7 @@ bWw+
     if(doc.indexOf('<!DOCTYPE html') === -1){
       doc = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>' + esc(r.title || 'سجل') + '</title>'
         + '<style>@page{size:A4;margin:8mm}body{font-family:Tajawal,Arial;background:white;overflow-x:hidden}.safe-hidden-deactivate{display:none!important}</style>'
-        + '</head><body>' + doc + '<script defer src="operational-inspection-card.js?v=20260827-preserve-agent-v3"></script>
-</body></html>';
+        + '</head><body>' + doc + '</body></html>';
     }
     if(autoPrint){
       var printScript = '<script>window.addEventListener("load",function(){setTimeout(function(){window.print()},500)});<\\/script>';
@@ -5826,12 +5855,13 @@ bWw+
     w.document.close();
   };
 
-  window.deleteRecordArchiveItem = function(id){
+  window.deleteRecordArchiveItem = async function(id){
     if(!confirm('هل تريد حذف هذا السجل؟')) return;
-    const item = getItem(id);
-    saveArchive(getArchive().filter(function(r){ return String(r.id) !== String(id); }));
-    if(item && currentRecordsFolder) openRecordsArchiveFolder(currentRecordsFolder);
-    else renderRecordsArchiveFolders();
+    const item=getItem(id);
+    try{
+      await saveArchiveVerified(getArchive().filter(function(r){return String(r.id)!==String(id);}));
+      if(item&&currentRecordsFolder)openRecordsArchiveFolder(currentRecordsFolder);else renderRecordsArchiveFolders();
+    }catch(e){alert('تعذر تأكيد حذف السجل سحابيًا؛ تمت استعادة السجل السابق.');}
   };
 
   window.openRecordSendDigitalModal = function(id){
@@ -5883,31 +5913,15 @@ bWw+
     alert('تم إرسال السجل إلى الأرشيف الرقمي.');
   };
 
-  window.addEventListener('message', function(event){
-    const data = event.data || {};
-    if(data.type !== 'WAKIL_RECORD_SAVED') return;
-    const p = data.payload || {};
-    const archive = getArchive();
-    const folderId = p.folderId || p.formId || RECORD_FOLDERS[0].id;
-    const name = String(p.personName || p.studentName || p.title || 'بدون اسم').trim();
-    const duplicateNo = archive.filter(function(r){ return r.folderId === folderId && String(r.personName || '').trim() === name; }).length + 1;
-    archive.push({
-      id: Date.now(),
-      folderId: folderId,
-      category: p.category || folderById(folderId).category || 'shared',
-      categoryLabel: p.categoryLabel || recordCategoryLabel(p.category || folderById(folderId).category || 'shared'),
-      folderName: p.folderName || folderById(folderId).name,
-      title: p.title || folderById(folderId).name,
-      personName: name,
-      displayName: duplicateNo > 1 ? name + ' (' + duplicateNo + ')' : name,
-      duplicateNo: duplicateNo,
-      htmlContent: p.printableHTML || p.htmlContent || '',
-      printableHTML: p.printableHTML || '',
-      summary: p.summary || '',
-      createdAt: new Date().toLocaleString('ar-SA')
-    });
-    saveArchive(archive);
-    if(document.getElementById('records-archive-view')?.style.display !== 'none') renderRecordsArchiveFolders();
+  window.addEventListener('message', async function(event){
+    const data=event.data||{};if(data.type!=='WAKIL_RECORD_SAVED')return;
+    const p=data.payload||{},archive=getArchive(),probe={formId:p.formId,folderId:p.folderId,folderName:p.folderName,title:p.title};
+    const folderId=canonicalRecordFolderId(probe)||String(p.formId||RECORD_FOLDERS[0].id),folder=folderById(folderId);
+    if(window.PrivateAgentScope && !window.PrivateAgentScope.allowed(folder.category || 'shared')){console.warn('[wakil archive] rejected outside assigned role',folder.category);return;}
+    const name=String(p.personName||p.studentName||p.title||'بدون اسم').trim();
+    const duplicateNo=archive.filter(r=>canonicalRecordFolderId(r)===folderId&&String(r.personName||'').trim()===name).length+1;
+    archive.push({id:Date.now(),formId:String(p.formId||folderId),folderId,folderName:folder.name,recordName:folder.name,category:p.category||folder.category||'shared',categoryLabel:p.categoryLabel||recordCategoryLabel(p.category||folder.category||'shared'),title:p.title||folder.name,personName:name,displayName:duplicateNo>1?name+' ('+duplicateNo+')':name,duplicateNo,htmlContent:p.printableHTML||p.htmlContent||'',printableHTML:p.printableHTML||'',summary:p.summary||'',createdAt:new Date().toLocaleString('ar-SA')});
+    try{await saveArchiveVerified(archive);if(document.getElementById('records-archive-view')?.style.display!=='none')renderRecordsArchiveFolders();}catch(e){console.error('[wakil legacy message archive]',e);}
   });
 
 })();

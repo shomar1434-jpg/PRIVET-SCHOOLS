@@ -77,7 +77,7 @@ Deno.serve(async(req)=>{if(req.method==='OPTIONS')return new Response('ok',{head
      }
      const msgVerify=await db.from('internal_messages').select('id').eq('school_id',sid).eq('id',mid).maybeSingle();if(msgVerify.error)throw msgVerify.error;if(!msgVerify.data)throw new Error('فشل التحقق النهائي من حفظ الرسالة');
      const recVerify=await db.from('internal_message_recipients').select('id').eq('school_id',sid).eq('message_id',mid);if(recVerify.error)throw recVerify.error;if((recVerify.data||[]).length!==recs.length)throw new Error('فشل التحقق النهائي من حفظ المستلمين');
-     return json({ok:true,messageId:mid,recipientCount:recs.length,attachmentCount,attachmentFileIds,attachmentsVerified:att.length?attachmentCount===att.length:true,verified:true})
+     return json({ok:true,messageId:mid,recipientCount:recs.length,attachmentCount,attachmentFileIds,attachmentsVerified:att.length?attachmentCount===att.length:true,verified:true,requestedAttachmentCount:att.length,savedAttachmentCount:attachmentCount,attachmentsConfirmed:att.length?attachmentCount===att.length:true})
    }catch(sendError){
      await cleanupFailedSend();
      return json({error:'لم تكتمل عملية الإرسال ولم يتم اعتماد الرسالة: '+(sendError instanceof Error?sendError.message:String(sendError)),sendRolledBack:true},500);

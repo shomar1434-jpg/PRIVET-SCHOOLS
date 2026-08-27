@@ -3454,41 +3454,6 @@ body{overflow-x:hidden}
 </head><body dir="rtl"><div id="portfolio-root">${portfolioHTML}</div><script>window.onload = function() { setTimeout(() => { window.print(); }, 1200); };<\/script>
 
 
-<!-- ACTIVITY_LEADER_GOALS_UPDATED_2026_05_26: المجالات والأهداف الوظيفية/الأدائية والتفصيلية لرائد/ة النشاط محدثة من ملف المستخدم. -->
-<script src="archive-save-integrity.js?v=20260826-archive-integrity1"></script>
-<script src="performance-report-save-integrity.js?v=20260826-performance-integrity5"></script>
-
-<script id="ACTIVITY_RECORDS_STRICT_ARCHIVE_V1">
-(function(){
-'use strict';
-const FOLDERS=[{"id": "basic", "name": "البيانات الأولية لمسؤول/ة النشاط"}, {"id": "training", "name": "الدورات التدريبية لمسؤول/ة النشاط"}, {"id": "goals", "name": "أهداف النشاط الطلابي"}, {"id": "tasks", "name": "مهام مسؤول/ة النشاط"}, {"id": "assignment", "name": "قرار تكليف مسؤول/ة النشاط"}, {"id": "council", "name": "مجلس النشاط الطلابي"}, {"id": "classleaders", "name": "مسؤولو/مسؤولات الفصول"}, {"id": "fields", "name": "مجالات النشاط الطلابي"}, {"id": "annualPlan", "name": "الخطة العامة للنشاط"}, {"id": "weeklyPlan", "name": "خطة النشاط الأسبوعية"}, {"id": "supervisors", "name": "المشرفون على المجالات"}, {"id": "attendance", "name": "سجل حضور الطلاب لمجالات النشاط"}, {"id": "permission", "name": "موافقة ولي الأمر على مشاركة الطالب"}, {"id": "circulars", "name": "سجل متابعة التعاميم الواردة"}, {"id": "talented", "name": "الطلاب المميزون في النشاط"}, {"id": "external", "name": "المشاركون على مستوى الإدارة"}, {"id": "implemented", "name": "استمارة حصر البرامج المنفذة"}, {"id": "clubs", "name": "أعضاء الأندية الطلابية"}, {"id": "events", "name": "الأيام والمناسبات"}, {"id": "followup", "name": "التوجيهات والمتابعة"}];
-function read(){try{const x=JSON.parse(localStorage.getItem('activity_leader_records_archive_v2')||'[]');return Array.isArray(x)?x:[]}catch(e){return []}}
-function esc(v){return String(v||'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
-window.openActivityRecordsArchiveView=function(){
- let v=document.getElementById('advisor-records-archive-view');if(v)v.style.display='block';
- let h=v&&v.querySelector('h2');if(h)h.textContent='🗃️ أرشيف سجلات رائد/ة النشاط';
- renderActivityRecordsArchiveFolders();
-};
-window.renderActivityRecordsArchiveFolders=function(){
- const c=document.getElementById('advisor-records-archive-content');if(!c)return;const items=read(),counts={};items.forEach(r=>counts[r.folderId]=(counts[r.folderId]||0)+1);
- c.innerHTML='<div class="ara-grid">'+FOLDERS.map(f=>'<div class="ara-folder" onclick="openActivityRecordsArchiveFolder(\''+esc(f.id)+'\')"><span class="ara-count">'+(counts[f.id]||0)+' سجل</span><div class="ara-icon">📂</div><div class="ara-name">'+esc(f.name)+'</div><div class="ara-note">تظهر هنا النسخ المحفوظة من هذا السجل.</div></div>').join('')+'</div>';
-};
-window.openActivityRecordsArchiveFolder=function(folderId){
- const c=document.getElementById('advisor-records-archive-content');if(!c)return;const f=FOLDERS.find(x=>x.id===folderId),rows=read().filter(r=>r.folderId===folderId);
- c.innerHTML='<section class="ara-list"><div style="background:white;border:1px solid #d1fae5;border-radius:22px;padding:16px;margin-bottom:16px"><b>📂 '+esc(f?.name||'سجل')+'</b></div>'+ (rows.length?rows.map(r=>'<div class="ara-row"><div><b>'+esc(r.displayName||r.title)+'</b><div style="font-size:10px;color:#64748b">'+esc(r.createdAt||'')+'</div></div></div>').join(''):'<div style="padding:30px;text-align:center">لا توجد سجلات محفوظة.</div>')+'</section>';
-};
-window.addEventListener('message',async function(event){
- const d=event.data||{};if(d.type!=='ACTIVITY_LEADER_RECORD_SAVED')return;
- try{const r=await RoleRecordsArchiveSaveEngine.save('activity',d.payload||{});event.source?.postMessage({type:'ACTIVITY_LEADER_RECORD_SAVE_ACK',requestId:d.requestId,ok:true,folderName:r.record.folderName,cloud:!!r.cloud},'*');}
- catch(e){event.source?.postMessage({type:'ACTIVITY_LEADER_RECORD_SAVE_ACK',requestId:d.requestId,ok:false,error:e?.message||String(e)},'*');}
-});
-document.addEventListener('click',function(e){
- const t=(e.target.closest('button,a,div')?.innerText||'').trim();
- if(/أرشيف السجلات/.test(t)&&/النشاط/.test(document.body.innerText||'')){setTimeout(openActivityRecordsArchiveView,0);}
-},true);
-})();
-</script>
-
 </body></html>`);
             printWindow.document.close();
             setTimeout(() => { loader.classList.add('hidden'); showToast("تم تجهيز مسودة ملف الإنجاز المهني كملف واحد ✅"); }, 1800);
@@ -4455,6 +4420,40 @@ body{overflow-x:hidden}
             refreshAssistantAlertCount();
         };
     </script>
+<script src="archive-save-integrity.js?v=20260826-archive-integrity1"></script>
+<script src="performance-report-save-integrity.js?v=20260826-performance-integrity5"></script>
+
+<script id="ACTIVITY_RECORDS_STRICT_ARCHIVE_V1">
+(function(){
+'use strict';
+const FOLDERS=[{"id": "basic", "name": "البيانات الأولية لمسؤول/ة النشاط"}, {"id": "training", "name": "الدورات التدريبية لمسؤول/ة النشاط"}, {"id": "goals", "name": "أهداف النشاط الطلابي"}, {"id": "tasks", "name": "مهام مسؤول/ة النشاط"}, {"id": "assignment", "name": "قرار تكليف مسؤول/ة النشاط"}, {"id": "council", "name": "مجلس النشاط الطلابي"}, {"id": "classleaders", "name": "مسؤولو/مسؤولات الفصول"}, {"id": "fields", "name": "مجالات النشاط الطلابي"}, {"id": "annualPlan", "name": "الخطة العامة للنشاط"}, {"id": "weeklyPlan", "name": "خطة النشاط الأسبوعية"}, {"id": "supervisors", "name": "المشرفون على المجالات"}, {"id": "attendance", "name": "سجل حضور الطلاب لمجالات النشاط"}, {"id": "permission", "name": "موافقة ولي الأمر على مشاركة الطالب"}, {"id": "circulars", "name": "سجل متابعة التعاميم الواردة"}, {"id": "talented", "name": "الطلاب المميزون في النشاط"}, {"id": "external", "name": "المشاركون على مستوى الإدارة"}, {"id": "implemented", "name": "استمارة حصر البرامج المنفذة"}, {"id": "clubs", "name": "أعضاء الأندية الطلابية"}, {"id": "events", "name": "الأيام والمناسبات"}, {"id": "followup", "name": "التوجيهات والمتابعة"}];
+function read(){try{if(window.RoleRecordsArchiveSaveEngine?.list)return RoleRecordsArchiveSaveEngine.list('activity',true);const x=JSON.parse(localStorage.getItem('activity_leader_records_archive_v2')||'[]');return Array.isArray(x)?x:[]}catch(e){return []}}
+function esc(v){return String(v||'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+window.openActivityRecordsArchiveView=function(){
+ let v=document.getElementById('advisor-records-archive-view');if(v)v.style.display='block';
+ let h=v&&v.querySelector('h2');if(h)h.textContent='🗃️ أرشيف سجلات رائد/ة النشاط';
+ renderActivityRecordsArchiveFolders();
+};
+window.renderActivityRecordsArchiveFolders=function(){
+ const c=document.getElementById('advisor-records-archive-content');if(!c)return;const items=read(),counts={};items.forEach(r=>counts[r.folderId]=(counts[r.folderId]||0)+1);
+ c.innerHTML='<div class="ara-grid">'+FOLDERS.map(f=>'<div class="ara-folder" onclick="openActivityRecordsArchiveFolder(\''+esc(f.id)+'\')"><span class="ara-count">'+(counts[f.id]||0)+' سجل</span><div class="ara-icon">📂</div><div class="ara-name">'+esc(f.name)+'</div><div class="ara-note">تظهر هنا النسخ المحفوظة من هذا السجل.</div></div>').join('')+'</div>';
+};
+window.openActivityRecordsArchiveFolder=function(folderId){
+ const c=document.getElementById('advisor-records-archive-content');if(!c)return;const f=FOLDERS.find(x=>x.id===folderId),rows=read().filter(r=>r.folderId===folderId);
+ c.innerHTML='<section class="ara-list"><div style="background:white;border:1px solid #d1fae5;border-radius:22px;padding:16px;margin-bottom:16px"><b>📂 '+esc(f?.name||'سجل')+'</b></div>'+ (rows.length?rows.map(r=>'<div class="ara-row"><div><b>'+esc(r.displayName||r.title)+'</b><div style="font-size:10px;color:#64748b">'+esc(r.createdAt||'')+'</div></div></div>').join(''):'<div style="padding:30px;text-align:center">لا توجد سجلات محفوظة.</div>')+'</section>';
+};
+window.addEventListener('message',async function(event){
+ const d=event.data||{};if(d.type!=='ACTIVITY_LEADER_RECORD_SAVED')return;
+ try{const r=await RoleRecordsArchiveSaveEngine.save('activity',d.payload||{});event.source?.postMessage({type:'ACTIVITY_LEADER_RECORD_SAVE_ACK',requestId:d.requestId,ok:true,folderName:r.record.folderName,cloud:!!r.cloud},'*');}
+ catch(e){event.source?.postMessage({type:'ACTIVITY_LEADER_RECORD_SAVE_ACK',requestId:d.requestId,ok:false,error:e?.message||String(e)},'*');}
+});
+document.addEventListener('click',function(e){
+ const t=(e.target.closest('button,a,div')?.innerText||'').trim();
+ if(/أرشيف السجلات/.test(t)&&/النشاط/.test(document.body.innerText||'')){setTimeout(openActivityRecordsArchiveView,0);}
+},true);
+})();
+</script>
+
     <script defer src="%VITE_ANALYTICS_ENDPOINT%/umami" data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
 
 <!-- SmartSchool Cloud Storage Unified Menu -->
@@ -5299,22 +5298,16 @@ function showFinalApproval(){var t=val('meetTitle')||'محضر اجتماع', li
   var pendingSmartRecordId = null;
 
   function esc(v){return String(v||'').replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
-  function read(){try{return JSON.parse(localStorage.getItem(ARCHIVE_KEY)||'[]');}catch(e){return [];}}
+  function read(){try{if(window.RoleRecordsArchiveSaveEngine?.list)return RoleRecordsArchiveSaveEngine.list('advisor',true);return JSON.parse(localStorage.getItem(ARCHIVE_KEY)||'[]');}catch(e){return [];}}
   function write(items){localStorage.setItem(ARCHIVE_KEY,JSON.stringify(items||[]));}
   function folderById(id){return FOLDERS.find(function(f){return f.id===id;})||FOLDERS[0]||{id:'other',name:'سجل'};}
   function contentEl(){return document.getElementById('advisor-records-archive-content');}
   function docForRecord(r, autoPrint){
     var doc = r.htmlContent && r.htmlContent.indexOf('<!DOCTYPE html') !== -1
       ? r.htmlContent
-      : '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>'+esc(r.title||'سجل')+'</title><style>@page{size:A4;margin:8mm}body{font-family:Tajawal,Arial,sans-serif;background:white}</style><style id="ss-code-flash-guard">body{overflow-x:hidden}.safe-hidden-deactivate{display:none!important}</style></head><body>'+ (r.htmlContent||'<pre>'+esc(r.summary||'')+'</pre>') + '
-<!-- ACTIVITY_LEADER_GOALS_UPDATED_2026_05_26: المجالات والأهداف الوظيفية/الأدائية والتفصيلية لرائد/ة النشاط محدثة من ملف المستخدم. -->
-</body></html>';
+      : '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>'+esc(r.title||'سجل')+'</title><style>@page{size:A4;margin:8mm}body{font-family:Tajawal,Arial,sans-serif;background:white}</style><style id="ss-code-flash-guard">body{overflow-x:hidden}.safe-hidden-deactivate{display:none!important}</style></head><body>'+(r.htmlContent||'<pre>'+esc(r.summary||'')+'</pre>')+'</body></html>';
     if(autoPrint && doc.indexOf('window.print')===-1){
-      doc = doc.replace('
-<!-- ACTIVITY_LEADER_GOALS_UPDATED_2026_05_26: المجالات والأهداف الوظيفية/الأدائية والتفصيلية لرائد/ة النشاط محدثة من ملف المستخدم. -->
-</body>','<script>window.onload=function(){setTimeout(function(){window.print()},500)}<\/script>
-<!-- ACTIVITY_LEADER_GOALS_UPDATED_2026_05_26: المجالات والأهداف الوظيفية/الأدائية والتفصيلية لرائد/ة النشاط محدثة من ملف المستخدم. -->
-</body>');
+      doc = doc.replace('</body>','<script>window.onload=function(){setTimeout(function(){window.print()},500)}<\/script></body>');
     }
     return doc;
   }
