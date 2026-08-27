@@ -1055,7 +1055,8 @@
 <script src="platform-persistence-guard.js"></script>
 <script defer src="school-base-settings-source.js"></script>
 <link rel="stylesheet" href="responsive-layout.css?v=20260818-responsive-1">
-<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
+<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"><script src="role-records-archive-save-engine.js?v=20260827-role-records-v1"></script>
+</head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden">
 
     <!-- نظام التنبيهات المخصص -->
@@ -3342,39 +3343,22 @@
     };
   }
 
-  window.sendCurrentRecordToAdvisorArchive = function(){
-    var payload = capturePrintableRecord();
-    if(!payload) return;
-
+  window.sendCurrentRecordToAdvisorArchive = async function(){
+    var payload=capturePrintableRecord();if(!payload)return;
     try{
-      if(window.parent && window.parent !== window){
-        window.parent.postMessage({type:'ADVISOR_RECORD_SAVED', payload:payload}, '*');
-      }else if(typeof window.saveAdvisorRecordToArchive === 'function'){
-        window.saveAdvisorRecordToArchive(payload);
-      }else{
-        var key='advisor_records_archive_v1';
-        var items=[];
-        try{items=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){items=[];}
-        var dup=items.filter(function(r){return r.folderId===payload.folderId && r.baseName===payload.personName;}).length+1;
-        items.push({
-          id:Date.now(),
-          folderId:payload.folderId,
-          title:payload.title,
-          baseName:payload.personName,
-          duplicateNo:dup,
-          displayName:dup>1?payload.personName+' ('+dup+')':payload.personName,
-          htmlContent:payload.htmlContent,
-          summary:payload.summary,
-          pdfMode:true,
-          createdAt:new Date().toLocaleString('ar-SA')
+      if(window.parent&&window.parent!==window){
+        const requestId='advisor_save_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+        const ack=await new Promise((resolve,reject)=>{
+          const timer=setTimeout(()=>{window.removeEventListener('message',onAck);reject(new Error('انتهت مهلة التحقق من الأرشيف.'));},10000);
+          function onAck(event){const d=event.data||{};if(d.type!=='ADVISOR_RECORD_SAVE_ACK'||d.requestId!==requestId)return;clearTimeout(timer);window.removeEventListener('message',onAck);d.ok?resolve(d):reject(new Error(d.error||'تعذر الحفظ.'))}
+          window.addEventListener('message',onAck);window.parent.postMessage({type:'ADVISOR_RECORD_SAVED',requestId,payload:payload},'*');
         });
-        localStorage.setItem(key,JSON.stringify(items));
+        alert('تم حفظ السجل والتحقق من ظهوره داخل مجلد «'+ack.folderName+'»'+(ack.cloud?' ومزامنته سحابيًا.':'.'));
+      }else{
+        const result=await RoleRecordsArchiveSaveEngine.save('advisor',payload);
+        alert('تم حفظ السجل والتحقق من ظهوره داخل مجلد «'+result.record.folderName+'».');
       }
-      alert('تم إرسال نسخة PDF جاهزة للطباعة إلى أرشيف السجلات.');
-    }catch(e){
-      console.error(e);
-      alert('تعذر إرسال النسخة إلى الأرشيف.');
-    }
+    }catch(e){console.error(e);alert('لم يكتمل حفظ السجل في الأرشيف: '+(e?.message||e));}
   };
 })();
 </script>

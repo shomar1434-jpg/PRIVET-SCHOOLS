@@ -723,7 +723,8 @@ td textarea,
 .uw-verified-title-back:hover{background:#e6fffb!important}
 @media print{.uw-verified-title-back{display:none!important}}
 </style><link rel="stylesheet" href="responsive-layout.css?v=20260818-responsive-1">
-<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
+<link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"><script src="role-records-archive-save-engine.js?v=20260827-role-records-v1"></script>
+</head>
 <body>
 <div class="app">
   <aside class="sidebar">
@@ -1046,39 +1047,25 @@ function fill(data){
 }
 function autoDraft(){localStorage.setItem(key()+"_draft",JSON.stringify(collect()))}
 function loadDraft(){fill(JSON.parse(localStorage.getItem(key()+"_draft")||"{}"))}
-function saveArchive(){
+async function saveArchive(){
  const data=collect();
  const list=JSON.parse(localStorage.getItem(key()+"_archive")||"[]");
- list.unshift(data);
- localStorage.setItem(key()+"_archive",JSON.stringify(list));
- localStorage.removeItem(key()+"_draft");
-
- // حفظ موحد داخل أرشيف سجلات مسؤول/ة النشاط في المنصة
- const archiveKey="activity_leader_records_archive_v2";
- let platformArchive=[];
- try{platformArchive=JSON.parse(localStorage.getItem(archiveKey)||"[]");}catch(e){platformArchive=[];}
- const folderId=current.id;
- const sameFolderCount=platformArchive.filter(x=>x.folderId===folderId).length+1;
- const displayName=current.title + " - نسخة " + sameFolderCount;
- platformArchive.push({
-   id:Date.now(),
-   folderId:folderId,
-   folderName:current.title,
-   recordId:current.id,
-   title:current.title,
-   displayName:displayName,
-   duplicateNo:sameFolderCount,
-   values:data.values,
-   htmlContent:"<!DOCTYPE html>"+document.documentElement.outerHTML,
-   createdAt:new Date().toLocaleString('ar-SA')
- });
- localStorage.setItem(archiveKey,JSON.stringify(platformArchive));
-
- if(window.parent && window.parent!==window){
-   try{window.parent.postMessage({type:'ACTIVITY_LEADER_RECORD_SAVED',payload:platformArchive[platformArchive.length-1]},'*');}catch(e){}
- }
- renderArchive();
- alert("تم حفظ السجل في الأرشيف داخل مجلده الخاص، ولن يتم حذف النسخ السابقة.");
+ list.unshift(data);localStorage.setItem(key()+"_archive",JSON.stringify(list));localStorage.removeItem(key()+"_draft");
+ const payload={folderId:current.id,formId:current.id,recordId:current.id,title:current.title,values:data.values,htmlContent:"<!DOCTYPE html>"+document.documentElement.outerHTML,source:'activity_leader_records'};
+ try{
+   if(window.parent&&window.parent!==window){
+     const requestId='activity_save_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
+     const ack=await new Promise((resolve,reject)=>{
+       const timer=setTimeout(()=>{window.removeEventListener('message',onAck);reject(new Error('انتهت مهلة التحقق من الأرشيف.'));},10000);
+       function onAck(event){const d=event.data||{};if(d.type!=='ACTIVITY_LEADER_RECORD_SAVE_ACK'||d.requestId!==requestId)return;clearTimeout(timer);window.removeEventListener('message',onAck);d.ok?resolve(d):reject(new Error(d.error||'تعذر الحفظ.'))}
+       window.addEventListener('message',onAck);window.parent.postMessage({type:'ACTIVITY_LEADER_RECORD_SAVED',requestId,payload},'*');
+     });
+     renderArchive();alert("تم حفظ السجل والتحقق من ظهوره داخل مجلد «"+ack.folderName+"»"+(ack.cloud?" ومزامنته سحابيًا.":"."));
+   }else{
+     const result=await RoleRecordsArchiveSaveEngine.save('activity',payload);
+     renderArchive();alert("تم حفظ السجل والتحقق من ظهوره داخل مجلد «"+result.record.folderName+"».");
+   }
+ }catch(e){console.error(e);alert("لم يكتمل حفظ السجل في الأرشيف: "+(e?.message||e));}
 }
 function toggleArchive(){document.getElementById('archivePanel').classList.toggle('show');renderArchive()}
 function renderArchive(){
