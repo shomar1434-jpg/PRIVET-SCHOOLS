@@ -1556,6 +1556,13 @@ body{overflow-x:hidden}
 <div class="w-14 h-14 bg-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg">📈</div>
 <h3 class="font-bold text-lg text-slate-700 flex items-center gap-2">🏅 متابعة التقويم الذاتي</h3>
 </div>
+<div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-cyan-400 cursor-pointer transition-all flex flex-col items-center gap-4 group" onclick="openOperationalInspectionFollowup()" data-private-operational-inspection-card="1">
+<div class="w-14 h-14 bg-cyan-700 text-white rounded-2xl flex items-center justify-center shadow-lg text-2xl">🛠️</div>
+<div class="text-center">
+<h3 class="font-bold text-lg text-slate-700">الفحص والمتابعة التشغيلية</h3>
+<p class="text-[10px] text-slate-400 font-bold mt-2">الحافلات • المقصف • الصيانة • النظافة</p>
+</div>
+</div>
 <div class="bg-white/90 p-8 rounded-[45px] shadow-lg border border-white hover:border-amber-400 cursor-pointer transition-all flex flex-col items-center gap-4 group min-h-[220px]" onclick="window.location.href='admin_employee_management.html?supervisor=agent'">
 <div class="w-16 h-16 bg-gradient-to-br from-amber-500 to-emerald-700 text-white rounded-[24px] flex items-center justify-center shadow-xl text-3xl">👤</div>
 <div class="text-center">
@@ -6038,6 +6045,52 @@ bWw+
 <script src="top-ai-center.js"></script>
 
 <script src="platform-page-navigation.js?v=20260818-nav1"></script>
+
+
+<script id="PRIVATE_OPERATIONAL_INSPECTION_NAV_SAFE_V1">
+(function(){
+  'use strict';
+  window.openOperationalInspectionFollowup = function(){
+    try { sessionStorage.setItem('agent_return_to_sections','1'); } catch(e) {}
+    window.location.href = 'operational_inspection_followup.html?role=agent';
+  };
+
+  function restoreAgentSectionsView(){
+    var shouldRestore = false;
+    try {
+      var params = new URLSearchParams(window.location.search || '');
+      shouldRestore = params.get('view') === 'sections' || sessionStorage.getItem('agent_return_to_sections') === '1';
+    } catch(e) {}
+    if(!shouldRestore) return;
+
+    try { sessionStorage.removeItem('agent_return_to_sections'); } catch(e) {}
+    var hideIds = ['activation-overlay','welcome-gate','archive-view','stats-view','portfolio-view','main-report-app','agent-records-view','records-archive-view','student-advisor-view'];
+    hideIds.forEach(function(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      el.style.display = 'none';
+      if(el.classList) el.classList.add('hidden');
+    });
+    var dashboard = document.getElementById('welcome-dashboard');
+    if(dashboard){
+      dashboard.style.display = 'block';
+      if(dashboard.classList) dashboard.classList.remove('hidden');
+    }
+    try {
+      var u = new URL(window.location.href);
+      u.searchParams.delete('view');
+      history.replaceState({}, '', u.pathname + u.search + u.hash);
+    } catch(e) {}
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', restoreAgentSectionsView, {once:true});
+  } else {
+    restoreAgentSectionsView();
+  }
+  window.addEventListener('load', restoreAgentSectionsView, {once:true});
+})();
+</script>
 
 <!-- PRIVATE_EDITION_BUILD_RUNTIME -->
 <script src="private-school-runtime.js"></script>
