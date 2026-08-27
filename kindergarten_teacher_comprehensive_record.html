@@ -2590,7 +2590,43 @@
 <script src="private-school-runtime.js"></script>
 
 <script id="KINDERGARTEN_RECORDS_ARCHIVE_VIEW_V1">
-(function(){function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}window.openRemainingRecordsArchive=function(role){const cfg=RemainingRoleRecordsArchiveEngine.config[role];if(!cfg)return;document.getElementById('remainingRecordsArchiveModal')?.remove();const m=document.createElement('div');m.id='remainingRecordsArchiveModal';m.dir='rtl';m.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.58);z-index:2147483000;padding:24px;overflow:auto';const all=RemainingRoleRecordsArchiveEngine.list(role);m.innerHTML='<div style="max-width:1100px;margin:auto;background:#f8fafc;border-radius:24px;padding:18px;font-family:Tajawal,Arial"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;color:#0f766e">🗃️ أرشيف السجلات</h2><button id="rrClose" style="border:0;padding:9px 13px;border-radius:10px">إغلاق</button></div><div id="rrFolders" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:16px"></div><div id="rrList" style="margin-top:16px"></div></div>';document.body.appendChild(m);m.querySelector('#rrClose').onclick=()=>m.remove();const folders=m.querySelector('#rrFolders'),list=m.querySelector('#rrList');folders.innerHTML=cfg.catalog.map(f=>{const n=all.filter(x=>x.folderId===f.id).length;return '<button data-f="'+esc(f.id)+'" style="background:#fff;border:1px solid #dbeafe;border-radius:16px;padding:15px;text-align:right"><b>'+esc(f.name)+'</b><div style="font-size:11px;color:#64748b">'+n+' سجل</div></button>'}).join('');folders.querySelectorAll('[data-f]').forEach(b=>b.onclick=function(){const fid=this.getAttribute('data-f'),f=cfg.catalog.find(x=>x.id===fid),rows=RemainingRoleRecordsArchiveEngine.list(role,fid);list.innerHTML='<h3>'+esc(f?.name||'')+'</h3>'+(rows.length?rows.slice().reverse().map(r=>'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px;margin:8px 0"><b>'+esc(r.displayName||r.title)+'</b><div style="font-size:10px;color:#64748b">'+esc(r.updatedAt||r.createdAt||'')+'</div></div>').join(''):'<div style="padding:25px;text-align:center;color:#94a3b8">لا توجد سجلات.</div>')})};if(new URLSearchParams(location.search).get('archive')==='1')window.addEventListener('load',()=>setTimeout(()=>openRemainingRecordsArchive('kindergarten'),600),{once:true})})();
+(function(){
+'use strict';
+function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function yearsFor(role){const a=RemainingRoleRecordsArchiveEngine.all(role);return [...new Set(a.map(x=>RemainingRoleRecordsArchiveEngine.normalizeYear(x.academicYear||x.year)))].filter(Boolean).sort().reverse()}
+function semestersFor(role,year){const a=RemainingRoleRecordsArchiveEngine.all(role).filter(x=>RemainingRoleRecordsArchiveEngine.normalizeYear(x.academicYear||x.year)===year);return [...new Set(a.map(x=>RemainingRoleRecordsArchiveEngine.normalizeSemester(x.semester||x.term)))].filter(Boolean)}
+window.openRemainingRecordsArchive=function(role){
+ const cfg=RemainingRoleRecordsArchiveEngine.config[role];if(!cfg)return;
+ document.getElementById('remainingRecordsArchiveModal')?.remove();
+ const ctx=RemainingRoleRecordsArchiveEngine.activeAcademicContext();
+ const m=document.createElement('div');m.id='remainingRecordsArchiveModal';m.dir='rtl';
+ m.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.58);z-index:2147483000;padding:24px;overflow:auto';
+ const years=yearsFor(role);if(!years.includes(ctx.academicYear))years.unshift(ctx.academicYear);
+ m.innerHTML='<div style="max-width:1150px;margin:auto;background:#f8fafc;border-radius:24px;padding:18px;font-family:Tajawal,Arial">'+
+ '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><div><h2 style="margin:0;color:#0f766e">🗃️ أرشيف السجلات</h2><div style="font-size:11px;color:#64748b;margin-top:4px">يعرض الفصل الحالي افتراضيًا، ويمكن الرجوع للفصول السابقة دون دمج البيانات.</div></div><button id="rrClose" style="border:0;padding:9px 13px;border-radius:10px">إغلاق</button></div>'+
+ '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"><select id="rrYear" style="padding:9px;border:1px solid #cbd5e1;border-radius:10px">'+years.map(y=>'<option '+(y===ctx.academicYear?'selected':'')+'>'+esc(y)+'</option>').join('')+'</select><select id="rrSemester" style="padding:9px;border:1px solid #cbd5e1;border-radius:10px"></select></div>'+
+ '<div id="rrFolders" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:16px"></div><div id="rrList" style="margin-top:16px"></div></div>';
+ document.body.appendChild(m);m.querySelector('#rrClose').onclick=()=>m.remove();
+ const ySel=m.querySelector('#rrYear'),sSel=m.querySelector('#rrSemester'),folders=m.querySelector('#rrFolders'),list=m.querySelector('#rrList');
+ function loadSemesters(){
+   const ss=semestersFor(role,ySel.value);const wanted=(ySel.value===ctx.academicYear?ctx.semester:'');
+   if(!ss.includes(wanted)&&wanted)ss.unshift(wanted);
+   sSel.innerHTML=ss.map(s=>'<option '+(s===wanted?'selected':'')+'>'+esc(s)+'</option>').join('');
+   if(!sSel.value)sSel.value=ctx.semester;renderFolders();
+ }
+ function renderFolders(){
+   const y=ySel.value,s=sSel.value;
+   folders.innerHTML=cfg.catalog.map(f=>{const n=RemainingRoleRecordsArchiveEngine.list(role,f.id,{academicYear:y,semester:s}).length;return '<button data-f="'+esc(f.id)+'" style="background:#fff;border:1px solid #dbeafe;border-radius:16px;padding:15px;text-align:right"><b>'+esc(f.name)+'</b><div style="font-size:11px;color:#64748b;margin-top:5px">'+n+' سجل — '+esc(s)+'</div></button>'}).join('');
+   list.innerHTML='';
+   folders.querySelectorAll('[data-f]').forEach(b=>b.onclick=function(){
+     const fid=this.getAttribute('data-f'),f=cfg.catalog.find(x=>x.id===fid),rows=RemainingRoleRecordsArchiveEngine.list(role,fid,{academicYear:ySel.value,semester:sSel.value});
+     list.innerHTML='<h3>'+esc(f?.name||'')+' — '+esc(ySel.value)+' — '+esc(sSel.value)+'</h3>'+(rows.length?rows.slice().reverse().map(r=>'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px;margin:8px 0"><b>'+esc(r.displayName||r.title)+'</b><div style="font-size:10px;color:#64748b">'+esc(r.updatedAt||r.createdAt||'')+'</div></div>').join(''):'<div style="padding:25px;text-align:center;color:#94a3b8">لا توجد سجلات في هذا الفصل.</div>');
+   });
+ }
+ ySel.onchange=loadSemesters;sSel.onchange=renderFolders;loadSemesters();
+};
+if(new URLSearchParams(location.search).get('archive')==='1')window.addEventListener('load',()=>setTimeout(()=>openRemainingRecordsArchive('kindergarten'),600),{once:true});
+})();
 </script>
 </body>
 </html>

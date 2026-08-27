@@ -161,7 +161,7 @@
     </nav>
 
     <!-- Main Content Area -->
-    <main class="flex-grow container mx-auto px-4 py-6">
+    <main class="flex-grow container mx-auto px-4 py-6"><div class="container mx-auto px-4 pt-3 print:hidden"><button onclick="openHealthSemesterArchive()" class="px-4 py-2 rounded-xl bg-slate-700 text-white text-xs font-bold">🗃️ أرشيف السجلات الصحية حسب الفصل</button></div>
 
         <!-- Tab 1: Dashboard -->
         <section id="sect-dashboard" class="tab-content block space-y-6">
@@ -1020,7 +1020,8 @@
         
         // Save Visit
         async function archiveHealthRecord(folderId,record,title){
-            const result=await RemainingRoleRecordsArchiveEngine.save('health',{folderId,title:title||'سجل صحي',baseName:(record&&(record.name||record.title||record.destination))||title||'سجل صحي',source:'school_health_unified_registry',data:JSON.parse(JSON.stringify(record||{}))});
+            const ctx=RemainingRoleRecordsArchiveEngine.activeAcademicContext();
+            const result=await RemainingRoleRecordsArchiveEngine.save('health',{folderId,title:title||'سجل صحي',baseName:(record&&(record.name||record.title||record.destination))||title||'سجل صحي',academicYear:ctx.academicYear,semester:ctx.semester,source:'school_health_unified_registry',data:JSON.parse(JSON.stringify(record||{}))});
             return result;
         }
 
@@ -1687,5 +1688,25 @@
 
 <!-- PRIVATE_EDITION_BUILD_RUNTIME -->
 <script src="private-school-runtime.js"></script>
+
+<script id="HEALTH_SEMESTER_ARCHIVE_V2">
+(function(){
+function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+window.openHealthSemesterArchive=function(){
+ const role='health',cfg=RemainingRoleRecordsArchiveEngine.config.health,ctx=RemainingRoleRecordsArchiveEngine.activeAcademicContext();
+ document.getElementById('healthSemesterArchiveModal')?.remove();
+ const all=RemainingRoleRecordsArchiveEngine.all(role),years=[...new Set(all.map(x=>RemainingRoleRecordsArchiveEngine.normalizeYear(x.academicYear||x.year)))].filter(Boolean).sort().reverse();
+ if(!years.includes(ctx.academicYear))years.unshift(ctx.academicYear);
+ const m=document.createElement('div');m.id='healthSemesterArchiveModal';m.dir='rtl';m.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:999999;padding:22px;overflow:auto';
+ m.innerHTML='<div style="max-width:1100px;margin:auto;background:#f8fafc;border-radius:22px;padding:18px"><div style="display:flex;justify-content:space-between"><div><h2 style="margin:0">🗃️ أرشيف السجلات الصحية</h2><small>الفصل الحالي افتراضيًا مع إمكانية الرجوع للفصول السابقة.</small></div><button id="hsClose">إغلاق</button></div><div style="display:flex;gap:10px;margin:14px 0"><select id="hsYear">'+years.map(y=>'<option '+(y===ctx.academicYear?'selected':'')+'>'+esc(y)+'</option>').join('')+'</select><select id="hsSem"></select></div><div id="hsFolders" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px"></div><div id="hsList"></div></div>';
+ document.body.appendChild(m);m.querySelector('#hsClose').onclick=()=>m.remove();
+ const y=m.querySelector('#hsYear'),s=m.querySelector('#hsSem'),fb=m.querySelector('#hsFolders'),list=m.querySelector('#hsList');
+ function semesters(){const ss=[...new Set(all.filter(x=>RemainingRoleRecordsArchiveEngine.normalizeYear(x.academicYear||x.year)===y.value).map(x=>RemainingRoleRecordsArchiveEngine.normalizeSemester(x.semester||x.term)))];if(y.value===ctx.academicYear&&!ss.includes(ctx.semester))ss.unshift(ctx.semester);s.innerHTML=ss.map(x=>'<option '+(x===ctx.semester?'selected':'')+'>'+esc(x)+'</option>').join('');render()}
+ function render(){fb.innerHTML=cfg.catalog.map(f=>{const n=RemainingRoleRecordsArchiveEngine.list(role,f.id,{academicYear:y.value,semester:s.value}).length;return '<button data-f="'+esc(f.id)+'" style="padding:14px;border:1px solid #d1fae5;border-radius:14px;background:#fff;text-align:right"><b>'+esc(f.name)+'</b><div>'+n+' سجل — '+esc(s.value)+'</div></button>'}).join('');list.innerHTML='';fb.querySelectorAll('[data-f]').forEach(b=>b.onclick=function(){const fid=this.getAttribute('data-f'),rows=RemainingRoleRecordsArchiveEngine.list(role,fid,{academicYear:y.value,semester:s.value});list.innerHTML=rows.length?rows.slice().reverse().map(r=>'<div style="background:#fff;padding:11px;margin:8px 0;border-radius:12px;border:1px solid #e2e8f0"><b>'+esc(r.displayName||r.title)+'</b><div style="font-size:10px;color:#64748b">'+esc(r.createdAt||'')+'</div></div>').join(''):'<div style="padding:24px;text-align:center">لا توجد سجلات في هذا الفصل.</div>'})}
+ y.onchange=semesters;s.onchange=render;semesters();
+};
+})();
+</script>
+
 </body>
 </html>
