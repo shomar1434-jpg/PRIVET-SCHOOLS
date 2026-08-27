@@ -1875,8 +1875,6 @@ body{overflow-x:hidden}
 @media(max-width:768px){#topAiCenterIcon,#studentAdvisorAiCenterBtn,#aiCenterBtn,.ai-center-floating,.ai-center-trigger{width:52px!important;height:52px!important;border-radius:16px!important;left:9px!important;bottom:9px!important}}
 @media print{#topAiCenterIcon,#studentAdvisorAiCenterBtn,#aiCenterBtn,.ai-center-floating,.ai-center-trigger{display:none!important}}
 </style>
-<script src="platform-cloud-session.js?v=20260818-session-v12"></script>
-<script src="cloud-file-engine.js"></script>
 <script src="independent-school-persistence-core.js?v=20260825-persistence-v1"></script>
 </head>
 <body data-ss-role="teacher" class="global-app-bg">
@@ -3489,8 +3487,6 @@ body{overflow-x:hidden}
 <body>
 <div id="portfolio-root">${portfolioHTML}</div>
 
-<script src="archive-save-integrity.js?v=20260826-archive-integrity1"></script>
-<script src="performance-report-save-integrity.js?v=20260826-performance-integrity5"></script>
 </body>
 </html>`);
             printWindow.document.close();
@@ -4894,6 +4890,11 @@ window.addEventListener('load',function(){
 })();
 </script>
 
+<script>window.CLOUD_STATE_CONFIG={moduleKey:"performance_reports_teacher",scope:"school",keys:["reports_archive","category_goals","archive_folder_goals"]};</script>
+<script src="platform-cloud-session.js?v=20260818-session-v12"></script>
+<script src="platform-state-engine.js"></script>
+<script src="platform-persistence-guard.js"></script>
+<script src="performance-report-archive-engine.js?v=20260827-domain-folder-v6"></script>
 <script src="performance-file-engine.js"></script>
 <script src="section-dashboard-safe-fix.js"></script>
 </body>

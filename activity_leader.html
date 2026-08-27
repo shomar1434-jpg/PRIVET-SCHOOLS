@@ -1765,8 +1765,6 @@ body[data-ss-role="activity-leader"] #ssDataAnalysis,
 body[data-ss-role="activity-leader"] [title*="تحليل البيانات"],
 body[data-ss-role="activity-leader"] [aria-label*="تحليل البيانات"]{display:none!important;}
 </style>
-<script src="platform-cloud-session.js?v=20260818-session-v12"></script>
-<script src="cloud-file-engine.js"></script>
 <script src="independent-school-persistence-core.js?v=20260825-persistence-v1"></script>
 </head>
 <body data-ss-role="activity-leader" class="global-app-bg">
@@ -3454,8 +3452,6 @@ body{overflow-x:hidden}
 
 
 <!-- ACTIVITY_LEADER_GOALS_UPDATED_2026_05_26: المجالات والأهداف الوظيفية/الأدائية والتفصيلية لرائد/ة النشاط محدثة من ملف المستخدم. -->
-<script src="archive-save-integrity.js?v=20260826-archive-integrity1"></script>
-<script src="performance-report-save-integrity.js?v=20260826-performance-integrity5"></script>
 </body></html>`);
             printWindow.document.close();
             setTimeout(() => { loader.classList.add('hidden'); showToast("تم تجهيز مسودة ملف الإنجاز المهني كملف واحد ✅"); }, 1800);
@@ -5273,15 +5269,9 @@ function showFinalApproval(){var t=val('meetTitle')||'محضر اجتماع', li
   function docForRecord(r, autoPrint){
     var doc = r.htmlContent && r.htmlContent.indexOf('<!DOCTYPE html') !== -1
       ? r.htmlContent
-      : '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>'+esc(r.title||'سجل')+'</title><style>@page{size:A4;margin:8mm}body{font-family:Tajawal,Arial,sans-serif;background:white}</style><style id="ss-code-flash-guard">body{overflow-x:hidden}.safe-hidden-deactivate{display:none!important}</style></head><body>'+ (r.htmlContent||'<pre>'+esc(r.summary||'')+'</pre>') + '
-<!-- ACTIVITY_LEADER_GOALS_UPDATED_2026_05_26: المجالات والأهداف الوظيفية/الأدائية والتفصيلية لرائد/ة النشاط محدثة من ملف المستخدم. -->
-</body></html>';
+      : '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>'+esc(r.title||'سجل')+'</title><style>@page{size:A4;margin:8mm}body{font-family:Tajawal,Arial,sans-serif;background:white}</style><style id="ss-code-flash-guard">body{overflow-x:hidden}.safe-hidden-deactivate{display:none!important}</style></head><body>'+ (r.htmlContent||'<pre>'+esc(r.summary||'')+'</pre>') + '</body></html>';
     if(autoPrint && doc.indexOf('window.print')===-1){
-      doc = doc.replace('
-<!-- ACTIVITY_LEADER_GOALS_UPDATED_2026_05_26: المجالات والأهداف الوظيفية/الأدائية والتفصيلية لرائد/ة النشاط محدثة من ملف المستخدم. -->
-</body>','<script>window.onload=function(){setTimeout(function(){window.print()},500)}<\/script>
-<!-- ACTIVITY_LEADER_GOALS_UPDATED_2026_05_26: المجالات والأهداف الوظيفية/الأدائية والتفصيلية لرائد/ة النشاط محدثة من ملف المستخدم. -->
-</body>');
+      doc = doc.replace('</body>','<script>window.onload=function(){setTimeout(function(){window.print()},500)}<\/script></body>');
     }
     return doc;
   }
@@ -5646,6 +5636,11 @@ window.addEventListener('load',function(){
 })();
 </script>
 
+<script>window.CLOUD_STATE_CONFIG={moduleKey:"performance_reports_activity_leader",scope:"school",keys:["reports_archive","category_goals","archive_folder_goals"]};</script>
+<script src="platform-cloud-session.js?v=20260818-session-v12"></script>
+<script src="platform-state-engine.js"></script>
+<script src="platform-persistence-guard.js"></script>
+<script src="performance-report-archive-engine.js?v=20260827-domain-folder-v6"></script>
 <script src="performance-file-engine.js"></script>
 <script src="section-dashboard-safe-fix.js"></script>
 

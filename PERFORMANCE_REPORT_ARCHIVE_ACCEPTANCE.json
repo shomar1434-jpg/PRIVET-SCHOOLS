@@ -1,0 +1,198 @@
+{
+  "status": "PASS",
+  "root_cause": [
+    "دوال الحفظ القديمة كانت تعتمد category فقط، من دون folderId/folderName صريحين، لذلك لم يكن ربط التقرير بمجلد المجال موحدًا بين الأرشيف ومحرك ملف الأداء.",
+    "عند وجود currentEditingId لا يقابل سجلاً فعليًا كانت بعض الدوال تنفذ idx=-1 ولا تضيف التقرير، ثم تعرض رسالة نجاح رغم عدم وجود التقرير.",
+    "واجهات المعلم والوكيل والموجه الطلابي ورائد النشاط لم تكن تحمل PlatformStateEngine/PlatformPersistenceGuard في مسار تقارير الأداء، لذلك لم يكن ممكناً إجراء تحقق سحابي صريح بعد الحفظ."
+  ],
+  "acceptance_tests": [
+    {
+      "role": "teacher",
+      "key": "reports_archive",
+      "folder": "أداء الواجبات الوظيفية",
+      "firstSave": true,
+      "edit": true,
+      "missingIdUpsert": true,
+      "cloudMatch": true
+    },
+    {
+      "role": "agent",
+      "key": "school_reports",
+      "folder": "أداء الواجبات الوظيفية",
+      "firstSave": true,
+      "edit": true,
+      "missingIdUpsert": true,
+      "cloudMatch": true
+    },
+    {
+      "role": "student_advisor",
+      "key": "reports_archive",
+      "folder": "أداء الواجبات الوظيفية",
+      "firstSave": true,
+      "edit": true,
+      "missingIdUpsert": true,
+      "cloudMatch": true
+    },
+    {
+      "role": "activity_leader",
+      "key": "reports_archive",
+      "folder": "أداء الواجبات الوظيفية",
+      "firstSave": true,
+      "edit": true,
+      "missingIdUpsert": true,
+      "cloudMatch": true
+    },
+    {
+      "role": "health_advisor",
+      "key": "reports_archive",
+      "folder": "أداء الواجبات الوظيفية",
+      "firstSave": true,
+      "edit": true,
+      "missingIdUpsert": true,
+      "cloudMatch": true
+    },
+    {
+      "role": "kindergarten_teacher",
+      "key": "reports_archive",
+      "folder": "أداء الواجبات الوظيفية",
+      "firstSave": true,
+      "edit": true,
+      "missingIdUpsert": true,
+      "cloudMatch": true
+    },
+    {
+      "role": "manager",
+      "key": "school_reports",
+      "folder": "أداء الواجبات الوظيفية",
+      "firstSave": true,
+      "edit": true,
+      "missingIdUpsert": true,
+      "cloudMatch": true
+    }
+  ],
+  "static_checks": [
+    {
+      "file": "teacher.html",
+      "select_values": 11,
+      "category_ids": 11,
+      "engine": true,
+      "cloud_guard": true
+    },
+    {
+      "file": "agent.html",
+      "select_values": 0,
+      "category_ids": 0,
+      "engine": true,
+      "cloud_guard": true
+    },
+    {
+      "file": "student_advisor.html",
+      "select_values": 15,
+      "category_ids": 0,
+      "engine": true,
+      "cloud_guard": true
+    },
+    {
+      "file": "activity_leader.html",
+      "select_values": 15,
+      "category_ids": 0,
+      "engine": true,
+      "cloud_guard": true
+    },
+    {
+      "file": "health_advisor.html",
+      "select_values": 14,
+      "category_ids": 14,
+      "engine": true,
+      "cloud_guard": true
+    },
+    {
+      "file": "kindergarten_teacher.html",
+      "select_values": 19,
+      "category_ids": 19,
+      "engine": true,
+      "cloud_guard": true
+    },
+    {
+      "file": "manager.html",
+      "select_values": 0,
+      "category_ids": 0,
+      "engine": true,
+      "cloud_guard": true
+    }
+  ],
+  "tested_operations": [
+    "new save",
+    "folder association",
+    "archive filter visibility",
+    "edit same report without duplicate",
+    "stale editing id upsert",
+    "cloud state exact-match verification"
+  ],
+  "changed_files": [
+    "performance-report-archive-engine.js",
+    "teacher.html",
+    "agent.html",
+    "student_advisor.html",
+    "activity_leader.html",
+    "health_advisor.html",
+    "kindergarten_teacher.html",
+    "manager.html"
+  ],
+  "script_validation": {
+    "teacher.html": {
+      "checked_executable_scripts": 9,
+      "skipped_non_js": [],
+      "failures": []
+    },
+    "agent.html": {
+      "checked_executable_scripts": 14,
+      "skipped_non_js": [
+        [
+          18,
+          "text/plain"
+        ]
+      ],
+      "failures": []
+    },
+    "student_advisor.html": {
+      "checked_executable_scripts": 16,
+      "skipped_non_js": [],
+      "failures": []
+    },
+    "activity_leader.html": {
+      "checked_executable_scripts": 16,
+      "skipped_non_js": [],
+      "failures": []
+    },
+    "health_advisor.html": {
+      "checked_executable_scripts": 15,
+      "skipped_non_js": [],
+      "failures": []
+    },
+    "kindergarten_teacher.html": {
+      "checked_executable_scripts": 14,
+      "skipped_non_js": [],
+      "failures": []
+    },
+    "manager.html": {
+      "checked_executable_scripts": 22,
+      "skipped_non_js": [],
+      "failures": []
+    }
+  },
+  "supabase_acceptance": {
+    "project": "okjwdzvnqsdetxdsvdgr",
+    "table": "platform_module_state",
+    "tested_payload": {
+      "state_key": "reports_archive",
+      "category": "واجبات",
+      "folderId": "واجبات",
+      "folderName": "أداء الواجبات الوظيفية"
+    },
+    "insert_verified": true,
+    "cleanup_verified": true,
+    "remaining_test_rows": 0
+  },
+  "additional_fix": "تم إصلاح كسر JavaScript موجود مسبقًا داخل Activity Leader archive engine نتج عن تعليق HTML أُدخل داخل سلسلة JavaScript؛ تم فحص السكربت بعد التصحيح."
+}

@@ -4843,7 +4843,6 @@ document.addEventListener("click", function(e){
 </head><body>${editor.innerHTML}\n
 <!-- SCHOOL COMMAND CENTER M1-M4 -->
 
-<script src="performance-report-save-integrity.js?v=20260826-performance-integrity5"></script>
 </body></html>`;
       record.file = new Blob([htmlDoc], {type:'application/msword'});
       if(!/\.doc$/i.test(record.name)) record.name = record.name.replace(/\.(docx|doc)$/i,'') + '_معدل.doc';
@@ -5336,6 +5335,7 @@ function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', ensureUI); else ensureUI();
 })();
 </script>
+<script src="performance-report-archive-engine.js?v=20260827-domain-folder-v6"></script>
 <script src="performance-file-engine.js"></script>
 <script defer="" src="improvement_plan_follow.js"></script>
 <script defer="" src="active_school_scope.js"></script>
@@ -5636,14 +5636,7 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
     }
     return [];
   }
-  function writeArray(key,arr){
-    try{
-      localStorage.setItem(key,JSON.stringify(arr||[]));
-      if(window.ArchiveSaveIntegrity){
-        Promise.resolve(ArchiveSaveIntegrity.verifyKey(key)).catch(function(e){console.warn('[ManagerArchive] cloud verification failed',key,e&&e.message||e);});
-      }
-    }catch(e){console.error('[ManagerArchive] save failed',key,e);}
-  }
+  function writeArray(key,arr){try{localStorage.setItem(key,JSON.stringify(arr||[]));}catch(e){}}
   function folderById(list,id){return list.find(function(f){return String(f.id)===String(id);})||list[0]||{id:'other',name:'أرشيف'};}
   function normalize(s){return String(s||'').replace(/سجل|ملف|أرشيف/g,'').replace(/\s+/g,' ').trim();}
   function folderByName(list,name){
@@ -5763,7 +5756,6 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
         +'<button data-decision-edit="'+id+'" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">تعديل</button>'
         +'<button data-decision-preview="'+id+'" class="bg-teal-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">معاينة</button>'
         +'<button data-decision-print="'+id+'" class="bg-slate-700 text-white px-4 py-2 rounded-xl text-[10px] font-bold">طباعة</button>'
-        +'<button data-decision-send="'+id+'" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold">إرسال للمكلف</button>'
         +'<button data-decision-delete="'+id+'" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl text-[10px] font-bold">حذف</button>'
         +'</div></div>';
     }).join('');
@@ -5775,11 +5767,6 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
     });
     host.querySelectorAll('[data-decision-print]').forEach(function(x){
       x.onclick=function(){previewDecisionCloudArchiveItem(this.getAttribute('data-decision-print'),true);};
-    });
-    host.querySelectorAll('[data-decision-send]').forEach(function(x){
-      x.onclick=function(){
-        location.href='administrative_assignment_decisions.html?editFileId='+encodeURIComponent(this.getAttribute('data-decision-send'))+'&sendToAssignee=1';
-      };
     });
     host.querySelectorAll('[data-decision-delete]').forEach(function(x){
       x.onclick=function(){deleteDecisionCloudArchiveItem(this.getAttribute('data-decision-delete'));};
@@ -5947,7 +5934,6 @@ window.addEventListener('storage',function(e){if(String(e.key||'').match(/report
 <script src="multi_school_switcher.js"></script>
 <script src="cloud-file-engine.js"></script>
 <script src="independent-school-persistence-core.js?v=20260825-persistence-v1"></script>
-<script src="archive-save-integrity.js?v=20260826-archive-integrity1"></script>
 <script src="cloud-file-bootstrap.js"></script>
 <script src="cloud-upload-hub.js"></script>
 <script src="cloud-file-auto-sync.js"></script>
