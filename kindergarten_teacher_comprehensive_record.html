@@ -536,6 +536,12 @@
                     localStorage.setItem('followup_classes_v3', JSON.stringify(this.classes));
                     localStorage.setItem('followup_global_v3', JSON.stringify(this.globalMetadata));
                 },
+                async archiveCurrentClassRecord(folderId) {
+                    this.saveData();const c=this.activeClass;if(!c){this.showNotification('لا يوجد صف/مجموعة نشطة لحفظ السجل.');return false}
+                    const titleMap={attendance:"كشف متابعة غياب الأطفال",participation:"سجل المشاركة والتفاعل",student_work:"سجل أعمال الأطفال"};
+                    try{const result=await RemainingRoleRecordsArchiveEngine.save('kindergarten',{folderId,title:titleMap[folderId]||'سجل',classId:c.id||'',className:this.classDisplayName(c),baseName:this.classDisplayName(c),academicYear:this.globalMetadata.year||'',semester:this.globalMetadata.semester||'',subject:c.subject||'',teacher:c.teacher||'',source:'comprehensive_record',data:JSON.parse(JSON.stringify(c))});this.showNotification('تم حفظ السجل والتحقق من مجلد «'+result.record.folderName+'»'+(result.cloud?' والمزامنة السحابية ✅':' ✅'));return true}catch(e){console.error(e);this.showNotification('لم يكتمل حفظ السجل في الأرشيف: '+(e?.message||e));return false}
+                },
+
 
                 // Notification Alerts Engine
                 showNotification(message, type = 'success') {
@@ -1226,9 +1232,10 @@
 <link rel="stylesheet" href="premium-ui.css">
 <script defer src="premium-ui.js"></script>
 
-<script>window.CLOUD_STATE_CONFIG={moduleKey:'teacher_comprehensive',scope:'user',keys:['followup_global_v3', 'followup_classes_v3'],prefixes:[]};</script>
+<script>window.CLOUD_STATE_CONFIG={moduleKey:'teacher_comprehensive',scope:'user',keys:['followup_global_v3', 'followup_classes_v3', 'kindergarten_teacher_records_archive_v1'],prefixes:[]};</script>
 <script src="platform-state-engine.js"></script>
 <script src="platform-persistence-guard.js"></script>
+<script src="remaining-role-records-archive-engine.js?v=20260827-remaining-records-v1"></script>
 <script defer src="school-base-settings-source.js"></script>
 <style id="uw-verified-back-style">
 .uw-verified-title-back{display:inline-flex!important;align-items:center!important;justify-content:center!important;vertical-align:middle!important;margin-inline-end:10px!important;width:36px!important;height:36px!important;border-radius:11px!important;background:#f1f5f9!important;color:#0f766e!important;border:1px solid #cbd5e1!important;text-decoration:none!important;font-size:20px!important;font-weight:900!important}
@@ -1413,6 +1420,8 @@
             </button>
         </div>
     </section>
+
+    <section class="bg-white border-b border-slate-200 px-4 py-3 print:hidden"><div class="container mx-auto flex flex-wrap gap-2 items-center justify-between"><div class="text-xs font-bold text-slate-500">الحفظ في أرشيف السجلات حسب نوع السجل</div><div class="flex flex-wrap gap-2"><button @click="archiveCurrentClassRecord('attendance')" class="px-3 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold">حفظ كشف متابعة غياب الأطفال</button><button @click="archiveCurrentClassRecord('participation')" class="px-3 py-2 rounded-xl bg-purple-600 text-white text-xs font-bold">حفظ سجل المشاركة والتفاعل</button><button @click="archiveCurrentClassRecord('student_work')" class="px-3 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold">حفظ سجل أعمال الأطفال</button><button type="button" onclick="openRemainingRecordsArchive('kindergarten')" class="px-3 py-2 rounded-xl bg-slate-700 text-white text-xs font-bold">🗃️ فتح أرشيف السجلات</button></div></div></section>
 
     <!-- =========================================================================
          NAVIGATION TAB BAR
@@ -2579,5 +2588,9 @@
 
 <!-- PRIVATE_EDITION_BUILD_RUNTIME -->
 <script src="private-school-runtime.js"></script>
+
+<script id="KINDERGARTEN_RECORDS_ARCHIVE_VIEW_V1">
+(function(){function esc(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}window.openRemainingRecordsArchive=function(role){const cfg=RemainingRoleRecordsArchiveEngine.config[role];if(!cfg)return;document.getElementById('remainingRecordsArchiveModal')?.remove();const m=document.createElement('div');m.id='remainingRecordsArchiveModal';m.dir='rtl';m.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.58);z-index:2147483000;padding:24px;overflow:auto';const all=RemainingRoleRecordsArchiveEngine.list(role);m.innerHTML='<div style="max-width:1100px;margin:auto;background:#f8fafc;border-radius:24px;padding:18px;font-family:Tajawal,Arial"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;color:#0f766e">🗃️ أرشيف السجلات</h2><button id="rrClose" style="border:0;padding:9px 13px;border-radius:10px">إغلاق</button></div><div id="rrFolders" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:16px"></div><div id="rrList" style="margin-top:16px"></div></div>';document.body.appendChild(m);m.querySelector('#rrClose').onclick=()=>m.remove();const folders=m.querySelector('#rrFolders'),list=m.querySelector('#rrList');folders.innerHTML=cfg.catalog.map(f=>{const n=all.filter(x=>x.folderId===f.id).length;return '<button data-f="'+esc(f.id)+'" style="background:#fff;border:1px solid #dbeafe;border-radius:16px;padding:15px;text-align:right"><b>'+esc(f.name)+'</b><div style="font-size:11px;color:#64748b">'+n+' سجل</div></button>'}).join('');folders.querySelectorAll('[data-f]').forEach(b=>b.onclick=function(){const fid=this.getAttribute('data-f'),f=cfg.catalog.find(x=>x.id===fid),rows=RemainingRoleRecordsArchiveEngine.list(role,fid);list.innerHTML='<h3>'+esc(f?.name||'')+'</h3>'+(rows.length?rows.slice().reverse().map(r=>'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px;margin:8px 0"><b>'+esc(r.displayName||r.title)+'</b><div style="font-size:10px;color:#64748b">'+esc(r.updatedAt||r.createdAt||'')+'</div></div>').join(''):'<div style="padding:25px;text-align:center;color:#94a3b8">لا توجد سجلات.</div>')})};if(new URLSearchParams(location.search).get('archive')==='1')window.addEventListener('load',()=>setTimeout(()=>openRemainingRecordsArchive('kindergarten'),600),{once:true})})();
+</script>
 </body>
 </html>

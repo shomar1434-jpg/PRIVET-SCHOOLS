@@ -77,11 +77,12 @@
 <link rel="stylesheet" href="premium-ui.css">
 <script defer src="premium-ui.js"></script>
 
-<script>window.CLOUD_STATE_CONFIG={moduleKey:'school_health',scope:'school',keys:['sh_clinicVisits', 'sh_chronicCases', 'sh_envInspections', 'sh_healthPrograms', 'sh_medicalTransfers'],prefixes:['sh_meta_']};</script>
+<script>window.CLOUD_STATE_CONFIG={moduleKey:'school_health',scope:'school',keys:['sh_clinicVisits', 'sh_chronicCases', 'sh_envInspections', 'sh_healthPrograms', 'sh_medicalTransfers', 'health_advisor_records_archive_v1'],prefixes:['sh_meta_']};</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-bridge.js"></script>
 <script src="platform-state-engine.js"></script>
 <script src="platform-persistence-guard.js"></script>
+<script src="remaining-role-records-archive-engine.js?v=20260827-remaining-records-v1"></script>
 <script defer src="school-base-settings-source.js"></script>
 <link rel="stylesheet" href="responsive-layout.css?v=20260818-responsive-1">
 <link rel="stylesheet" href="private-ui-system.css?v=20260820-uiux2"></head>
@@ -1018,7 +1019,12 @@
 
         
         // Save Visit
-        function saveNewVisit(e) {
+        async function archiveHealthRecord(folderId,record,title){
+            const result=await RemainingRoleRecordsArchiveEngine.save('health',{folderId,title:title||'سجل صحي',baseName:(record&&(record.name||record.title||record.destination))||title||'سجل صحي',source:'school_health_unified_registry',data:JSON.parse(JSON.stringify(record||{}))});
+            return result;
+        }
+
+        async function saveNewVisit(e) {
             e.preventDefault();
             const newVisit = {
                 id: 'v_' + Date.now(),
@@ -1036,13 +1042,14 @@
 
             clinicVisits.unshift(newVisit); // Add new to start
             persistState();
+            await archiveHealthRecord('clinic',newVisit,'السجل الصحي الشامل');
             closeModal('modal-visit');
             e.target.reset();
-            showToast("تم حفظ الحالة الصحية بنجاح ⚕️");
+            showToast("تم حفظ الحالة الصحية والتحقق من أرشيف السجلات ⚕️");
         }
 
         // Save Chronic disease
-        function saveNewChronic(e) {
+        async function saveNewChronic(e) {
             e.preventDefault();
             let finalDisease = document.getElementById('chr-disease').value;
             if (finalDisease === 'أخرى') {
@@ -1063,14 +1070,15 @@
 
             chronicCases.unshift(newChronic);
             persistState();
+            await archiveHealthRecord('chronic',newChronic,'الحالات المزمنة والمعدية');
             closeModal('modal-chronic');
             e.target.reset();
             document.getElementById('custom-disease-container').classList.add('hidden');
-            showToast("تم حصر الحالة الصحية الخاصة وحفظها بنجاح 📋");
+            showToast("تم حفظ الحالة الصحية الخاصة والتحقق من الأرشيف 📋");
         }
 
         // Save Inspection
-        function saveNewEnv(e) {
+        async function saveNewEnv(e) {
             e.preventDefault();
             const newEnv = {
                 id: 'e_' + Date.now(),
@@ -1084,13 +1092,14 @@
 
             envInspections.unshift(newEnv);
             persistState();
+            await archiveHealthRecord('environment',newEnv,'البيئة الصحية المدرسية');
             closeModal('modal-env');
             e.target.reset();
-            showToast("تم توثيق متابعة البيئة الصحية المدرسية 🍏");
+            showToast("تم حفظ متابعة البيئة الصحية والتحقق من الأرشيف 🍏");
         }
 
         // Save Program
-        function saveNewProgram(e) {
+        async function saveNewProgram(e) {
             e.preventDefault();
             const newProg = {
                 id: 'p_' + Date.now(),
@@ -1104,12 +1113,13 @@
 
             healthPrograms.unshift(newProg);
             persistState();
+            await archiveHealthRecord('programs',newProg,'البرامج الصحية');
             closeModal('modal-program');
             e.target.reset();
-            showToast("تم تسجيل البرنامج الصحي وحفظه 📢");
+            showToast("تم حفظ البرنامج الصحي والتحقق من الأرشيف 📢");
         }
 
-        function saveNewTransfer(e) {
+        async function saveNewTransfer(e) {
             e.preventDefault();
             const newTransfer = {
                 id: 't_' + Date.now(),
@@ -1125,9 +1135,10 @@
             };
             medicalTransfers.unshift(newTransfer);
             persistState();
+            await archiveHealthRecord('transfers',newTransfer,'التحويلات الطبية والطوارئ');
             closeModal('modal-transfer');
             e.target.reset();
-            showToast("تم حفظ التحويل الطبي/الحالة الطارئة 🚑");
+            showToast("تم حفظ التحويل الطبي والتحقق من الأرشيف 🚑");
         }
 
         function deleteRecord(arrayName, id, text = "العنصر") {
